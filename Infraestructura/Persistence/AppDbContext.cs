@@ -16,7 +16,6 @@ namespace Infraestructura.Persistence
         {
             
         }
-
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Categoria> Categorias { get; set; }
         public DbSet <Subasta> Subastas { get; set; }
@@ -24,7 +23,6 @@ namespace Infraestructura.Persistence
         public DbSet <Billetera> Billeteras { get; set; }
         public DbSet<AuditoriaLog> AuditoriaLogs {  get; set; }
         public DbSet< TransaccionLedger> TransaccionLedgers { get; set; }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -76,6 +74,7 @@ namespace Infraestructura.Persistence
                 .HasForeignKey(s=>s.CategoriaId)
                 .OnDelete(DeleteBehavior.Restrict);
             });
+
             modelBuilder.Entity<Puja>(entity =>
             {
                 entity.ToTable("Pujas");
@@ -94,8 +93,6 @@ namespace Infraestructura.Persistence
                     .HasForeignKey(p => p.CompradorId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
-
-
 
             modelBuilder.Entity<Billetera>(entity =>
             {
@@ -117,10 +114,6 @@ namespace Infraestructura.Persistence
 
             });
 
-
-
-
-
             modelBuilder.Entity<AuditoriaLog>(entity =>
             {
                 entity.ToTable("AuditoriaLogs");
@@ -135,12 +128,7 @@ namespace Infraestructura.Persistence
                     .WithMany(u => u.AuditoriaLogs)
                     .HasForeignKey(a => a.UsuarioId)
                     .OnDelete(DeleteBehavior.Restrict);
-
-
             });
-
-
-
 
             modelBuilder.Entity<TransaccionLedger>(entity =>
             {
@@ -160,14 +148,7 @@ namespace Infraestructura.Persistence
                     .WithMany(s => s.Transacciones)
                     .HasForeignKey(t => t.SubastaId)
                     .OnDelete(DeleteBehavior.Restrict);
-
             });
-
-
-
-
-            }
-
-
+        }
     }
 }
