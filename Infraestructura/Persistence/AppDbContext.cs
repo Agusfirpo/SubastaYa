@@ -101,7 +101,7 @@ namespace Infraestructura.Persistence
             {
 
                 entity.ToTable("Billeteras");
-                entity.HasKey(b = b.Id);
+                entity.HasKey(b => b.Id);
                 entity.Property(b => b.Id).ValueGeneratedOnAdd();
                 entity.Property(b => b.SaldoTotal).HasPrecision(18, 2).IsRequired();
                 entity.Property(b => b.SaldoRetenido).HasPrecision(18, 2).IsRequired();
@@ -115,7 +115,7 @@ namespace Infraestructura.Persistence
 
                 entity.HasIndex(b => b.UsuarioId).IsUnique();
 
-            }
+            });
 
 
 
@@ -132,12 +132,12 @@ namespace Infraestructura.Persistence
                 entity.Property(a => a.Fecha).IsRequired();
 
                 entity.HasOne(a => a.Usuario)
-                    .WithMany(u => u.Auditorias)
+                    .WithMany(u => u.AuditoriaLogs)
                     .HasForeignKey(a => a.UsuarioId)
                     .OnDelete(DeleteBehavior.Restrict);
 
 
-            }
+            });
 
 
 
@@ -161,7 +161,7 @@ namespace Infraestructura.Persistence
                     .HasForeignKey(t => t.SubastaId)
                     .OnDelete(DeleteBehavior.Restrict);
 
-            }
+            });
 
 
 
