@@ -21,6 +21,9 @@ namespace Infraestructura.Persistence
         public DbSet<Categoria> Categorias { get; set; }
         public DbSet <Subasta> Subastas { get; set; }
         public DbSet<Puja> Pujas { get; set; }
+        public DbSet <Billetera> Billeteras { get; set; }
+        public DbSet<AuditoriaLog> AuditoriaLogs {  get; set; }
+        public DbSet< TransaccionLedger> TransaccionLedgers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -92,7 +95,78 @@ namespace Infraestructura.Persistence
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
-        }
+
+
+            modelBuilder.Entity<Billetera>(entity =>
+            {
+
+                entity.ToTable("Billeteras");
+                entity.HasKey(b = b.Id);
+                entity.Property(b => b.Id).ValueGeneratedOnAdd();
+                entity.Property(b => b.SaldoTotal).HasPrecision(18, 2).IsRequired();
+                entity.Property(b => b.SaldoRetenido).HasPrecision(18, 2).IsRequired();
+                entity.Property(b => b.SaldoDisponible).HasPrecision(18, 2);
+                entity.Property(b => b.Version).IsConcurrencyToken();
+
+                entity.HasOne(b => b.Usuario)
+                .WithOne(u => u.Billetera)
+                .HasForeignKey<Billetera>(b => b.UsuarioId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(b => b.UsuarioId).IsUnique();
+
+            }
+
+
+
+
+
+            modelBuilder.Entity<AuditoriaLog>(entity =>
+            {
+                entity.ToTable("AuditoriaLogs");
+                entity.HasKey(a => a.Id);
+                entity.Property(a => a.Id).ValueGeneratedOnAdd();
+                entity.Property(a => a.Entidad).IsRequired().HasMaxLength(50);
+                entity.Property(a => a.Accion).IsRequired().HasMaxLength(100);
+                entity.Property(a => a.DetalleJson).HasColumnType("nvarchar(max)");
+                entity.Property(a => a.Fecha).IsRequired();
+
+                entity.HasOne(a => a.Usuario)
+                    .WithMany(u => u.Auditorias)
+                    .HasForeignKey(a => a.UsuarioId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+
+            }
+
+
+
+
+            modelBuilder.Entity<TransaccionLedger>(entity =>
+            {
+                entity.ToTable("TransaccionesLedger");
+                entity.HasKey(t => t.Id);
+                entity.Property(t => t.Id).ValueGeneratedOnAdd();
+                entity.Property(t => t.Tipo).HasConversion<string>().HasMaxLength(30).IsRequired();
+                entity.Property(t => t.Monto).HasPrecision(18, 2).IsRequired();
+                entity.Property(t => t.Fecha).IsRequired();
+
+                entity.HasOne(t => t.Billetera)
+                    .WithMany(b => b.Transacciones)
+                    .HasForeignKey(t => t.BilleteraId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(t => t.Subasta)
+                    .WithMany(s => s.Transacciones)
+                    .HasForeignKey(t => t.SubastaId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+            }
+
+
+
+
+            }
 
 
     }
