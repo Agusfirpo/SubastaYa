@@ -20,8 +20,8 @@ namespace Dominio.Entities
 
         public Billetera? Billetera { get; set; }
 
-        public IList<Subasta> subasta { get; set; }= new List<Subasta>();
-        public IList<Puja> Puja { get; set; }= new List<Puja>();
+        public IList<Subasta> Subastas { get; set; }= new List<Subasta>();
+        public IList<Puja> Pujas { get; set; }= new List<Puja>();
 
         public IList <AuditoriaLog> AuditoriaLogs { get; set; }= new List<AuditoriaLog>();
 
