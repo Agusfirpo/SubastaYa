@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dominio.Enums;
 
 namespace Dominio.Entities
 {
@@ -17,8 +18,6 @@ namespace Dominio.Entities
         public TipoTransaccion Tipo {  get; set; }
 
         public decimal Monto { get; set; }  
-
-        public decimal Monto {  set; get; }
 
         public DateTime Fecha { get; set; } 
 
