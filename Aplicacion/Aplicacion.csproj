@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="DTOs\" />
+    <Folder Include="Exceptions\" />
+    <Folder Include="Helpers\" />
+    <Folder Include="Interfaces\Handlers\" />
+    <Folder Include="Interfaces\Repositories\" />
+    <Folder Include="UseCases\Auditoria\Handler\" />
+    <Folder Include="UseCases\Auditoria\Command\" />
+    <Folder Include="UseCases\Auditoria\Queries\" />
+    <Folder Include="UseCases\Billetera\Command\" />
+    <Folder Include="UseCases\Billetera\Handler\" />
+    <Folder Include="UseCases\Billetera\Queries\" />
+    <Folder Include="UseCases\Categoria\Command\" />
+    <Folder Include="UseCases\Categoria\Handler\" />
+    <Folder Include="UseCases\Categoria\Queries\" />
+    <Folder Include="UseCases\Puja\Command\" />
+    <Folder Include="UseCases\Puja\Handler\" />
+    <Folder Include="UseCases\Puja\Queries\" />
+    <Folder Include="UseCases\Subasta\Command\" />
+    <Folder Include="UseCases\Subasta\Handler\" />
+    <Folder Include="UseCases\Subasta\Queries\" />
+    <Folder Include="UseCases\Transaccion\Command\" />
+    <Folder Include="UseCases\Transaccion\Handler\" />
+    <Folder Include="UseCases\Transaccion\Queries\" />
+    <Folder Include="UseCases\Usuario\Command\" />
+    <Folder Include="UseCases\Usuario\Handler\" />
+    <Folder Include="UseCases\Usuario\Queries\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.30" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.30" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.30">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.30" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.30">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dominio\Dominio.csproj" />
+  </ItemGroup>
+
+</Project>
