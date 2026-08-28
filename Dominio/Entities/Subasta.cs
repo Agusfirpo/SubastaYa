@@ -25,7 +25,7 @@ namespace Dominio.Entities
 
         public decimal IncrementoMinimo { get; set; }
 
-        public DateTime FechaIncio { get; set; }    
+        public DateTime FechaInicio { get; set; }    
 
         public DateTime FechaFin {  get; set; }
 

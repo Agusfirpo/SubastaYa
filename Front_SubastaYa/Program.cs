@@ -1,4 +1,5 @@
 using Front_SubastaYa;
+using Front_SubastaYa.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 

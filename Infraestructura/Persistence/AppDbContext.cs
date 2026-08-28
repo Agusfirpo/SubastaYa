@@ -59,7 +59,7 @@ namespace Infraestructura.Persistence
                 entity.Property(s => s.UrlImagen).HasMaxLength(500);
                 entity.Property(s => s.PrecioBase).HasPrecision(18, 2).IsRequired();
                 entity.Property(s => s.IncrementoMinimo).HasPrecision(18, 2).IsRequired();
-                entity.Property(s => s.FechaIncio).IsRequired();
+                entity.Property(s => s.FechaInicio).IsRequired();
                 entity.Property(s => s.FechaFin).IsRequired();
                 entity.Property(s => s.Estado).HasConversion<string>().HasMaxLength(20).IsRequired();
                 entity.Property(s => s.Version).IsConcurrencyToken();
@@ -102,7 +102,7 @@ namespace Infraestructura.Persistence
                 entity.Property(b => b.Id).ValueGeneratedOnAdd();
                 entity.Property(b => b.SaldoTotal).HasPrecision(18, 2).IsRequired();
                 entity.Property(b => b.SaldoRetenido).HasPrecision(18, 2).IsRequired();
-                entity.Property(b => b.SaldoDisponible).HasPrecision(18, 2);
+                entity.Ignore(b=> b.SaldoDisponible);
                 entity.Property(b => b.Version).IsConcurrencyToken();
 
                 entity.HasOne(b => b.Usuario)
