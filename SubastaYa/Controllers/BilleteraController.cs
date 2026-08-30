@@ -1,4 +1,6 @@
-﻿using Aplicacion.DTOs.Response;
+﻿using Aplicacion.DTOs.Request;
+using Aplicacion.DTOs.Response;
+using Aplicacion.UseCases.Billetera.Command;
 using Aplicacion.UseCases.Billetera.Handler;
 using Aplicacion.UseCases.Billetera.Queries;
 using Microsoft.AspNetCore.Mvc;
@@ -10,10 +12,11 @@ namespace SubastaYa.Controllers
     public class BilleteraController : ControllerBase
     {
         private readonly ObtenerBilleteraHandler _obtenerBilleteraHandler;
-
-        public BilleteraController(ObtenerBilleteraHandler obtenerBilleteraHandler)
+        private readonly AcreditarSaldoHandler _acreditarSaldoHandler;
+        public BilleteraController(ObtenerBilleteraHandler obtenerBilleteraHandler, AcreditarSaldoHandler acreditarSaldoHandler)
         {
             _obtenerBilleteraHandler = obtenerBilleteraHandler;
+            _acreditarSaldoHandler = acreditarSaldoHandler;
         }
 
         [HttpGet]
@@ -36,6 +39,38 @@ namespace SubastaYa.Controllers
             }
 
             return Ok(resultado);
+        }
+
+        [HttpPost("depositos")]
+        public async Task<ActionResult<BilleteraResponse>> AcreditarSaldo(int usuarioId, AcreditarSaldoRequest request)
+        {
+            try
+            {
+                var command = new AcreditarSaldoCommand
+                {
+                    UsuarioId = usuarioId,
+                    Monto = request.Monto
+                };
+
+                var resultado = await _acreditarSaldoHandler.Handle(command);
+
+                if (resultado == null)
+                {
+                    return NotFound(new
+                    {
+                        mensaje = "No se encontró la billetera del usuario."
+                    });
+                }
+
+                return Ok(resultado);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new
+                {
+                    mensaje = ex.Message
+                });
+            }
         }
     }
 }

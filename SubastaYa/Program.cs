@@ -1,6 +1,7 @@
 using Aplicacion.Interfaces.Repositories;
 using Aplicacion.UseCases.Billetera.Handler;
 using Aplicacion.UseCases.Categoria.Handler;
+using Aplicacion.UseCases.Puja.Handler;
 using Aplicacion.UseCases.Subasta.Handler;
 using Infraestructura.Persistence;
 using Infraestructura.Repositories;
@@ -24,17 +25,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>options.UseSqlServer(
 );
 
 //Builders
-
-builder.Services.AddScoped<IBilleteraRepository, BilleteraRepository>();
-builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
-builder.Services.AddScoped<ISubastaRepository, SubastaRepository>();
-
-
-builder.Services.AddScoped<ListarSubastasHandler>();
-builder.Services.AddScoped<CrearSubastaHandler>();
-builder.Services.AddScoped<ListarCategoriasHandler>();
-builder.Services.AddScoped<ObtenerBilleteraHandler>();
-
 
 
 var app = builder.Build();
