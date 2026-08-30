@@ -1,4 +1,7 @@
 using Aplicacion.Interfaces.Repositories;
+using Aplicacion.UseCases.Billetera.Handler;
+using Aplicacion.UseCases.Categoria.Handler;
+
 <<<<<<< HEAD
 using Aplicacion.UseCases.Subasta.Handler;
 =======
