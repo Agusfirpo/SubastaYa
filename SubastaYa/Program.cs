@@ -25,15 +25,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>options.UseSqlServer(
 
 //Builders
 
-builder.Services.AddScoped<IBilleteraRepository, BilleteraRepository>();
-builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
-builder.Services.AddScoped<ISubastaRepository, SubastaRepository>();
 
 
-builder.Services.AddScoped<ListarSubastasHandler>();
-builder.Services.AddScoped<CrearSubastaHandler>();
-builder.Services.AddScoped<ListarCategoriasHandler>();
-builder.Services.AddScoped<ObtenerBilleteraHandler>();
+
+
 
 
 
