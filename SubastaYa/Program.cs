@@ -1,13 +1,7 @@
 using Aplicacion.Interfaces.Repositories;
 using Aplicacion.UseCases.Billetera.Handler;
 using Aplicacion.UseCases.Categoria.Handler;
-
-<<<<<<< HEAD
 using Aplicacion.UseCases.Subasta.Handler;
-=======
-using Aplicacion.UseCases.Billetera.Handler;
-using Aplicacion.UseCases.Categoria.Handler;
->>>>>>> f24ca4abb52998d28df5d5a0c2173dd80ec193ab
 using Infraestructura.Persistence;
 using Infraestructura.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -41,11 +35,6 @@ builder.Services.AddScoped<CrearSubastaHandler>();
 builder.Services.AddScoped<ListarCategoriasHandler>();
 builder.Services.AddScoped<ObtenerBilleteraHandler>();
 
-builder.Services.AddScoped<ISubastaRepository, SubastaRepository>();
-
-
-builder.Services.AddScoped<ListarSubastasHandler>();
-builder.Services.AddScoped<CrearSubastaHandler>();
 
 
 var app = builder.Build();
