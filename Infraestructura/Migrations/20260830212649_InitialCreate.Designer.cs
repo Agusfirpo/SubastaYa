@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infraestructura.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260828184044_InitialCreate")]
+    [Migration("20260830212649_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -92,6 +92,40 @@ namespace Infraestructura.Migrations
                         .IsUnique();
 
                     b.ToTable("Billeteras", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            SaldoRetenido = 0m,
+                            SaldoTotal = 0m,
+                            UsuarioId = 1,
+                            Version = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            SaldoRetenido = 45000m,
+                            SaldoTotal = 150000m,
+                            UsuarioId = 2,
+                            Version = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            SaldoRetenido = 0m,
+                            SaldoTotal = 200000m,
+                            UsuarioId = 3,
+                            Version = 1
+                        },
+                        new
+                        {
+                            Id = 4,
+                            SaldoRetenido = 0m,
+                            SaldoTotal = 500m,
+                            UsuarioId = 4,
+                            Version = 1
+                        });
                 });
 
             modelBuilder.Entity("Dominio.Entities.Categoria", b =>
@@ -114,6 +148,32 @@ namespace Infraestructura.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categorias", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Nombre = "Tecnología",
+                            UrlIcono = "tech.png"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Nombre = "Coleccionables",
+                            UrlIcono = "col.png"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Nombre = "Indumentaria",
+                            UrlIcono = "ropa.png"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Nombre = "Vehículos",
+                            UrlIcono = "auto.png"
+                        });
                 });
 
             modelBuilder.Entity("Dominio.Entities.Puja", b =>
@@ -144,6 +204,32 @@ namespace Infraestructura.Migrations
                     b.HasIndex("SubastaId");
 
                     b.ToTable("Pujas", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CompradorId = 3,
+                            FechaPuja = new DateTime(2026, 8, 30, 11, 20, 0, 0, DateTimeKind.Unspecified),
+                            Monto = 35000m,
+                            SubastaId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CompradorId = 2,
+                            FechaPuja = new DateTime(2026, 8, 30, 11, 40, 0, 0, DateTimeKind.Unspecified),
+                            Monto = 45000m,
+                            SubastaId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CompradorId = 3,
+                            FechaPuja = new DateTime(2026, 8, 28, 12, 0, 0, 0, DateTimeKind.Unspecified),
+                            Monto = 25000m,
+                            SubastaId = 4
+                        });
                 });
 
             modelBuilder.Entity("Dominio.Entities.Subasta", b =>
@@ -205,6 +291,83 @@ namespace Infraestructura.Migrations
                     b.HasIndex("VendedorId");
 
                     b.ToTable("Subastas", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CategoriaId = 1,
+                            Descripcion = "Subasta activa estándar",
+                            Estado = "Activa",
+                            FechaFin = new DateTime(2026, 8, 30, 12, 30, 0, 0, DateTimeKind.Unspecified),
+                            FechaInicio = new DateTime(2026, 8, 30, 11, 0, 0, 0, DateTimeKind.Unspecified),
+                            IncrementoMinimo = 1000m,
+                            PrecioBase = 30000m,
+                            Titulo = "Notebook Pro",
+                            UrlImagen = "img1.png",
+                            VendedorId = 1,
+                            Version = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CategoriaId = 2,
+                            Descripcion = "Subasta crítica para probar anti-sniping",
+                            Estado = "Activa",
+                            FechaFin = new DateTime(2026, 8, 30, 12, 1, 0, 0, DateTimeKind.Unspecified),
+                            FechaInicio = new DateTime(2026, 8, 30, 10, 0, 0, 0, DateTimeKind.Unspecified),
+                            IncrementoMinimo = 500m,
+                            PrecioBase = 10000m,
+                            Titulo = "Reloj Antiguo",
+                            UrlImagen = "img2.png",
+                            VendedorId = 1,
+                            Version = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CategoriaId = 4,
+                            Descripcion = "Subasta programada",
+                            Estado = "Programada",
+                            FechaFin = new DateTime(2026, 9, 1, 12, 0, 0, 0, DateTimeKind.Unspecified),
+                            FechaInicio = new DateTime(2026, 8, 31, 12, 0, 0, 0, DateTimeKind.Unspecified),
+                            IncrementoMinimo = 50000m,
+                            PrecioBase = 1500000m,
+                            Titulo = "Auto Usado",
+                            UrlImagen = "img3.png",
+                            VendedorId = 1,
+                            Version = 1
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CategoriaId = 1,
+                            Descripcion = "Subasta vencida con ganador",
+                            Estado = "Activa",
+                            FechaFin = new DateTime(2026, 8, 29, 12, 0, 0, 0, DateTimeKind.Unspecified),
+                            FechaInicio = new DateTime(2026, 8, 27, 12, 0, 0, 0, DateTimeKind.Unspecified),
+                            IncrementoMinimo = 1000m,
+                            PrecioBase = 20000m,
+                            Titulo = "Monitor 24",
+                            UrlImagen = "img4.png",
+                            VendedorId = 1,
+                            Version = 1
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CategoriaId = 3,
+                            Descripcion = "Subasta vencida sin ofertas",
+                            Estado = "Activa",
+                            FechaFin = new DateTime(2026, 8, 28, 12, 0, 0, 0, DateTimeKind.Unspecified),
+                            FechaInicio = new DateTime(2026, 8, 25, 12, 0, 0, 0, DateTimeKind.Unspecified),
+                            IncrementoMinimo = 2000m,
+                            PrecioBase = 50000m,
+                            Titulo = "Campera Cuero",
+                            UrlImagen = "img5.png",
+                            VendedorId = 1,
+                            Version = 1
+                        });
                 });
 
             modelBuilder.Entity("Dominio.Entities.TransaccionLedger", b =>
@@ -240,6 +403,25 @@ namespace Infraestructura.Migrations
                     b.HasIndex("SubastaId");
 
                     b.ToTable("TransaccionesLedger", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            BilleteraId = 2,
+                            Fecha = new DateTime(2026, 8, 26, 12, 0, 0, 0, DateTimeKind.Unspecified),
+                            Monto = 150000m,
+                            Tipo = "Deposito"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            BilleteraId = 2,
+                            Fecha = new DateTime(2026, 8, 30, 11, 40, 0, 0, DateTimeKind.Unspecified),
+                            Monto = 45000m,
+                            SubastaId = 1,
+                            Tipo = "Retencion"
+                        });
                 });
 
             modelBuilder.Entity("Dominio.Entities.Usuario", b =>
@@ -274,6 +456,40 @@ namespace Infraestructura.Migrations
                         .IsUnique();
 
                     b.ToTable("Usuarios", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Email = "vendedor@test.com",
+                            FechaRegistro = new DateTime(2026, 8, 20, 12, 0, 0, 0, DateTimeKind.Unspecified),
+                            Nombre = "Vendedor",
+                            PasswordHash = "hash123"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Email = "comprador1@test.com",
+                            FechaRegistro = new DateTime(2026, 8, 25, 12, 0, 0, 0, DateTimeKind.Unspecified),
+                            Nombre = "Comprador 1",
+                            PasswordHash = "hash123"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Email = "comprador2@test.com",
+                            FechaRegistro = new DateTime(2026, 8, 28, 12, 0, 0, 0, DateTimeKind.Unspecified),
+                            Nombre = "Comprador 2",
+                            PasswordHash = "hash123"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Email = "sinfondos@test.com",
+                            FechaRegistro = new DateTime(2026, 8, 29, 12, 0, 0, 0, DateTimeKind.Unspecified),
+                            Nombre = "Sin Fondos",
+                            PasswordHash = "hash123"
+                        });
                 });
 
             modelBuilder.Entity("Dominio.Entities.AuditoriaLog", b =>

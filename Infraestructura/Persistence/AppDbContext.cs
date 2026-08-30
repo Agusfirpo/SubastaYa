@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Dominio.Entities;
+using Dominio.Enums;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Dominio.Entities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 
 namespace Infraestructura.Persistence
@@ -149,6 +150,167 @@ namespace Infraestructura.Persistence
                     .HasForeignKey(t => t.SubastaId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
+
+            // =========================
+            // SEED DATA
+            // =========================
+
+            var fechaBase = new DateTime(2026, 8, 30, 12, 0, 0);
+
+            // 1. Usuarios
+            modelBuilder.Entity<Usuario>().HasData(
+                new Usuario { Id = 1, Email = "vendedor@test.com", Nombre = "Vendedor", PasswordHash = "hash123", FechaRegistro = fechaBase.AddDays(-10) },
+                new Usuario { Id = 2, Email = "comprador1@test.com", Nombre = "Comprador 1", PasswordHash = "hash123", FechaRegistro = fechaBase.AddDays(-5) },
+                new Usuario { Id = 3, Email = "comprador2@test.com", Nombre = "Comprador 2", PasswordHash = "hash123", FechaRegistro = fechaBase.AddDays(-2) },
+                new Usuario { Id = 4, Email = "sinfondos@test.com", Nombre = "Sin Fondos", PasswordHash = "hash123", FechaRegistro = fechaBase.AddDays(-1) }
+            );
+
+            // 2. Billeteras
+            modelBuilder.Entity<Billetera>().HasData(
+                new Billetera { Id = 1, UsuarioId = 1, SaldoTotal = 0m, SaldoRetenido = 0m, Version = 1 },
+                new Billetera { Id = 2, UsuarioId = 2, SaldoTotal = 150000m, SaldoRetenido = 45000m, Version = 1 },
+                new Billetera { Id = 3, UsuarioId = 3, SaldoTotal = 200000m, SaldoRetenido = 0m, Version = 1 },
+                new Billetera { Id = 4, UsuarioId = 4, SaldoTotal = 500m, SaldoRetenido = 0m, Version = 1 }
+            );
+
+            // 3. Categorías
+            modelBuilder.Entity<Categoria>().HasData(
+                new Categoria { Id = 1, Nombre = "Tecnología", UrlIcono = "tech.png" },
+                new Categoria { Id = 2, Nombre = "Coleccionables", UrlIcono = "col.png" },
+                new Categoria { Id = 3, Nombre = "Indumentaria", UrlIcono = "ropa.png" },
+                new Categoria { Id = 4, Nombre = "Vehículos", UrlIcono = "auto.png" }
+            );
+
+            // 4. Subastas
+            modelBuilder.Entity<Subasta>().HasData(
+                new Subasta
+                {
+                    Id = 1,
+                    VendedorId = 1,
+                    CategoriaId = 1,
+                    Titulo = "Notebook Pro",
+                    Descripcion = "Subasta activa estándar",
+                    UrlImagen = "img1.png",
+                    PrecioBase = 30000m,
+                    IncrementoMinimo = 1000m,
+                    FechaInicio = fechaBase.AddHours(-1),
+                    FechaFin = fechaBase.AddMinutes(30),
+                    Estado = EstadoSubasta.Activa,
+                    Version = 1
+                },
+
+                new Subasta
+                {
+                    Id = 2,
+                    VendedorId = 1,
+                    CategoriaId = 2,
+                    Titulo = "Reloj Antiguo",
+                    Descripcion = "Subasta crítica para probar anti-sniping",
+                    UrlImagen = "img2.png",
+                    PrecioBase = 10000m,
+                    IncrementoMinimo = 500m,
+                    FechaInicio = fechaBase.AddHours(-2),
+                    FechaFin = fechaBase.AddMinutes(1),
+                    Estado = EstadoSubasta.Activa,
+                    Version = 1
+                },
+
+                new Subasta
+                {
+                    Id = 3,
+                    VendedorId = 1,
+                    CategoriaId = 4,
+                    Titulo = "Auto Usado",
+                    Descripcion = "Subasta programada",
+                    UrlImagen = "img3.png",
+                    PrecioBase = 1500000m,
+                    IncrementoMinimo = 50000m,
+                    FechaInicio = fechaBase.AddHours(24),
+                    FechaFin = fechaBase.AddHours(48),
+                    Estado = EstadoSubasta.Programada,
+                    Version = 1
+                },
+
+                new Subasta
+                {
+                    Id = 4,
+                    VendedorId = 1,
+                    CategoriaId = 1,
+                    Titulo = "Monitor 24",
+                    Descripcion = "Subasta vencida con ganador",
+                    UrlImagen = "img4.png",
+                    PrecioBase = 20000m,
+                    IncrementoMinimo = 1000m,
+                    FechaInicio = fechaBase.AddDays(-3),
+                    FechaFin = fechaBase.AddDays(-1),
+                    Estado = EstadoSubasta.Activa,
+                    Version = 1
+                },
+
+                new Subasta
+                {
+                    Id = 5,
+                    VendedorId = 1,
+                    CategoriaId = 3,
+                    Titulo = "Campera Cuero",
+                    Descripcion = "Subasta vencida sin ofertas",
+                    UrlImagen = "img5.png",
+                    PrecioBase = 50000m,
+                    IncrementoMinimo = 2000m,
+                    FechaInicio = fechaBase.AddDays(-5),
+                    FechaFin = fechaBase.AddDays(-2),
+                    Estado = EstadoSubasta.Activa,
+                    Version = 1
+                }
+            );
+
+            // 5. Pujas
+            modelBuilder.Entity<Puja>().HasData(
+                new Puja { Id = 1, SubastaId = 1, CompradorId = 3, Monto = 35000m, FechaPuja = fechaBase.AddMinutes(-40) },
+                new Puja { Id = 2, SubastaId = 1, CompradorId = 2, Monto = 45000m, FechaPuja = fechaBase.AddMinutes(-20) },
+                new Puja { Id = 3, SubastaId = 4, CompradorId = 3, Monto = 25000m, FechaPuja = fechaBase.AddDays(-2) }
+            );
+
+            // 6. Ledger
+            modelBuilder.Entity<TransaccionLedger>().HasData(
+                new TransaccionLedger
+                {
+                    Id = 1,
+                    BilleteraId = 2,
+                    Tipo = TipoTransaccion.Deposito,
+                    Monto = 150000m,
+                    Fecha = fechaBase.AddDays(-4),
+                    SubastaId = null
+                },
+
+                new TransaccionLedger
+                {
+                    Id = 2,
+                    BilleteraId = 2,
+                    Tipo = TipoTransaccion.Retencion,
+                    Monto = 45000m,
+                    Fecha = fechaBase.AddMinutes(-20),
+                    SubastaId = 1
+                }
+            );
+
+
+
+
+
+
+
+
+
+
+
+
+
         }
+
+
+
+
+
     }
 }
