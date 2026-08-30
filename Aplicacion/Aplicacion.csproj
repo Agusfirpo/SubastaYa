@@ -13,11 +13,8 @@
     <Folder Include="UseCases\Auditoria\Handler\" />
     <Folder Include="UseCases\Auditoria\Command\" />
     <Folder Include="UseCases\Auditoria\Queries\" />
-    <Folder Include="UseCases\Billetera\Command\" />
     <Folder Include="UseCases\Categoria\Command\" />
     <Folder Include="UseCases\Puja\Command\" />
-    <Folder Include="UseCases\Puja\Handler\" />
-    <Folder Include="UseCases\Puja\Queries\" />
     <Folder Include="UseCases\Transaccion\Command\" />
     <Folder Include="UseCases\Transaccion\Handler\" />
     <Folder Include="UseCases\Transaccion\Queries\" />
