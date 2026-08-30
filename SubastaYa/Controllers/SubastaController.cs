@@ -13,13 +13,15 @@ namespace SubastaYa.Controllers
     {
         private readonly ListarSubastasHandler _listarSubastasHandler;
         private readonly CrearSubastaHandler _crearSubastaHandler;
-
+        private readonly ObtenerSubastaPorIdHandler _obtenerSubastaPorIdHandler;
         public SubastaController(
-            ListarSubastasHandler listarSubastasHandler,
-            CrearSubastaHandler crearSubastaHandler)
+         ListarSubastasHandler listarSubastasHandler,
+         CrearSubastaHandler crearSubastaHandler,
+          ObtenerSubastaPorIdHandler obtenerSubastaPorIdHandler)
         {
             _listarSubastasHandler = listarSubastasHandler;
             _crearSubastaHandler = crearSubastaHandler;
+            _obtenerSubastaPorIdHandler = obtenerSubastaPorIdHandler;
         }
 
         [HttpGet]
@@ -67,5 +69,29 @@ namespace SubastaYa.Controllers
                 });
             }
         }
+
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<DetalleSubastaResponse>> ObtenerPorId(int id)
+        {
+            var query = new ObtenerSubastaPorIdQuery
+            {
+                Id = id
+            };
+
+            var resultado =
+                await _obtenerSubastaPorIdHandler.Handle(query);
+
+            if (resultado == null)
+            {
+                return NotFound(new
+                {
+                    mensaje = "La subasta no existe."
+                });
+            }
+
+            return Ok(resultado);
+        }
+
+
     }
 }
