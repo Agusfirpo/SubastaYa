@@ -32,5 +32,27 @@ namespace Infraestructura.Repositories
 
             await _context.SaveChangesAsync();
         }
+
+        public async Task<Subasta?> ObtenerPorIdAsync(int id)
+        {
+            return await _context.Subastas
+                .AsNoTracking()
+                .Include(s => s.Categoria)
+                .Include(s => s.Vendedor)
+                .Include(s => s.Pujas)
+                .FirstOrDefaultAsync(s => s.Id == id);
+        }
+
+
+
+        public async Task<IList<Subasta>> ObtenerPorVendedorIdAsync(int vendedorId)
+        {
+            return await _context.Subastas
+                .AsNoTracking()
+                .Include(s => s.Categoria)
+                .Include(s => s.Pujas)
+                .Where(s => s.VendedorId == vendedorId)
+                .ToListAsync();
+        }
     }
 }

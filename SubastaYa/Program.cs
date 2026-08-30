@@ -26,6 +26,22 @@ builder.Services.AddDbContext<AppDbContext>(options =>options.UseSqlServer(
 
 //Builders
 
+builder.Services.AddScoped<IBilleteraRepository, BilleteraRepository>();
+builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+builder.Services.AddScoped<ISubastaRepository, SubastaRepository>();
+builder.Services.AddScoped<IPujaRepository, PujaRepository>();
+builder.Services.AddScoped<ITransaccionRepository, TransaccionRepository>();
+builder.Services.AddScoped<IAuditoriaRepository, AuditoriaRepository>();
+builder.Services.AddScoped<IUnidadTrabajo, UnidadTrabajo>();
+
+builder.Services.AddScoped<ObtenerSubastaPorIdHandler>();
+builder.Services.AddScoped<ListarPujasPorSubastaHandler>();
+builder.Services.AddScoped<ListarSubastasHandler>();
+builder.Services.AddScoped<CrearSubastaHandler>();
+builder.Services.AddScoped<ListarCategoriasHandler>();
+builder.Services.AddScoped<ObtenerBilleteraHandler>();
+builder.Services.AddScoped<AcreditarSaldoHandler>();
+builder.Services.AddScoped<ListarSubastasPorVendedorHandler>();
 
 var app = builder.Build();
 
