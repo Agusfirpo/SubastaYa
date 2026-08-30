@@ -1,4 +1,7 @@
+using Aplicacion.Interfaces.Repositories;
+using Aplicacion.UseCases.Subasta.Handler;
 using Infraestructura.Persistence;
+using Infraestructura.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +21,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>options.UseSqlServer(
     )
 );
 
+
+builder.Services.AddScoped<ISubastaRepository, SubastaRepository>();
+
+
+builder.Services.AddScoped<ListarSubastasHandler>();
+builder.Services.AddScoped<CrearSubastaHandler>();
 
 
 var app = builder.Build();

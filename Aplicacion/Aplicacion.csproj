@@ -7,11 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="DTOs\" />
     <Folder Include="Exceptions\" />
     <Folder Include="Helpers\" />
     <Folder Include="Interfaces\Handlers\" />
-    <Folder Include="Interfaces\Repositories\" />
     <Folder Include="UseCases\Auditoria\Handler\" />
     <Folder Include="UseCases\Auditoria\Command\" />
     <Folder Include="UseCases\Auditoria\Queries\" />
@@ -24,9 +22,6 @@
     <Folder Include="UseCases\Puja\Command\" />
     <Folder Include="UseCases\Puja\Handler\" />
     <Folder Include="UseCases\Puja\Queries\" />
-    <Folder Include="UseCases\Subasta\Command\" />
-    <Folder Include="UseCases\Subasta\Handler\" />
-    <Folder Include="UseCases\Subasta\Queries\" />
     <Folder Include="UseCases\Transaccion\Command\" />
     <Folder Include="UseCases\Transaccion\Handler\" />
     <Folder Include="UseCases\Transaccion\Queries\" />

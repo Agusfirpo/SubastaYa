@@ -5,21 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 namespace Aplicacion.DTOs.Response
 {
-    public class SubastaResponse
+    public class CrearSubastaResponse
     {
         public int Id { get; set; }
 
         public string Titulo { get; set; } 
-
-        public string Categoria { get; set; } 
-
-        public string UrlImagen { get; set; } 
-
-        public decimal PrecioBase { get; set; }
-
-        public DateTime FechaInicio { get; set; }
-
-        public DateTime FechaFin { get; set; }
 
         public string Estado { get; set; } 
     }
