@@ -3,6 +3,7 @@ using Aplicacion.UseCases.Billetera.Handler;
 using Aplicacion.UseCases.Categoria.Handler;
 using Aplicacion.UseCases.Puja.Handler;
 using Aplicacion.UseCases.Subasta.Handler;
+using Aplicacion.UseCases.Transaccion.Handler;
 using Infraestructura.Persistence;
 using Infraestructura.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -41,11 +42,12 @@ builder.Services.AddScoped<ListarPujasPorSubastaHandler>();
 builder.Services.AddScoped<ListarSubastasHandler>();
 builder.Services.AddScoped<CrearSubastaHandler>();
 builder.Services.AddScoped<ListarCategoriasHandler>();
-builder.Services.AddScoped<ObtenerBilleteraHandler>();
-builder.Services.AddScoped<AcreditarSaldoHandler>();
+builder.Services.AddScoped<ObtenerBilleteraHandler>(); 
+builder.Services.AddScoped<AcreditarSaldoHandler>(); 
 builder.Services.AddScoped<ListarSubastasPorVendedorHandler>();
 builder.Services.AddScoped<FinalizarSubastasHandler>();
 builder.Services.AddScoped<ListarParticipacionesHandler>();
+builder.Services.AddScoped<ListarTransaccionesHandler>();
 
 builder.Services.AddHostedService<SubastaWorker>();
 
