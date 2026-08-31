@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="Helpers\" />
-    <Folder Include="Interfaces\Handlers\" />
     <Folder Include="UseCases\Auditoria\Handler\" />
     <Folder Include="UseCases\Auditoria\Command\" />
     <Folder Include="UseCases\Auditoria\Queries\" />
@@ -20,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.12" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.30" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.30" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.30">

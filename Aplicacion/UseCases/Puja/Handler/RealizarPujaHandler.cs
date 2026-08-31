@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Aplicacion.DTOs.Response;
+using Aplicacion.Interfaces.Handlers;
 using Aplicacion.Interfaces.Repositories;
 using Aplicacion.UseCases.Puja.Command;
 using Dominio.Entities;
@@ -19,14 +20,15 @@ namespace Aplicacion.UseCases.Puja.Handler
         private readonly ITransaccionRepository _transaccionRepository;
         private readonly IAuditoriaRepository _auditoriaRepository;
         private readonly IUnidadTrabajo _unidadTrabajo;
-
+        private readonly INotificadorSubasta _notificadorSubasta;
         public RealizarPujaHandler(
             ISubastaRepository subastaRepository,
             IPujaRepository pujaRepository,
             IBilleteraRepository billeteraRepository,
             ITransaccionRepository transaccionRepository,
             IAuditoriaRepository auditoriaRepository,
-            IUnidadTrabajo unidadTrabajo)
+            IUnidadTrabajo unidadTrabajo,
+            INotificadorSubasta notificadorSubasta)
         {
             _subastaRepository = subastaRepository;
             _pujaRepository = pujaRepository;
@@ -34,6 +36,7 @@ namespace Aplicacion.UseCases.Puja.Handler
             _transaccionRepository = transaccionRepository;
             _auditoriaRepository = auditoriaRepository;
             _unidadTrabajo = unidadTrabajo;
+            _notificadorSubasta = notificadorSubasta;
         }
 
         public async Task<RealizarPujaResponse> Handle(
@@ -285,6 +288,12 @@ namespace Aplicacion.UseCases.Puja.Handler
                     TiempoExtendido = tiempoExtendido
                 };
             });
+            await _notificadorSubasta.NotificarNuevaPuja(
+                resultado!.SubastaId,
+                resultado.Monto,
+                command.CompradorId,
+                resultado.FechaFin,
+                resultado.TiempoExtendido);
 
             return resultado!;
         }

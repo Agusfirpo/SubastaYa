@@ -1,3 +1,4 @@
+using Aplicacion.Interfaces.Handlers;
 using Aplicacion.Interfaces.Repositories;
 using Aplicacion.UseCases.Billetera.Handler;
 using Aplicacion.UseCases.Categoria.Handler;
@@ -7,6 +8,7 @@ using Aplicacion.UseCases.Transaccion.Handler;
 using Infraestructura.Persistence;
 using Infraestructura.Repositories;
 using Microsoft.EntityFrameworkCore;
+using SubastaYa.Hubs;
 using SubastaYa.Workers;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,7 +37,7 @@ builder.Services.AddScoped<IPujaRepository, PujaRepository>();
 builder.Services.AddScoped<ITransaccionRepository, TransaccionRepository>();
 builder.Services.AddScoped<IAuditoriaRepository, AuditoriaRepository>();
 builder.Services.AddScoped<IUnidadTrabajo, UnidadTrabajo>();
-
+builder.Services.AddScoped<INotificadorSubasta, NotificadorSubasta>();
 
 builder.Services.AddScoped<ObtenerSubastaPorIdHandler>();
 builder.Services.AddScoped<ListarPujasPorSubastaHandler>();
@@ -50,7 +52,7 @@ builder.Services.AddScoped<ListarParticipacionesHandler>();
 builder.Services.AddScoped<ListarTransaccionesHandler>();
 
 builder.Services.AddHostedService<SubastaWorker>();
-
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -66,5 +68,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<SubastaHub>("/hubs/subastas");
 
 app.Run();
