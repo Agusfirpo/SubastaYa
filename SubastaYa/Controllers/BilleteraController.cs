@@ -3,6 +3,8 @@ using Aplicacion.DTOs.Response;
 using Aplicacion.UseCases.Billetera.Command;
 using Aplicacion.UseCases.Billetera.Handler;
 using Aplicacion.UseCases.Billetera.Queries;
+using Aplicacion.UseCases.Transaccion.Handler;
+using Aplicacion.UseCases.Transaccion.Queries;
 using Microsoft.AspNetCore.Mvc;
 
 namespace SubastaYa.Controllers
@@ -13,10 +15,12 @@ namespace SubastaYa.Controllers
     {
         private readonly ObtenerBilleteraHandler _obtenerBilleteraHandler;
         private readonly AcreditarSaldoHandler _acreditarSaldoHandler;
-        public BilleteraController(ObtenerBilleteraHandler obtenerBilleteraHandler, AcreditarSaldoHandler acreditarSaldoHandler)
+        private readonly ListarTransaccionesHandler _listarTransaccionesHandler;
+        public BilleteraController(ObtenerBilleteraHandler obtenerBilleteraHandler, AcreditarSaldoHandler acreditarSaldoHandler,ListarTransaccionesHandler listarTransaccionesHandler)
         {
             _obtenerBilleteraHandler = obtenerBilleteraHandler;
             _acreditarSaldoHandler = acreditarSaldoHandler;
+            _listarTransaccionesHandler = listarTransaccionesHandler;
         }
 
         [HttpGet]
@@ -71,6 +75,28 @@ namespace SubastaYa.Controllers
                     mensaje = ex.Message
                 });
             }
+        }
+
+        [HttpGet("transacciones")]
+        public async Task<ActionResult<IList<TransaccionResponse>>> ObtenerTransacciones(int usuarioId)
+        {
+            var query = new ListarTransaccionesQuery
+            {
+                UsuarioId = usuarioId
+            };
+
+            var resultado = await _listarTransaccionesHandler.Handle(query);
+
+            if (resultado == null)
+            {
+                return NotFound(new
+                {
+                    mensaje =
+                        "No se encontró la billetera del usuario."
+                });
+            }
+
+            return Ok(resultado);
         }
     }
 }

@@ -10,5 +10,8 @@ namespace Aplicacion.Interfaces.Repositories
     public interface IPujaRepository
     {
         Task<IList<Puja>> ObtenerPorSubastaIdAsync(int subastaid);
+
+        Task<IList<Puja>> ObtenerPorCompradorIdAsync(int compradorId);
+
     }
 }
