@@ -42,6 +42,12 @@ namespace Infraestructura.Repositories
             await _context.Pujas.AddAsync(puja);
         }
 
+        public async Task<IList<Puja>> ObtenerPorCompradorIdAsync(
+            int compradorId)
+        {
+            return await _context.Pujas.AsNoTracking().Include(p => p.Subasta).ThenInclude(s => s.Pujas).Where(p => p.CompradorId == compradorId).ToListAsync();
+        }
+
 
     }
 }

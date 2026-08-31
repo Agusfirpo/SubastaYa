@@ -14,6 +14,8 @@ namespace Aplicacion.Interfaces.Repositories
         Task<Puja?> ObtenerMayorPorSubastaIdAsync(int subastaId);
 
         Task AgregarAsync(Puja puja);
-        
+
+        Task<IList<Puja>> ObtenerPorCompradorIdAsync(int compradorId);
+
     }
 }
