@@ -1,5 +1,7 @@
-﻿using Aplicacion.Interfaces.Repositories;
+﻿using Aplicacion.Exceptions;
+using Aplicacion.Interfaces.Repositories;
 using Infraestructura.Persistence;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +31,15 @@ namespace Infraestructura.Repositories
                 await _context.SaveChangesAsync();
 
                 await transaccion.CommitAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                await transaccion.RollbackAsync();
+
+                _context.ChangeTracker.Clear();
+
+                throw new ConcurrenciaException(
+                    "La subasta fue modificada por otro usuario.");
             }
             catch
             {

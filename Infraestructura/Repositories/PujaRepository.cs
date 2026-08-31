@@ -27,5 +27,21 @@ namespace Infraestructura.Repositories
                 .OrderByDescending(p => p.FechaPuja)
                 .ToListAsync();
         }
+
+        public async Task<Puja?> ObtenerMayorPorSubastaIdAsync(int subastaId)
+        {
+            return await _context.Pujas
+                .AsNoTracking()
+                .Where(p => p.SubastaId == subastaId)
+                .OrderByDescending(p => p.Monto)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task AgregarAsync(Puja puja)
+        {
+            await _context.Pujas.AddAsync(puja);
+        }
+
+
     }
 }

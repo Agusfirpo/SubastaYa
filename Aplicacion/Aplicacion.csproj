@@ -7,14 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Exceptions\" />
     <Folder Include="Helpers\" />
     <Folder Include="Interfaces\Handlers\" />
     <Folder Include="UseCases\Auditoria\Handler\" />
     <Folder Include="UseCases\Auditoria\Command\" />
     <Folder Include="UseCases\Auditoria\Queries\" />
     <Folder Include="UseCases\Categoria\Command\" />
-    <Folder Include="UseCases\Puja\Command\" />
     <Folder Include="UseCases\Transaccion\Command\" />
     <Folder Include="UseCases\Transaccion\Handler\" />
     <Folder Include="UseCases\Transaccion\Queries\" />

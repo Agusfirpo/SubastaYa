@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Aplicacion.Interfaces.Repositories;
+using Dominio.Entities;
+using Dominio.Enums;
+using Infraestructura.Persistence;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Aplicacion.Interfaces.Repositories;
-using Dominio.Entities;
-using Infraestructura.Persistence;
-using Microsoft.EntityFrameworkCore;
 
 namespace Infraestructura.Repositories
 {
@@ -52,6 +53,24 @@ namespace Infraestructura.Repositories
                 .Include(s => s.Categoria)
                 .Include(s => s.Pujas)
                 .Where(s => s.VendedorId == vendedorId)
+                .ToListAsync();
+        }
+
+
+        public async Task<Subasta?> ObtenerPorIdParaActualizarAsync(int id)
+        {
+            return await _context.Subastas
+                .FirstOrDefaultAsync(s => s.Id == id);
+        }
+
+
+        public async Task<IList<Subasta>> ObtenerVencidasParaActualizarAsync(DateTime fechaActual)
+        {
+            return await _context.Subastas
+                .Include(s => s.Pujas)
+                .Where(s =>
+                    s.Estado == EstadoSubasta.Activa &&
+                    s.FechaFin <= fechaActual)
                 .ToListAsync();
         }
     }

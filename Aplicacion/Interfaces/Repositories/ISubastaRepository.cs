@@ -17,5 +17,9 @@ using Dominio.Entities;
             Task AgregarAsync(Subasta subasta);
 
             Task<IList<Subasta>> ObtenerPorVendedorIdAsync(int vendedorId);
+
+            Task<Subasta?> ObtenerPorIdParaActualizarAsync(int id);
+
+            Task<IList<Subasta>> ObtenerVencidasParaActualizarAsync(DateTime fechaActual);
     }
     }
