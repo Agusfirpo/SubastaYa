@@ -21,6 +21,10 @@ namespace Aplicacion.DTOs.Response
 
         public DateTime FechaFin { get; set; }
 
-        public string Estado { get; set; } 
+        public string Estado { get; set; }
+
+        public decimal PujaActual { get; set; }
+
+        public int CantidadPujas { get; set; }
     }
 }

@@ -21,5 +21,7 @@ using Dominio.Entities;
             Task<Subasta?> ObtenerPorIdParaActualizarAsync(int id);
 
             Task<IList<Subasta>> ObtenerVencidasParaActualizarAsync(DateTime fechaActual);
+
+            Task<IList<Subasta>> ObtenerTodasAsync(string? estado,int? categoriaId,decimal? precioMinimo,decimal? precioMaximo,string? orden);
     }
     }

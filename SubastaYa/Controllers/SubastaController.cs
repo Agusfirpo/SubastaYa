@@ -25,9 +25,21 @@ namespace SubastaYa.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IList<SubastaResponse>>> ObtenerTodas()
+        public async Task<ActionResult<IList<SubastaResponse>>> ObtenerTodas(
+         [FromQuery] string? estado,
+         [FromQuery] int? categoriaId,
+         [FromQuery] decimal? precioMinimo,
+         [FromQuery] decimal? precioMaximo,
+         [FromQuery] string? orden)
         {
-            var query = new ListarSubastasQuery();
+            var query = new ListarSubastasQuery
+            {
+                Estado = estado,
+                CategoriaId = categoriaId,
+                PrecioMinimo = precioMinimo,
+                PrecioMaximo = precioMaximo,
+                Orden = orden
+            };
 
             var resultado =
                 await _listarSubastasHandler.Handle(query);

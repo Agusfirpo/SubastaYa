@@ -73,5 +73,62 @@ namespace Infraestructura.Repositories
                     s.FechaFin <= fechaActual)
                 .ToListAsync();
         }
+
+        public async Task<IList<Subasta>> ObtenerTodasAsync(string? estado,int? categoriaId,decimal? precioMinimo,decimal? precioMaximo,string? orden)
+        {
+            var query = _context.Subastas
+                .AsNoTracking()
+                .Include(s => s.Categoria)
+                .Include(s => s.Pujas)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(estado))
+            {
+                if (Enum.TryParse<EstadoSubasta>(
+                    estado,
+                    true,
+                    out var estadoSubasta))
+                {
+                    query = query.Where(
+                        s => s.Estado == estadoSubasta);
+                }
+            }
+
+            if (categoriaId.HasValue)
+            {
+                query = query.Where(
+                    s => s.CategoriaId == categoriaId.Value);
+            }
+
+            if (precioMinimo.HasValue)
+            {
+                query = query.Where(
+                    s => s.PrecioBase >= precioMinimo.Value);
+            }
+
+            if (precioMaximo.HasValue)
+            {
+                query = query.Where(
+                    s => s.PrecioBase <= precioMaximo.Value);
+            }
+
+            if (orden == "tiempo")
+            {
+                query = query.OrderBy(s => s.FechaFin);
+            }
+            else if (orden == "puja")
+            {
+                query = query.OrderByDescending(
+                    s => s.Pujas.Any()
+                        ? s.Pujas.Max(p => p.Monto)
+                        : s.PrecioBase);
+            }
+
+            return await query.ToListAsync();
+        }
+
+
+
+
     }
 }

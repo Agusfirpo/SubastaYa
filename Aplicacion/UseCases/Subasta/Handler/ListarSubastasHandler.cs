@@ -23,7 +23,12 @@ namespace Aplicacion.UseCases.Subasta.Handler
             ListarSubastasQuery query)
         {
             var subastas =
-                await _subastaRepository.ObtenerTodasAsync();
+                await _subastaRepository.ObtenerTodasAsync(
+                    query.Estado,
+                    query.CategoriaId,
+                    query.PrecioMinimo,
+                    query.PrecioMaximo,
+                    query.Orden);
 
             return subastas
                 .Select(s => new SubastaResponse
@@ -33,6 +38,14 @@ namespace Aplicacion.UseCases.Subasta.Handler
                     Categoria = s.Categoria.Nombre,
                     UrlImagen = s.UrlImagen,
                     PrecioBase = s.PrecioBase,
+
+
+                    PujaActual = s.Pujas.Any()
+                        ? s.Pujas.Max(p => p.Monto)
+                        : s.PrecioBase,
+
+                    CantidadPujas = s.Pujas.Count,
+
                     FechaInicio = s.FechaInicio,
                     FechaFin = s.FechaFin,
                     Estado = s.Estado.ToString()
