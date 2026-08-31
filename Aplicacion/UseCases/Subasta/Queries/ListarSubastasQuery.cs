@@ -18,6 +18,10 @@ using System.Threading.Tasks;
             public decimal? PrecioMaximo { get; set; }
 
             public string? Orden { get; set; }
-        }
+
+           public int Pagina { get; set; } = 1;
+
+           public int TamanioPagina { get; set; } = 10;
+    }
     }
 

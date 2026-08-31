@@ -74,13 +74,25 @@ namespace Infraestructura.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IList<Subasta>> ObtenerTodasAsync(string? estado,int? categoriaId,decimal? precioMinimo,decimal? precioMaximo,string? orden)
+        public async Task<(IList<Subasta> Items, int TotalItems)>ObtenerTodasAsync(
+        string? estado,
+        int? categoriaId,
+        decimal? precioMinimo,
+        decimal? precioMaximo,
+        string? orden,
+        int pagina,
+        int tamanioPagina)
         {
             var query = _context.Subastas
                 .AsNoTracking()
                 .Include(s => s.Categoria)
                 .Include(s => s.Pujas)
                 .AsQueryable();
+
+
+            // =========================
+            // FILTRO POR ESTADO
+            // =========================
 
             if (!string.IsNullOrWhiteSpace(estado))
             {
@@ -94,11 +106,21 @@ namespace Infraestructura.Repositories
                 }
             }
 
+
+            // =========================
+            // FILTRO POR CATEGORÍA
+            // =========================
+
             if (categoriaId.HasValue)
             {
                 query = query.Where(
                     s => s.CategoriaId == categoriaId.Value);
             }
+
+
+            // =========================
+            // PRECIO MÍNIMO
+            // =========================
 
             if (precioMinimo.HasValue)
             {
@@ -106,15 +128,26 @@ namespace Infraestructura.Repositories
                     s => s.PrecioBase >= precioMinimo.Value);
             }
 
+
+            // =========================
+            // PRECIO MÁXIMO
+            // =========================
+
             if (precioMaximo.HasValue)
             {
                 query = query.Where(
                     s => s.PrecioBase <= precioMaximo.Value);
             }
 
+
+            // =========================
+            // ORDENAMIENTO
+            // =========================
+
             if (orden == "tiempo")
             {
-                query = query.OrderBy(s => s.FechaFin);
+                query = query.OrderBy(
+                    s => s.FechaFin);
             }
             else if (orden == "puja")
             {
@@ -123,10 +156,31 @@ namespace Infraestructura.Repositories
                         ? s.Pujas.Max(p => p.Monto)
                         : s.PrecioBase);
             }
+            else
+            {
+                query = query.OrderBy(s => s.Id);
+            }
 
-            return await query.ToListAsync();
+
+            // =========================
+            // TOTAL ANTES DE PAGINAR
+            // =========================
+
+            var totalItems = await query.CountAsync();
+
+
+            // =========================
+            // PAGINACIÓN
+            // =========================
+
+            var items = await query
+                .Skip((pagina - 1) * tamanioPagina)
+                .Take(tamanioPagina)
+                .ToListAsync();
+
+
+            return (items, totalItems);
         }
-
 
 
 
