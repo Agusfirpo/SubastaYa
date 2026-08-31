@@ -11,6 +11,6 @@ namespace Dominio.Enums
         Programada = 1,
         Activa = 2,
         Finalizada = 3,
-        Cancelada = 4
+        Desierta = 4
     }
 }

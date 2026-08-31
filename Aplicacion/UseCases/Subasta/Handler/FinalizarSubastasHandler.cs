@@ -58,7 +58,7 @@ namespace Aplicacion.UseCases.Subasta.Handler
 
                 if (!subasta.Pujas.Any())
                 {
-                    subasta.Estado = EstadoSubasta.Cancelada;
+                    subasta.Estado = EstadoSubasta.Desierta;
                     subasta.Version++;
 
                     await _auditoriaRepository.AgregarAsync(
