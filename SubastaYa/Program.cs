@@ -6,6 +6,7 @@ using Aplicacion.UseCases.Subasta.Handler;
 using Infraestructura.Persistence;
 using Infraestructura.Repositories;
 using Microsoft.EntityFrameworkCore;
+using SubastaYa.Workers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +35,7 @@ builder.Services.AddScoped<ITransaccionRepository, TransaccionRepository>();
 builder.Services.AddScoped<IAuditoriaRepository, AuditoriaRepository>();
 builder.Services.AddScoped<IUnidadTrabajo, UnidadTrabajo>();
 
+
 builder.Services.AddScoped<ObtenerSubastaPorIdHandler>();
 builder.Services.AddScoped<ListarPujasPorSubastaHandler>();
 builder.Services.AddScoped<ListarSubastasHandler>();
@@ -42,6 +44,11 @@ builder.Services.AddScoped<ListarCategoriasHandler>();
 builder.Services.AddScoped<ObtenerBilleteraHandler>();
 builder.Services.AddScoped<AcreditarSaldoHandler>();
 builder.Services.AddScoped<ListarSubastasPorVendedorHandler>();
+builder.Services.AddScoped<FinalizarSubastasHandler>();
+builder.Services.AddScoped<ListarParticipacionesHandler>();
+
+builder.Services.AddHostedService<SubastaWorker>();
+
 
 var app = builder.Build();
 
