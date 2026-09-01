@@ -1,0 +1,133 @@
+﻿@page "/mis-publicaciones"
+
+@using System.Net.Http.Json
+@using Aplicacion.DTOs.Response
+
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-6">
+
+    <MudText Typo="Typo.h4">Mis publicaciones</MudText>
+    <MudText Color="Color.Secondary" Class="mb-4">
+        Subastas publicadas por el usuario
+    </MudText>
+
+    <MudStack Row="true" Class="mb-4">
+        <MudNumericField T="int"
+                         Label="Usuario"
+                         @bind-Value="usuarioId" />
+
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   OnClick="Cargar">
+            Consultar
+        </MudButton>
+    </MudStack>
+
+    @if (cargando)
+    {
+        <MudProgressCircular Indeterminate="true" />
+    }
+    else if (publicaciones.Count == 0)
+    {
+        <MudAlert Severity="Severity.Info">
+            El usuario no tiene publicaciones.
+        </MudAlert>
+    }
+    else
+    {
+        <MudTable T="PublicacionResponse"
+                  Items="@publicaciones"
+                  Hover="true">
+
+            <HeaderContent>
+                <MudTh>Subasta</MudTh>
+                <MudTh>Estado</MudTh>
+                <MudTh>Pujas</MudTh>
+                <MudTh>Precio actual</MudTh>
+                <MudTh>Finaliza</MudTh>
+                <MudTh></MudTh>
+            </HeaderContent>
+
+            <RowTemplate>
+
+                <MudTd>
+                    <strong>@context.Titulo</strong><br />
+                    <small>@context.Categoria</small>
+                </MudTd>
+
+                <MudTd>
+                    <MudChip T="string"
+                             Size="Size.Small"
+                             Color="@ColorEstado(context.Estado)">
+                        @context.Estado
+                    </MudChip>
+                </MudTd>
+
+                <MudTd>@context.CantidadPujas</MudTd>
+
+                <MudTd>
+                    $ @context.PrecioActual.ToString("N2")
+                </MudTd>
+
+                <MudTd>
+                    @context.FechaFin.ToLocalTime()
+                    
+                </MudTd>
+
+                <MudTd>
+                    <MudButton Size="Size.Small"
+                               OnClick="@(() => Ver(context.Id))">
+                        Ver
+                    </MudButton>
+                </MudTd>
+
+            </RowTemplate>
+
+        </MudTable>
+    }
+
+</MudContainer>
+
+@code {
+    private int usuarioId = 1;
+    private bool cargando;
+    private IList<PublicacionResponse> publicaciones = [];
+
+    protected override async Task OnInitializedAsync()
+        => await Cargar();
+
+    private async Task Cargar()
+    {
+        cargando = true;
+
+        try
+        {
+            publicaciones = await Http.GetFromJsonAsync<IList<PublicacionResponse>>(
+                $"api/v1/usuarios/{usuarioId}/subastas") ?? [];
+        }
+        catch
+        {
+            Snackbar.Add(
+                "No se pudieron cargar las publicaciones.",
+                Severity.Error);
+        }
+        finally
+        {
+            cargando = false;
+        }
+    }
+
+    private void Ver(int id)
+        => Navigation.NavigateTo($"/subastas/{id}");
+
+    private Color ColorEstado(string estado) => estado switch
+    {
+        "Activa" => Color.Success,
+        "Programada" => Color.Info,
+        "Desierta" => Color.Warning,
+        _ => Color.Default
+    };
+}
