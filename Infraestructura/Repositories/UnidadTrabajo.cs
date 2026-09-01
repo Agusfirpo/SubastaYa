@@ -13,16 +13,13 @@ namespace Infraestructura.Repositories
     public class UnidadTrabajo : IUnidadTrabajo
     {
         private readonly AppDbContext _context;
-
         public UnidadTrabajo(AppDbContext context)
         {
             _context = context;
         }
-
         public async Task EjecutarEnTransaccionAsync(Func<Task> accion)
         {
-            await using var transaccion =
-                await _context.Database.BeginTransactionAsync();
+            await using var transaccion = await _context.Database.BeginTransactionAsync();
 
             try
             {
@@ -38,8 +35,7 @@ namespace Infraestructura.Repositories
 
                 _context.ChangeTracker.Clear();
 
-                throw new ConcurrenciaException(
-                    "La subasta fue modificada por otro usuario.");
+                throw new ConcurrenciaException("La subasta fue modificada por otro usuario.");
             }
             catch
             {

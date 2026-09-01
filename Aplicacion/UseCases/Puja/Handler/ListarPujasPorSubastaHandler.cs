@@ -17,7 +17,6 @@ namespace Aplicacion.UseCases.Puja.Handler
         {
             _pujaRepository = pujaRepository;
         }
-
         public async Task<IList<PujaResponse>> Handle(ListarPujasPorSubastaQuery query)
         {
             var pujas = await _pujaRepository.ObtenerPorSubastaIdAsync(query.SubastaId);
@@ -28,7 +27,6 @@ namespace Aplicacion.UseCases.Puja.Handler
                 SubastaId = p.SubastaId,
                 Monto = p.Monto,
                 FechaPuja = p.FechaPuja,
-
                 Usuario = $"Usuario***{p.CompradorId}"
             })
                 .ToList();

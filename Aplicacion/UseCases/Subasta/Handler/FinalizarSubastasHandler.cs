@@ -16,7 +16,6 @@ namespace Aplicacion.UseCases.Subasta.Handler
         private readonly ITransaccionRepository _transaccionRepository;
         private readonly IAuditoriaRepository _auditoriaRepository;
         private readonly IUnidadTrabajo _unidadTrabajo;
-
         public FinalizarSubastasHandler(
             ISubastaRepository subastaRepository,
             IBilleteraRepository billeteraRepository,
@@ -30,32 +29,23 @@ namespace Aplicacion.UseCases.Subasta.Handler
             _auditoriaRepository = auditoriaRepository;
             _unidadTrabajo = unidadTrabajo;
         }
-
         public async Task Handle()
         {
             var ahora = DateTime.UtcNow;
-
-            var subastas =
-                await _subastaRepository
-                    .ObtenerVencidasParaActualizarAsync(ahora);
+            var subastas =await _subastaRepository.ObtenerVencidasParaActualizarAsync(ahora);
 
             foreach (var subasta in subastas)
             {
                 await FinalizarSubasta(subasta);
             }
         }
-
-        private async Task FinalizarSubasta(
-            Dominio.Entities.Subasta subasta)
+        private async Task FinalizarSubasta(Dominio.Entities.Subasta subasta)
         {
             await _unidadTrabajo.EjecutarEnTransaccionAsync(async () =>
             {
                 var ahora = DateTime.UtcNow;
 
-                // ============================
                 // SUBASTA SIN PUJAS
-                // ============================
-
                 if (!subasta.Pujas.Any())
                 {
                     subasta.Estado = EstadoSubasta.Desierta;
@@ -68,64 +58,33 @@ namespace Aplicacion.UseCases.Subasta.Handler
                             EntidadId = subasta.Id,
                             Accion = "CIERRE_DESIERTA",
                             UsuarioId = null,
-                            DetalleJson =
-                                "{\"motivo\":\"Subasta finalizada sin pujas\"}",
+                            DetalleJson = "{\"motivo\":\"Subasta finalizada sin pujas\"}",
                             Fecha = ahora
                         });
-
                     return;
                 }
 
-
-                // ============================
                 // DETERMINAR GANADOR
-                // ============================
+                var pujaGanadora = subasta.Pujas.OrderByDescending(p => p.Monto).First();
 
-                var pujaGanadora = subasta.Pujas
-                    .OrderByDescending(p => p.Monto)
-                    .First();
+                var billeteraComprador =await _billeteraRepository.ObtenerPorUsuarioAsync(pujaGanadora.CompradorId);
 
-                var billeteraComprador =
-                    await _billeteraRepository
-                        .ObtenerPorUsuarioAsync(
-                            pujaGanadora.CompradorId);
-
-                var billeteraVendedor =
-                    await _billeteraRepository
-                        .ObtenerPorUsuarioAsync(
-                            subasta.VendedorId);
+                var billeteraVendedor =await _billeteraRepository.ObtenerPorUsuarioAsync(subasta.VendedorId);
 
                 if (billeteraComprador == null ||
                     billeteraVendedor == null)
                 {
-                    throw new InvalidOperationException(
-                        "No se encontraron las billeteras necesarias para liquidar la subasta.");
+                    throw new InvalidOperationException("No se encontraron las billeteras necesarias para liquidar la subasta.");
                 }
 
-
-                // ============================
                 // LIQUIDACIÓN
-                // ============================
-
-                billeteraComprador.SaldoRetenido -=
-                    pujaGanadora.Monto;
-
-                billeteraComprador.SaldoTotal -=
-                    pujaGanadora.Monto;
-
+                billeteraComprador.SaldoRetenido -= pujaGanadora.Monto;
+                billeteraComprador.SaldoTotal -= pujaGanadora.Monto;
                 billeteraComprador.Version++;
-
-
-                billeteraVendedor.SaldoTotal +=
-                    pujaGanadora.Monto;
-
+                billeteraVendedor.SaldoTotal += pujaGanadora.Monto;
                 billeteraVendedor.Version++;
 
-
-                // ============================
                 // LEDGER COMPRADOR
-                // ============================
-
                 await _transaccionRepository.AgregarAsync(
                     new TransaccionLedger
                     {
@@ -135,12 +94,8 @@ namespace Aplicacion.UseCases.Subasta.Handler
                         Fecha = ahora,
                         SubastaId = subasta.Id
                     });
-
-
-                // ============================
+                
                 // LEDGER VENDEDOR
-                // ============================
-
                 await _transaccionRepository.AgregarAsync(
                     new TransaccionLedger
                     {
@@ -151,19 +106,11 @@ namespace Aplicacion.UseCases.Subasta.Handler
                         SubastaId = subasta.Id
                     });
 
-
-                // ============================
                 // FINALIZAR
-                // ============================
-
                 subasta.Estado = EstadoSubasta.Finalizada;
                 subasta.Version++;
 
-
-                // ============================
                 // AUDITORÍA
-                // ============================
-
                 await _auditoriaRepository.AgregarAsync(
                     new AuditoriaLog
                     {
@@ -171,8 +118,7 @@ namespace Aplicacion.UseCases.Subasta.Handler
                         EntidadId = subasta.Id,
                         Accion = "CIERRE_CON_GANADOR",
                         UsuarioId = null,
-                        DetalleJson =
-                            $"{{\"ganadorId\":{pujaGanadora.CompradorId},\"monto\":{pujaGanadora.Monto}}}",
+                        DetalleJson = $"{{\"ganadorId\":{pujaGanadora.CompradorId},\"monto\":{pujaGanadora.Monto}}}",
                         Fecha = ahora
                     });
             });

@@ -13,12 +13,10 @@ namespace Infraestructura.Repositories
     public class PujaRepository : IPujaRepository
     {
         private readonly AppDbContext _context;
-
         public PujaRepository(AppDbContext context) 
         { 
             _context = context; 
         }
-
         public async Task<IList<Puja>> ObtenerPorSubastaIdAsync (int subastaId)
         {
             return await _context.Pujas
@@ -27,7 +25,6 @@ namespace Infraestructura.Repositories
                 .OrderByDescending(p => p.FechaPuja)
                 .ToListAsync();
         }
-
         public async Task<Puja?> ObtenerMayorPorSubastaIdAsync(int subastaId)
         {
             return await _context.Pujas
@@ -36,22 +33,17 @@ namespace Infraestructura.Repositories
                 .OrderByDescending(p => p.Monto)
                 .FirstOrDefaultAsync();
         }
-
         public async Task AgregarAsync(Puja puja)
         {
             await _context.Pujas.AddAsync(puja);
         }
-
-        public async Task<IList<Puja>> ObtenerPorCompradorIdAsync(
-    int compradorId)
+        public async Task<IList<Puja>> ObtenerPorCompradorIdAsync(int compradorId)
         {
             return await _context.Pujas
                 .Include(p => p.Subasta)
-                    .ThenInclude(s => s.Pujas)
+                .ThenInclude(s => s.Pujas)
                 .Where(p => p.CompradorId == compradorId)
                 .ToListAsync();
         }
-
-
     }
 }

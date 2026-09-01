@@ -35,8 +35,7 @@ namespace Aplicacion.UseCases.Billetera.Handler
         {
             if (command.Monto <= 0)
             {
-                throw new ArgumentException(
-                    "El monto a acreditar debe ser mayor a cero.");
+                throw new ArgumentException("El monto a acreditar debe ser mayor a cero.");
             }
 
             BilleteraResponse? resultado = null;
@@ -44,15 +43,13 @@ namespace Aplicacion.UseCases.Billetera.Handler
             await _unidadTrabajo.EjecutarEnTransaccionAsync(
                 async () =>
                 {
-                    var billetera =
-                        await _billeteraRepository.ObtenerPorUsuarioAsync(command.UsuarioId);
+                    var billetera = await _billeteraRepository.ObtenerPorUsuarioAsync(command.UsuarioId);
 
                     if (billetera == null)
                         return;
 
                     billetera.SaldoTotal += command.Monto;
 
-                    // Como Version es int y concurrency token.
                     billetera.Version++;
 
                     var transaccion = new TransaccionLedger
@@ -72,8 +69,7 @@ namespace Aplicacion.UseCases.Billetera.Handler
                         EntidadId = billetera.Id,
                         Accion = "ACREDITACION_SALDO",
                         UsuarioId = command.UsuarioId,
-                        DetalleJson =
-                            $"{{\"monto\":{command.Monto}}}",
+                        DetalleJson = $"{{\"monto\":{command.Monto}}}",
                         Fecha = DateTime.UtcNow
                     };
 
@@ -88,7 +84,6 @@ namespace Aplicacion.UseCases.Billetera.Handler
                         SaldoDisponible = billetera.SaldoDisponible
                     };
                 });
-
             return resultado;
         }
     }

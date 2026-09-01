@@ -13,12 +13,10 @@ namespace Infraestructura.Repositories
     public class CategoriaRepository : ICategoriaRepository
     {
         private readonly AppDbContext _context;
-
         public CategoriaRepository(AppDbContext context) 
         { 
             _context = context;
         }
-
         public async Task<IList<Categoria>> ObtenerTodasAsync()
         {
             return await _context.Categorias.ToArrayAsync();

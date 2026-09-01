@@ -13,36 +13,24 @@ namespace Aplicacion.UseCases.Subasta.Handler
     {
         private readonly ISubastaRepository _subastaRepository;
 
-        public ListarSubastasPorVendedorHandler(
-            ISubastaRepository subastaRepository)
+        public ListarSubastasPorVendedorHandler(ISubastaRepository subastaRepository)
         {
             _subastaRepository = subastaRepository;
         }
 
-        public async Task<IList<PublicacionResponse>> Handle(
-            ListarSubastasPorVendedorQuery query)
+        public async Task<IList<PublicacionResponse>> Handle(ListarSubastasPorVendedorQuery query)
         {
-            var subastas =
-                await _subastaRepository
-                    .ObtenerPorVendedorIdAsync(query.VendedorId);
+            var subastas = await _subastaRepository.ObtenerPorVendedorIdAsync(query.VendedorId);
 
             return subastas
                 .Select(s => new PublicacionResponse
                 {
                     Id = s.Id,
-
                     Titulo = s.Titulo,
-
                     Categoria = s.Categoria.Nombre,
-
                     Estado = s.Estado.ToString(),
-
                     CantidadPujas = s.Pujas.Count,
-
-                    PrecioActual = s.Pujas.Any()
-                        ? s.Pujas.Max(p => p.Monto)
-                        : s.PrecioBase,
-
+                    PrecioActual = s.Pujas.Any()? s.Pujas.Max(p => p.Monto) : s.PrecioBase,
                     FechaFin = s.FechaFin
                 })
                 .ToList();

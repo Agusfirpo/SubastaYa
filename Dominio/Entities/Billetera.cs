@@ -8,20 +8,13 @@ namespace Dominio.Entities
 {
     public class Billetera
     {
-        public int Id { get; set; }
-      
+        public int Id { get; set; }      
         public int UsuarioId { get; set; }
-
         public decimal SaldoTotal { get; set; }
-
         public decimal SaldoRetenido { get; set; }
-
         public decimal SaldoDisponible => SaldoTotal - SaldoRetenido; 
-
         public int Version { get; set; }
-
         public Usuario Usuario { get; set; } = null;
-
         public IList<TransaccionLedger> Transacciones { get; set; } = new List<TransaccionLedger>();
     }
 }

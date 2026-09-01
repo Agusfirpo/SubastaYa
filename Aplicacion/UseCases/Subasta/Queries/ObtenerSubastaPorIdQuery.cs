@@ -10,5 +10,6 @@ namespace Aplicacion.UseCases.Subasta.Queries
     public class ObtenerSubastaPorIdQuery
     {
         public int Id { get; set; }
+
     }
 }

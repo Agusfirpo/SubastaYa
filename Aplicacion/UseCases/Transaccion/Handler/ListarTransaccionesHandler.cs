@@ -13,20 +13,15 @@ namespace Aplicacion.UseCases.Transaccion.Handler
     {
         private readonly IBilleteraRepository _billeteraRepository;
         private readonly ITransaccionRepository _transaccionRepository;
-
-        public ListarTransaccionesHandler(
-            IBilleteraRepository billeteraRepository,
-            ITransaccionRepository transaccionRepository)
+        public ListarTransaccionesHandler(IBilleteraRepository billeteraRepository,ITransaccionRepository transaccionRepository)
         {
             _billeteraRepository = billeteraRepository;
             _transaccionRepository = transaccionRepository;
         }
 
-        public async Task<IList<TransaccionResponse>?> Handle(
-            ListarTransaccionesQuery query)
+        public async Task<IList<TransaccionResponse>?> Handle(ListarTransaccionesQuery query)
         {
-            var billetera =
-                await _billeteraRepository.ObtenerPorUsuarioAsync(query.UsuarioId);
+            var billetera = await _billeteraRepository.ObtenerPorUsuarioAsync(query.UsuarioId);
 
             if (billetera == null)
                 return null;

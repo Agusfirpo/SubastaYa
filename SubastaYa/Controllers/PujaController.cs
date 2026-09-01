@@ -14,7 +14,6 @@ namespace SubastaYa.Controllers
     {
         private readonly ListarPujasPorSubastaHandler _listarPujasPorSubastaHandler;
         private readonly RealizarPujaHandler _realizarPujaHandler;
-
         public PujaController(ListarPujasPorSubastaHandler listarPujasPorSubastaHandler , RealizarPujaHandler realizarPujaHandler)
         {
             _listarPujasPorSubastaHandler = listarPujasPorSubastaHandler;
@@ -22,20 +21,17 @@ namespace SubastaYa.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IList<PujaResponse>>> ObtenerPorSubasta(
-            int subastaId)
+        public async Task<ActionResult<IList<PujaResponse>>> ObtenerPorSubasta(int subastaId)
         {
             var query = new ListarPujasPorSubastaQuery
             {
                 SubastaId = subastaId
             };
 
-            var resultado =
-                await _listarPujasPorSubastaHandler.Handle(query);
+            var resultado = await _listarPujasPorSubastaHandler.Handle(query);
 
             return Ok(resultado);
         }
-
 
         [HttpPost]
         public async Task<ActionResult<RealizarPujaResponse>> Realizar(int subastaId,RealizarPujaRequest request)
@@ -49,12 +45,9 @@ namespace SubastaYa.Controllers
                     Monto = request.Monto
                 };
 
-                var resultado =
-                    await _realizarPujaHandler.Handle(command);
+                var resultado = await _realizarPujaHandler.Handle(command);
 
-                return Created(
-                    $"/api/v1/subastas/{subastaId}/pujas",
-                    resultado);
+                return Created($"/api/v1/subastas/{subastaId}/pujas", resultado);
             }
             catch (ConcurrenciaException ex)
             {

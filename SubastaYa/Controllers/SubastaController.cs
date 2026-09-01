@@ -47,8 +47,7 @@ namespace SubastaYa.Controllers
                     TamanioPagina = tamanioPagina
                 };
 
-                var resultado =
-                    await _listarSubastasHandler.Handle(query);
+                var resultado = await _listarSubastasHandler.Handle(query);
 
                 return Ok(resultado);
             }
@@ -62,8 +61,7 @@ namespace SubastaYa.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<CrearSubastaResponse>> Crear(
-            CrearSubastaRequest request)
+        public async Task<ActionResult<CrearSubastaResponse>> Crear(CrearSubastaRequest request)
         {
             try
             {
@@ -80,12 +78,9 @@ namespace SubastaYa.Controllers
                     FechaFin = request.FechaFin
                 };
 
-                var resultado =
-                    await _crearSubastaHandler.Handle(command);
+                var resultado = await _crearSubastaHandler.Handle(command);
 
-                return Created(
-                    $"/api/v1/subastas/{resultado.Id}",
-                    resultado);
+                return Created($"/api/v1/subastas/{resultado.Id}",resultado);
             }
             catch (ArgumentException ex)
             {
@@ -104,8 +99,7 @@ namespace SubastaYa.Controllers
                 Id = id
             };
 
-            var resultado =
-                await _obtenerSubastaPorIdHandler.Handle(query);
+            var resultado = await _obtenerSubastaPorIdHandler.Handle(query);
 
             if (resultado == null)
             {
@@ -117,7 +111,5 @@ namespace SubastaYa.Controllers
 
             return Ok(resultado);
         }
-
-
     }
 }

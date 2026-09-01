@@ -10,18 +10,12 @@ using System.Threading.Tasks;
         public class ListarSubastasQuery
         {
             public string? Estado { get; set; }
-
             public int? CategoriaId { get; set; }
-
             public decimal? PrecioMinimo { get; set; }
-
             public decimal? PrecioMaximo { get; set; }
-
             public string? Orden { get; set; }
-
-           public int Pagina { get; set; } = 1;
-
-           public int TamanioPagina { get; set; } = 10;
+            public int Pagina { get; set; } = 1;
+            public int TamanioPagina { get; set; } = 10;
     }
     }
 

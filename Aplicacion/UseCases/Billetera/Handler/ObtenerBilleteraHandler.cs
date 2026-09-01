@@ -17,7 +17,6 @@ namespace Aplicacion.UseCases.Billetera.Handler
         {
             _billeteraRepository = billeteraRepository;
         }
-
         public async Task<BilleteraResponse?> Handle(ObtenerBilleteraQuery query)
         {
             var billetera = await _billeteraRepository.ObtenerPorUsuarioAsync(query.UsuarioId);

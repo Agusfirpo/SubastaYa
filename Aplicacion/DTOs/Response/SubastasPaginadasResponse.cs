@@ -8,8 +8,7 @@ namespace Aplicacion.DTOs.Response
 {
     public class SubastasPaginadasResponse
     {
-        public IList<SubastaResponse> Items { get; set; }
-            = new List<SubastaResponse>();
+        public IList<SubastaResponse> Items { get; set; } = new List<SubastaResponse>();
 
         public int Pagina { get; set; }
 

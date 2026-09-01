@@ -10,14 +10,12 @@ namespace SubastaYa.Controllers
     public class CategoriaController : ControllerBase
     {
         private readonly ListarCategoriasHandler _listarCategoriasHandler;
-
         public CategoriaController(ListarCategoriasHandler listarCategoriasHandler)
         {
             _listarCategoriasHandler = listarCategoriasHandler;
         }
 
         [HttpGet]
-
         public async Task<ActionResult<IList<CategoriaResponse>>> ObtenerTodas()
         {
             var query = new ListarCategoriasQuery();

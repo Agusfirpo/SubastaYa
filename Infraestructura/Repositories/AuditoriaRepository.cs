@@ -12,12 +12,10 @@ namespace Infraestructura.Repositories
     public class AuditoriaRepository : IAuditoriaRepository
     {
         private readonly AppDbContext _context;
-
         public AuditoriaRepository(AppDbContext context)
         {
             _context = context;
         }
-
         public async Task AgregarAsync(AuditoriaLog auditoria)
         {
             await _context.AuditoriaLogs.AddAsync(auditoria);
