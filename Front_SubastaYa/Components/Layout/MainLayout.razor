@@ -1,25 +1,117 @@
 ﻿@inherits LayoutComponentBase
 
-<MudThemeProvider />
+<MudThemeProvider Theme="@tema" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
 <MudLayout>
 
-    <MudAppBar Elevation="1">
+    @* BARRA SUPERIOR *@
+    <MudAppBar Elevation="0" Class="app-bar">
 
-        <MudText Typo="Typo.h6">
-            SubastaYa
-        </MudText>
+        <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                       Color="Color.Inherit"
+                       OnClick="ToggleMenu" />
+
+        <div class="marca">
+            <MudIcon Icon="@Icons.Material.Filled.Gavel"
+                     Size="Size.Large" />
+
+            <MudText Typo="Typo.h6">
+                SubastaYa
+            </MudText>
+        </div>
+
+        <MudSpacer />
+
+        <MudChip T="string"
+                 Icon="@Icons.Material.Filled.Person"
+                 Class="usuario-chip">
+            Usuario
+        </MudChip>
 
     </MudAppBar>
 
 
-    <MudMainContent>
+    @* MENÚ LATERAL *@
+    <MudDrawer @bind-Open="menuAbierto"
+               Variant="DrawerVariant.Responsive"
+               Elevation="0"
+               Class="menu-lateral">
 
-        <MudContainer MaxWidth="MaxWidth.Large"
-                      Class="mt-6">
+        <div class="logo-menu">
+
+            <div class="logo-icono">
+                <MudIcon Icon="@Icons.Material.Filled.Gavel"
+                         Size="Size.Large" />
+            </div>
+
+            <div>
+                <MudText Typo="Typo.h5" Class="logo-titulo">
+                    SubastaYa
+                </MudText>
+
+                <MudText Typo="Typo.caption"
+                         Color="Color.Secondary">
+                    Subastas online
+                </MudText>
+            </div>
+
+        </div>
+
+        <MudDivider />
+
+        <MudNavMenu Class="pa-3">
+
+            <MudText Typo="Typo.caption"
+                     Class="menu-seccion">
+                EXPLORAR
+            </MudText>
+
+            <MudNavLink Href="/subastas"
+                        Match="NavLinkMatch.Prefix"
+                        Icon="@Icons.Material.Filled.Storefront">
+                Subastas
+            </MudNavLink>
+
+            <MudNavLink Href="/crear-subasta"
+                        Icon="@Icons.Material.Filled.AddCircleOutline">
+                Publicar subasta
+            </MudNavLink>
+
+            <MudNavLink Href="/billetera"
+                        Icon="@Icons.Material.Filled.AccountBalanceWallet">
+                Mi billetera
+            </MudNavLink>
+
+            <MudDivider Class="my-4" />
+
+            <MudText Typo="Typo.caption"
+                     Class="menu-seccion">
+                MI ACTIVIDAD
+            </MudText>
+
+            <MudNavLink Href="/mis-publicaciones"
+                        Icon="@Icons.Material.Filled.Inventory2">
+                Mis publicaciones
+            </MudNavLink>
+
+            <MudNavLink Href="/mis-pujas"
+                        Icon="@Icons.Material.Filled.ShoppingBag">
+                Mis compras / pujas
+            </MudNavLink>
+
+        </MudNavMenu>
+
+    </MudDrawer>
+
+
+    @* CONTENIDO *@
+    <MudMainContent Class="contenido-principal">
+
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge"
+                      Class="pa-6">
 
             @Body
 
@@ -28,3 +120,37 @@
     </MudMainContent>
 
 </MudLayout>
+
+
+@code {
+    private bool menuAbierto = true;
+
+    private readonly MudTheme tema = new()
+    {
+        PaletteLight = new PaletteLight
+        {
+            // AZUL MARINO
+            Primary = "#0B1F3A",
+
+            // NARANJA
+            Secondary = "#F97316",
+
+            Background = "#F5F7FA",
+            Surface = "#FFFFFF",
+
+            AppbarBackground = "#0B1F3A",
+            AppbarText = "#FFFFFF",
+
+            TextPrimary = "#172033",
+            TextSecondary = "#667085"
+        },
+
+        LayoutProperties = new LayoutProperties
+        {
+            DefaultBorderRadius = "12px"
+        }
+    };
+
+    private void ToggleMenu()
+        => menuAbierto = !menuAbierto;
+}

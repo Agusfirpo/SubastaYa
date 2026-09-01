@@ -1,0 +1,112 @@
+﻿/* ============================= */
+/* BARRA SUPERIOR                */
+/* ============================= */
+
+.app-bar {
+    background: #0b1f3a !important;
+    color: white;
+    border-bottom: 3px solid #f97316;
+}
+
+.marca {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+/* ============================= */
+/* USUARIO                       */
+/* ============================= */
+
+.usuario-chip {
+    background: rgba(255, 255, 255, .12) !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, .18);
+}
+
+
+/* ============================= */
+/* MENÚ LATERAL                  */
+/* ============================= */
+
+.menu-lateral {
+    background: #ffffff !important;
+    border-right: 1px solid #e5e7eb;
+}
+
+.logo-menu {
+    height: 90px;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-icono {
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f97316;
+    color: white;
+}
+
+.logo-titulo {
+    color: #0b1f3a;
+    font-weight: 700 !important;
+}
+
+
+/* ============================= */
+/* TÍTULOS DEL MENÚ              */
+/* ============================= */
+
+.menu-seccion {
+    display: block;
+    padding: 0 12px 8px 12px;
+    color: #f97316 !important;
+    font-weight: 700 !important;
+    letter-spacing: .5px;
+}
+
+
+/* ============================= */
+/* LINKS                         */
+/* ============================= */
+
+.menu-lateral .mud-nav-link {
+    border-radius: 10px;
+    margin-bottom: 5px;
+    color: #344054;
+}
+
+    .menu-lateral .mud-nav-link:hover {
+        background: #fff7ed;
+        color: #0b1f3a;
+    }
+
+
+    /* LINK ACTIVO */
+
+    .menu-lateral .mud-nav-link.active {
+        background: #fff1e6 !important;
+        color: #f97316 !important;
+        font-weight: 600;
+    }
+
+        .menu-lateral .mud-nav-link.active .mud-icon-root {
+            color: #f97316 !important;
+        }
+
+
+/* ============================= */
+/* CONTENIDO                     */
+/* ============================= */
+
+.contenido-principal {
+    min-height: 100vh;
+    background: #f5f7fa;
+}

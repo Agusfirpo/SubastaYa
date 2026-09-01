@@ -50,6 +50,7 @@ builder.Services.AddScoped<ListarSubastasPorVendedorHandler>();
 builder.Services.AddScoped<FinalizarSubastasHandler>();
 builder.Services.AddScoped<ListarParticipacionesHandler>();
 builder.Services.AddScoped<ListarTransaccionesHandler>();
+builder.Services.AddScoped<RealizarPujaHandler>();
 
 builder.Services.AddHostedService<SubastaWorker>();
 builder.Services.AddSignalR();
