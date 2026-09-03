@@ -16,6 +16,8 @@ using System.Threading.Tasks;
             public string? Orden { get; set; }
             public int Pagina { get; set; } = 1;
             public int TamanioPagina { get; set; } = 10;
-    }
+            public string? Busqueda { get; set; }
+
+        }
     }
 

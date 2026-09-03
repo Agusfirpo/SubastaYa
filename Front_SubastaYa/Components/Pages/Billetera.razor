@@ -77,8 +77,11 @@
             <MudButton Variant="Variant.Filled"
                        Color="Color.Primary"
                        Class="mt-3"
+                       Disabled="@depositando"
                        OnClick="Depositar">
-                Depositar
+
+                @(depositando ? "Depositando..." : "Depositar")
+
             </MudButton>
 
         </MudPaper>
@@ -114,6 +117,7 @@
     private int usuarioId = 2;
     private decimal monto;
     private bool cargando;
+    private bool depositando;
 
     private BilleteraResponse? billetera;
     private IList<TransaccionResponse> transacciones = [];
@@ -151,18 +155,32 @@
             return;
         }
 
-        var response = await Http.PostAsJsonAsync(
-            $"api/v1/usuarios/{usuarioId}/billetera/depositos",
-            new AcreditarSaldoRequest { Monto = monto });
+        depositando = true;
 
-        if (!response.IsSuccessStatusCode)
+        try
         {
-            Snackbar.Add("No se pudo acreditar el saldo.", Severity.Error);
-            return;
-        }
+            var response = await Http.PostAsJsonAsync(
+                $"api/v1/usuarios/{usuarioId}/billetera/depositos",
+                new AcreditarSaldoRequest { Monto = monto });
 
-        monto = 0;
-        Snackbar.Add("Saldo acreditado correctamente.", Severity.Success);
-        await CargarTodo();
+            if (!response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("No se pudo acreditar el saldo.", Severity.Error);
+                return;
+            }
+
+            monto = 0;
+            Snackbar.Add("Saldo acreditado correctamente.", Severity.Success);
+
+            await CargarTodo();
+        }
+        catch
+        {
+            Snackbar.Add("No se pudo conectar con la API.", Severity.Error);
+        }
+        finally
+        {
+            depositando = false;
+        }
     }
 }

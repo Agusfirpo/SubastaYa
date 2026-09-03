@@ -37,7 +37,9 @@ namespace Aplicacion.UseCases.Subasta.Handler
                     query.PrecioMaximo,
                     query.Orden,
                     query.Pagina,
-                    query.TamanioPagina);
+                    query.TamanioPagina,
+                    query.Busqueda
+                    );
 
             var items = resultado.Items
                 .Select(s => new SubastaResponse

@@ -105,11 +105,12 @@
 
         try
         {
-            participaciones = await Http.GetFromJsonAsync<IList<ParticipacionResponse>>(
-                $"api/v1/usuarios/{usuarioId}/pujas") ?? [];
+            participaciones = await Http.GetFromJsonAsync<IList<ParticipacionResponse>>($"api/v1/usuarios/{usuarioId}/pujas") ?? [];
         }
         catch
         {
+            participaciones = [];
+
             Snackbar.Add("No se pudieron cargar las pujas.", Severity.Error);
         }
         finally

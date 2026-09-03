@@ -31,6 +31,6 @@ namespace Aplicacion.DTOs.Response
 
         public DateTime FechaFin { get; set; }
 
-        public string Estado { get; set; } = string.Empty;
+        public string Estado { get; set; }
     }
 }

@@ -66,7 +66,8 @@ namespace Infraestructura.Repositories
                 decimal? precioMaximo,
                 string? orden,
                 int pagina,
-                int tamanioPagina)
+                int tamanioPagina,
+                string? busqueda)
         {
             var query = _context.Subastas
                 .AsNoTracking()
@@ -84,6 +85,12 @@ namespace Infraestructura.Repositories
                 {
                     query = query.Where(s => s.Estado == estadoSubasta);
                 }
+            }
+
+            if (!string.IsNullOrWhiteSpace(busqueda))
+            {
+                query = query.Where(s =>
+                    s.Titulo.Contains(busqueda));
             }
 
             // FILTRO POR CATEGORÍA
@@ -126,5 +133,7 @@ namespace Infraestructura.Repositories
 
             return (items, totalItems);
         }
+
+
     }
 }

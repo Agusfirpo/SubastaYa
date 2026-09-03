@@ -1,0 +1,8 @@
+﻿.imagen-placeholder {
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eef1f5;
+    color: #98a2b3;
+}

@@ -143,6 +143,19 @@
                     </MudText>
 
                     </MudStack>
+                 
+                    
+                    <MudImage Src="@subasta.UrlImagen"
+                              Alt="@subasta.Titulo"
+                              Class="detalle-imagen mb-4" />
+                    
+               
+                    
+                    <div class="imagen-placeholder-detalle mb-4">
+                        <MudIcon Icon="@Icons.Material.Filled.Image"
+                                 Size="Size.Large" />
+                    </div>
+                    
 
                 </MudPaper>
 
@@ -437,6 +450,12 @@
     {
         if (subasta == null)
             return;
+
+        if (subasta.Estado != "Activa")
+        {
+            Snackbar.Add("La subasta ya no está activa.", Severity.Warning);
+            return;
+        }
 
         var minimo = CalcularPujaMinima();
 

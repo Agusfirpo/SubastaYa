@@ -1,5 +1,5 @@
 ﻿@inherits LayoutComponentBase
-
+@inject NavigationManager Navigation
 <MudThemeProvider Theme="@tema" />
 <MudPopoverProvider />
 <MudDialogProvider />
@@ -42,9 +42,16 @@
 
         <div class="logo-menu">
 
-            <div class="logo-icono">
+            <div class="logo-subastaya"
+                 @onclick="@(() => Navigation.NavigateTo("/home"))">
+
                 <MudIcon Icon="@Icons.Material.Filled.Gavel"
                          Size="Size.Large" />
+
+                <MudText Typo="Typo.h6">
+                    SubastaYa
+                </MudText>
+
             </div>
 
             <div>

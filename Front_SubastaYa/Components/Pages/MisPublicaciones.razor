@@ -48,6 +48,8 @@
                 <MudTh>Pujas</MudTh>
                 <MudTh>Precio actual</MudTh>
                 <MudTh>Finaliza</MudTh>
+                <MudTh>Recaudación</MudTh>
+                <MudTh>Adjudicación</MudTh>
                 <MudTh></MudTh>
             </HeaderContent>
 
@@ -70,6 +72,14 @@
 
                 <MudTd>
                     $ @context.PrecioActual.ToString("N2")
+                </MudTd>
+
+                <MudTd>
+                    $ @context.Recaudacion.ToString("N2")
+                </MudTd>
+
+                <MudTd>
+                    @context.EstadoAdjudicacion
                 </MudTd>
 
                 <MudTd>
@@ -110,6 +120,7 @@
         }
         catch
         {
+            publicaciones = [];
             Snackbar.Add(
                 "No se pudieron cargar las publicaciones.",
                 Severity.Error);
