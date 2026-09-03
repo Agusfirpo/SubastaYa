@@ -11,22 +11,24 @@
 <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-6">
 
     <MudText Typo="Typo.h4">Publicar subasta</MudText>
+
     <MudText Color="Color.Secondary" Class="mb-4">
-        Completá los datos de la nueva subasta
+        Completá los datos de tu publicación
     </MudText>
 
-    <MudPaper Class="pa-6">
+    <MudPaper Class="pa-6" Elevation="1">
 
         <MudGrid>
-
-            <MudItem xs="12">
+            
+            <MudItem xs="12" sm="6">
                 <MudNumericField T="int"
                                  Label="ID vendedor"
                                  Variant="Variant.Outlined"
-                                 @bind-Value="vendedorId" />
+                                 @bind-Value="vendedorId"
+                                 Min="1" />
             </MudItem>
 
-            <MudItem xs="12">
+            <MudItem xs="12" sm="6">
                 <MudSelect T="int"
                            Label="Categoría"
                            Variant="Variant.Outlined"
@@ -67,6 +69,7 @@
                                  Variant="Variant.Outlined"
                                  Adornment="Adornment.Start"
                                  AdornmentText="$"
+                                 Min="0"
                                  @bind-Value="precioBase" />
             </MudItem>
 
@@ -76,29 +79,30 @@
                                  Variant="Variant.Outlined"
                                  Adornment="Adornment.Start"
                                  AdornmentText="$"
+                                 Min="0"
                                  @bind-Value="incrementoMinimo" />
             </MudItem>
 
             <MudItem xs="12" sm="6">
-                <MudDatePicker Label="Fecha de inicio"
+                <MudDatePicker Label="Fecha inicio"
                                Variant="Variant.Outlined"
                                @bind-Date="fechaInicio" />
             </MudItem>
 
             <MudItem xs="12" sm="6">
-                <MudTimePicker Label="Hora de inicio"
+                <MudTimePicker Label="Hora inicio"
                                Variant="Variant.Outlined"
                                @bind-Time="horaInicio" />
             </MudItem>
 
             <MudItem xs="12" sm="6">
-                <MudDatePicker Label="Fecha de finalización"
+                <MudDatePicker Label="Fecha fin"
                                Variant="Variant.Outlined"
                                @bind-Date="fechaFin" />
             </MudItem>
 
             <MudItem xs="12" sm="6">
-                <MudTimePicker Label="Hora de finalización"
+                <MudTimePicker Label="Hora fin"
                                Variant="Variant.Outlined"
                                @bind-Time="horaFin" />
             </MudItem>
@@ -123,37 +127,37 @@
 @code {
     private IList<CategoriaResponse> categorias = [];
 
-    private int vendedorId = 1;
-    private int categoriaId = 1;
-
-    private string titulo = "";
-    private string descripcion = "";
-    private string urlImagen = "";
-
-    private decimal precioBase;
-    private decimal incrementoMinimo;
+    private int vendedorId = 1, categoriaId = 1;
+    private string titulo = "", descripcion = "", urlImagen = "";
+    private decimal precioBase, incrementoMinimo;
+    private bool guardando;
 
     private DateTime? fechaInicio = DateTime.Today;
-    private TimeSpan? horaInicio = DateTime.Now.TimeOfDay;
-
     private DateTime? fechaFin = DateTime.Today.AddDays(1);
+    private TimeSpan? horaInicio = DateTime.Now.TimeOfDay;
     private TimeSpan? horaFin = DateTime.Now.TimeOfDay;
-
-    private bool guardando;
 
     protected override async Task OnInitializedAsync()
     {
-        categorias = await Http.GetFromJsonAsync<IList<CategoriaResponse>>(
-            "api/v1/categorias") ?? [];
+        try
+        {
+            categorias = await Http.GetFromJsonAsync<IList<CategoriaResponse>>(
+                "api/v1/categorias") ?? [];
+        }
+        catch
+        {
+            Snackbar.Add("No se pudieron cargar las categorías.", Severity.Error);
+        }
     }
 
     private async Task Crear()
     {
         if (string.IsNullOrWhiteSpace(titulo) ||
+            precioBase <= 0 || incrementoMinimo <= 0 ||
             fechaInicio == null || fechaFin == null ||
             horaInicio == null || horaFin == null)
         {
-            Snackbar.Add("Completá los datos obligatorios.", Severity.Warning);
+            Snackbar.Add("Revisá los datos ingresados.", Severity.Warning);
             return;
         }
 
@@ -183,14 +187,11 @@
                 FechaFin = fin.ToUniversalTime()
             };
 
-            var response = await Http.PostAsJsonAsync(
-                "api/v1/subastas", request);
+            var response = await Http.PostAsJsonAsync("api/v1/subastas", request);
 
             if (!response.IsSuccessStatusCode)
             {
-                Snackbar.Add(
-                    await response.Content.ReadAsStringAsync(),
-                    Severity.Error);
+                Snackbar.Add(await LeerError(response), Severity.Error);
                 return;
             }
 
@@ -199,10 +200,8 @@
 
             Snackbar.Add("Subasta publicada correctamente.", Severity.Success);
 
-            if (creada != null)
-                Navigation.NavigateTo($"/subastas/{creada.Id}");
-            else
-                Navigation.NavigateTo("/subastas");
+            Navigation.NavigateTo(
+                creada == null ? "/subastas" : $"/subastas/{creada.Id}");
         }
         catch
         {
@@ -212,5 +211,23 @@
         {
             guardando = false;
         }
+    }
+
+    private async Task<string> LeerError(HttpResponseMessage response)
+    {
+        try
+        {
+            var error = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+            return error?.Mensaje ?? "No se pudo crear la subasta.";
+        }
+        catch
+        {
+            return "No se pudo crear la subasta.";
+        }
+    }
+
+    private class ErrorResponse
+    {
+        public string Mensaje { get; set; } = "";
     }
 }

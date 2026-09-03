@@ -12,6 +12,22 @@
 @inject ISnackbar Snackbar
 
 
+
+<MudPaper Class="pa-4 mb-4" Elevation="0">
+
+    <MudText Typo="Typo.caption">
+        Tiempo restante
+    </MudText>
+
+    <MudText Typo="Typo.h4"
+             Color="@ColorTemporizador()">
+
+        @TextoTemporizador()
+
+    </MudText>
+
+</MudPaper>
+
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-6">
 
     @* ============================= *@
@@ -162,7 +178,21 @@
                     </MudText>
 
 
+                  
+
                     @* SOLO PERMITIMOS PUJAR SI ESTÁ ACTIVA *@
+
+                    @if (Participo())
+                    {
+                        <MudAlert Severity="@(EsLider() ? Severity.Success : Severity.Warning)"
+                                  Class="mb-3">
+
+                            @(EsLider()
+                                ? "Estás liderando esta subasta"
+                                : "Tu oferta fue superada")
+
+                        </MudAlert>
+                    }
 
                 @if (subasta.Estado == "Activa")
                     {
@@ -276,6 +306,9 @@
 
 @code {
 
+    private TimeSpan tiempoRestante;
+    private CancellationTokenSource? temporizadorCts;
+
     // =========================================
     // ID QUE RECIBIMOS DESDE /subastas/{id}
     // =========================================
@@ -327,6 +360,7 @@
 
         montoPuja = CalcularPujaMinima();
 
+        IniciarTemporizador();
         await ConectarSignalR();
     }
 
@@ -397,16 +431,29 @@
             .WithAutomaticReconnect()
             .Build();
 
-        hubConnection.On<JsonElement>("NuevaPuja", async _ =>
+        hubConnection.On<JsonElement>("NuevaPuja", async evento =>
+    {
+       var extendida =
+        evento.TryGetProperty("tiempoExtendido", out var valor) &&
+        valor.GetBoolean();
+
+         await CargarSubasta();
+         await CargarPujas();
+
+         ActualizarTiempo();
+
+        if (subasta != null)
+        montoPuja = CalcularPujaMinima();
+
+        if (extendida)
         {
-            await CargarSubasta();
-            await CargarPujas();
+        Snackbar.Add(
+            "La subasta fue extendida 2 minutos por anti-sniping.",
+            Severity.Warning);
+        }
 
-            if (subasta != null)
-                montoPuja = CalcularPujaMinima();
-
-            await InvokeAsync(StateHasChanged);
-        });
+         await InvokeAsync(StateHasChanged);
+    });
 
         await hubConnection.StartAsync();
         await hubConnection.InvokeAsync("UnirseASubasta", Id);
@@ -426,6 +473,20 @@
         return subasta.CantidadPujas == 0
             ? subasta.PrecioBase
             : subasta.PujaActual + subasta.IncrementoMinimo;
+    }
+
+    private bool Participo()
+    => pujas.Any(p =>
+        p.Usuario == $"Usuario***{compradorId}");
+
+    private bool EsLider()
+    {
+        var mayor = pujas
+            .OrderByDescending(p => p.Monto)
+            .FirstOrDefault();
+
+        return mayor?.Usuario ==
+               $"Usuario***{compradorId}";
     }
 
 
@@ -549,7 +610,7 @@
             _ => Color.Default
         };
 
-
+        
     // La API devuelve errores como:
     // { "mensaje": "Saldo insuficiente." }
 
@@ -560,6 +621,9 @@
 
     public async ValueTask DisposeAsync()
     {
+        temporizadorCts?.Cancel();
+        temporizadorCts?.Dispose();
+
         if (hubConnection == null)
             return;
 
@@ -568,4 +632,63 @@
 
         await hubConnection.DisposeAsync();
     }
+    private void IniciarTemporizador()
+    {
+        temporizadorCts?.Cancel();
+        temporizadorCts = new CancellationTokenSource();
+
+        ActualizarTiempo();
+        _ = EjecutarTemporizador(temporizadorCts.Token);
+    }
+
+    private async Task EjecutarTemporizador(CancellationToken token)
+    {
+        try
+        {
+            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+
+            while (await timer.WaitForNextTickAsync(token))
+            {
+                ActualizarTiempo();
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (OperationCanceledException) { }
+    }
+
+    private void ActualizarTiempo()
+    {
+        if (subasta == null)
+            return;
+
+        var restante = subasta.FechaFin.ToLocalTime() - DateTime.Now;
+
+        tiempoRestante = restante > TimeSpan.Zero
+            ? restante
+            : TimeSpan.Zero;
+    }
+
+    private string TextoTemporizador()
+    {
+        if (tiempoRestante <= TimeSpan.Zero)
+            return "Finalizada";
+
+        return $"{(int)tiempoRestante.TotalHours:00}:" +
+               $"{tiempoRestante.Minutes:00}:" +
+               $"{tiempoRestante.Seconds:00}";
+    }
+
+    private Color ColorTemporizador()
+    {
+        if (tiempoRestante <= TimeSpan.FromSeconds(30))
+            return Color.Error;
+
+        if (tiempoRestante <= TimeSpan.FromMinutes(1))
+            return Color.Warning;
+
+        return Color.Primary;
+    }
+
+
+
 }
