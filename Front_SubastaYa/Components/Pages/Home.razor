@@ -1,7 +1,160 @@
 ﻿@page "/"
+@page "/home"
 
-<PageTitle>Home</PageTitle>
+@inject NavigationManager Navigation
 
-<h1>Hello, world!</h1>
+<MudContainer MaxWidth="MaxWidth.Large" Class="home-container">
 
-Welcome to your new app.
+    <MudPaper Class="home-hero" Elevation="0">
+
+        <div class="home-hero-contenido">
+
+            <div>
+                <MudText Typo="Typo.h3" Class="home-titulo">
+                    Bienvenido a SubastaYa
+                </MudText>
+
+                <MudText Typo="Typo.h6" Class="home-subtitulo">
+                    Publicá, ofertá y participá en subastas en tiempo real.
+                </MudText>
+
+                <MudStack Row="true" Spacing="2" Class="mt-5">
+
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.Search"
+                               OnClick="@(() => Ir("/subastas"))">
+                        Ver subastas
+                    </MudButton>
+
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.AddCircle"
+                               OnClick="@(() => Ir("/crear-subasta"))">
+                        Publicar subasta
+                    </MudButton>
+
+                </MudStack>
+            </div>
+
+            <MudIcon Icon="@Icons.Material.Filled.Gavel"
+                     Class="home-icono" />
+
+        </div>
+
+    </MudPaper>
+
+
+    <MudText Typo="Typo.h5" Class="mt-6 mb-4">
+        ¿Qué querés hacer?
+    </MudText>
+
+    <MudGrid>
+
+        <MudItem xs="12" sm="6" md="4">
+            <MudCard Class="home-card" @onclick="@(() => Ir("/subastas"))">
+                <MudCardContent>
+                    <MudIcon Icon="@Icons.Material.Filled.Storefront"
+                             Color="Color.Primary"
+                             Size="Size.Large" />
+
+                    <MudText Typo="Typo.h6" Class="mt-3">
+                        Explorar subastas
+                    </MudText>
+
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        Encontrá productos, filtrá resultados y realizá ofertas.
+                    </MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+
+        <MudItem xs="12" sm="6" md="4">
+            <MudCard Class="home-card" @onclick="@(() => Ir("/crear-subasta"))">
+                <MudCardContent>
+                    <MudIcon Icon="@Icons.Material.Filled.AddCircle"
+                             Color="Color.Primary"
+                             Size="Size.Large" />
+
+                    <MudText Typo="Typo.h6" Class="mt-3">
+                        Publicar subasta
+                    </MudText>
+
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        Creá una nueva publicación y configurá sus condiciones.
+                    </MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+
+        <MudItem xs="12" sm="6" md="4">
+            <MudCard Class="home-card" @onclick="@(() => Ir("/billetera"))">
+                <MudCardContent>
+                    <MudIcon Icon="@Icons.Material.Filled.AccountBalanceWallet"
+                             Color="Color.Primary"
+                             Size="Size.Large" />
+
+                    <MudText Typo="Typo.h6" Class="mt-3">
+                        Mi billetera
+                    </MudText>
+
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        Consultá saldo, fondos retenidos y movimientos.
+                    </MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+    </MudGrid>
+
+
+    <MudText Typo="Typo.h5" Class="mt-6 mb-4">
+        Mi actividad
+    </MudText>
+
+    <MudGrid>
+
+        <MudItem xs="12" sm="6">
+            <MudCard Class="home-card" @onclick="@(() => Ir("/mis-publicaciones"))">
+                <MudCardContent>
+                    <MudIcon Icon="@Icons.Material.Filled.Inventory2"
+                             Color="Color.Primary" />
+
+                    <MudText Typo="Typo.h6" Class="mt-2">
+                        Mis publicaciones
+                    </MudText>
+
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        Revisá las subastas que publicaste.
+                    </MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudCard Class="home-card" @onclick="@(() => Ir("/mis-pujas"))">
+                <MudCardContent>
+                    <MudIcon Icon="@Icons.Material.Filled.ShoppingBag"
+                             Color="Color.Primary" />
+
+                    <MudText Typo="Typo.h6" Class="mt-2">
+                        Mis compras / pujas
+                    </MudText>
+
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        Consultá las subastas en las que participaste.
+                    </MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+    </MudGrid>
+
+</MudContainer>
+
+@code {
+    private void Ir(string ruta)
+        => Navigation.NavigateTo(ruta);
+}

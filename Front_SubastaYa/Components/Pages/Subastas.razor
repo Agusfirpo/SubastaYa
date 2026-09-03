@@ -2,72 +2,47 @@
 
 @using System.Net.Http.Json
 @using Aplicacion.DTOs.Response
+@using Front_SubastaYa.Components
 
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ISnackbar Snackbar
 
-
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-6">
 
-    @* ============================= *@
-    @* ENCABEZADO                    *@
-    @* ============================= *@
-
-    <MudText Typo="Typo.h4">
-        Subastas
-    </MudText>
-
-    <MudText Typo="Typo.body1"
-             Color="Color.Secondary"
-             Class="mb-4">
+    <MudText Typo="Typo.h4">Subastas</MudText>
+    <MudText Typo="Typo.body1" Color="Color.Secondary" Class="mb-4">
         Encontrá y participá en subastas
     </MudText>
 
-
-    @* ============================= *@
-    @* FILTROS                       *@
-    @* ============================= *@
-
+    @* FILTROS *@
     <MudPaper Class="pa-4 mb-6" Elevation="1">
-
         <MudGrid>
 
-            @* ESTADO *@
+            <MudItem xs="12" md="4">
+                <MudTextField T="string"
+                              Label="Buscar"
+                              Placeholder="Título de la subasta..."
+                              Variant="Variant.Outlined"
+                              Adornment="Adornment.End"
+                              AdornmentIcon="@Icons.Material.Filled.Search"
+                              @bind-Value="busqueda" />
+            </MudItem>
 
-            <MudItem xs="12" sm="6" md="3">
-
+            <MudItem xs="12" sm="6" md="2">
                 <MudSelect T="string"
                            Label="Estado"
                            Variant="Variant.Outlined"
                            @bind-Value="estado"
                            Clearable="true">
-
-                    <MudSelectItem T="string" Value="@("Activa")">
-                        Activa
-                    </MudSelectItem>
-
-                    <MudSelectItem T="string" Value="@("Programada")">
-                        Programada
-                    </MudSelectItem>
-
-                    <MudSelectItem T="string" Value="@("Finalizada")">
-                        Finalizada
-                    </MudSelectItem>
-
-                    <MudSelectItem T="string" Value="@("Desierta")">
-                        Desierta
-                    </MudSelectItem>
-
+                    <MudSelectItem Value="@("Activa")">Activa</MudSelectItem>
+                    <MudSelectItem Value="@("Programada")">Programada</MudSelectItem>
+                    <MudSelectItem Value="@("Finalizada")">Finalizada</MudSelectItem>
+                    <MudSelectItem Value="@("Desierta")">Desierta</MudSelectItem>
                 </MudSelect>
-
             </MudItem>
 
-
-            @* CATEGORÍA *@
-
             <MudItem xs="12" sm="6" md="3">
-
                 <MudSelect T="int?"
                            Label="Categoría"
                            Variant="Variant.Outlined"
@@ -76,255 +51,181 @@
 
                     @foreach (var categoria in categorias)
                     {
-                        <MudSelectItem T="int?"
-                                       Value="@((int?)categoria.Id)">
+                        <MudSelectItem T="int?" Value="@((int?)categoria.Id)">
                             @categoria.Nombre
                         </MudSelectItem>
                     }
 
                 </MudSelect>
-
             </MudItem>
 
-
-            @* PRECIO MÍNIMO *@
-
-            <MudItem xs="12" sm="6" md="2">
-
-                <MudNumericField T="decimal?"
-                                 Label="Precio mínimo"
-                                 Variant="Variant.Outlined"
-                                 @bind-Value="precioMinimo" />
-
-            </MudItem>
-
-
-            @* PRECIO MÁXIMO *@
-
-            <MudItem xs="12" sm="6" md="2">
-
-                <MudNumericField T="decimal?"
-                                 Label="Precio máximo"
-                                 Variant="Variant.Outlined"
-                                 @bind-Value="precioMaximo" />
-
-            </MudItem>
-
-
-            @* ORDENAMIENTO *@
-
-            <MudItem xs="12" sm="6" md="2">
-
+            <MudItem xs="12" sm="6" md="3">
                 <MudSelect T="string"
                            Label="Ordenar"
                            Variant="Variant.Outlined"
                            @bind-Value="orden"
                            Clearable="true">
-
-                    <MudSelectItem T="string"
-                                   Value="@("tiempo")">
-                        Menor tiempo
-                    </MudSelectItem>
-
-                    <MudSelectItem T="string"
-                                   Value="@("puja")">
-                        Mayor puja
-                    </MudSelectItem>
-
+                    <MudSelectItem Value="@("tiempo")">Menor tiempo</MudSelectItem>
+                    <MudSelectItem Value="@("puja")">Mayor puja</MudSelectItem>
                 </MudSelect>
+            </MudItem>
 
+            <MudItem xs="12" sm="6" md="3">
+                <MudNumericField T="decimal?"
+                                 Label="Precio mínimo"
+                                 Variant="Variant.Outlined"
+                                 @bind-Value="precioMinimo" />
+            </MudItem>
+
+            <MudItem xs="12" sm="6" md="3">
+                <MudNumericField T="decimal?"
+                                 Label="Precio máximo"
+                                 Variant="Variant.Outlined"
+                                 @bind-Value="precioMaximo" />
             </MudItem>
 
         </MudGrid>
 
-
-        @* BOTONES DE FILTRO *@
-
-        <MudStack Row="true"
-                  Spacing="2"
-                  Class="mt-4">
-
+        <MudStack Row="true" Spacing="2" Class="mt-4">
             <MudButton Variant="Variant.Filled"
                        Color="Color.Primary"
                        OnClick="AplicarFiltros">
-
                 Aplicar filtros
-
             </MudButton>
 
             <MudButton Variant="Variant.Outlined"
                        OnClick="LimpiarFiltros">
-
                 Limpiar
-
             </MudButton>
-
         </MudStack>
-
     </MudPaper>
 
 
-    @* ============================= *@
-    @* RESULTADOS                    *@
-    @* ============================= *@
-
+    @* RESULTADOS *@
     @if (cargando)
     {
         <div class="d-flex justify-center mt-8">
-
             <MudProgressCircular Indeterminate="true"
                                  Color="Color.Primary" />
-
         </div>
     }
     else if (resultado == null || resultado.Items.Count == 0)
     {
-        <MudAlert Severity="Severity.Info"
-                  Class="mt-4">
-
+        <MudAlert Severity="Severity.Info">
             No se encontraron subastas.
-
         </MudAlert>
     }
     else
     {
-        <MudGrid Class="mt-4">
+        <MudGrid>
 
             @foreach (var subasta in resultado.Items)
             {
-                <MudItem xs="12"
-                         sm="6"
-                         md="4">
+                <MudItem xs="12" sm="6" md="4">
 
-                    <MudCard Style="height: 100%;">
+                    <MudCard Class="subasta-card">
+
+                        @* IMAGEN *@
+                        @if (!string.IsNullOrWhiteSpace(subasta.UrlImagen))
+                        {
+                            <MudCardMedia Image="@subasta.UrlImagen"
+                                          Height="180" />
+                        }
+                        else
+                        {
+                            <div class="imagen-placeholder">
+                                <MudIcon Icon="@Icons.Material.Filled.Image"
+                                         Size="Size.Large" />
+                            </div>
+                        }
 
                         <MudCardContent>
 
                             <MudStack Spacing="2">
 
-                                @* TÍTULO *@
-
                                 <MudText Typo="Typo.h6">
                                     @subasta.Titulo
                                 </MudText>
 
-
-                                @* ESTADO *@
-
                                 <div>
-
                                     <MudChip T="string"
                                              Size="Size.Small"
                                              Color="@ObtenerColorEstado(subasta.Estado)">
-
                                         @subasta.Estado
-
                                     </MudChip>
-
                                 </div>
-
-
-                                @* CATEGORÍA *@
 
                                 <MudText Typo="Typo.body2"
                                          Color="Color.Secondary">
-
                                     @subasta.Categoria
-
                                 </MudText>
-
 
                                 <MudDivider />
 
+                                <MudGrid>
+                                    <MudItem xs="6">
+                                        <MudText Typo="Typo.caption">
+                                            Precio base
+                                        </MudText>
 
-                                @* PRECIO BASE *@
+                                        <MudText Typo="Typo.body1">
+                                            $ @subasta.PrecioBase.ToString("N2")
+                                        </MudText>
+                                    </MudItem>
 
-                                <MudText Typo="Typo.caption">
-                                    Precio base
-                                </MudText>
+                                    <MudItem xs="6">
+                                        <MudText Typo="Typo.caption">
+                                            Puja actual
+                                        </MudText>
 
-                                <MudText Typo="Typo.body1">
-                                    $ @subasta.PrecioBase.ToString("N2")
-                                </MudText>
-
-
-                                @* PUJA ACTUAL *@
-
-                                <MudText Typo="Typo.caption">
-                                    Puja actual
-                                </MudText>
-
-                                <MudText Typo="Typo.h5"
-                                         Color="Color.Primary">
-
-                                    $ @subasta.PujaActual.ToString("N2")
-
-                                </MudText>
-
-
-                                @* CANTIDAD DE PUJAS *@
+                                        <MudText Typo="Typo.h6"
+                                                 Color="Color.Primary">
+                                            $ @subasta.PujaActual.ToString("N2")
+                                        </MudText>
+                                    </MudItem>
+                                </MudGrid>
 
                                 <MudText Typo="Typo.body2">
-
                                     @subasta.CantidadPujas
-                                    @(subasta.CantidadPujas == 1
-                                                                ? "puja"
-                                                                : "pujas")
-
+                                    @(subasta.CantidadPujas == 1 ? "puja" : "pujas")
                                 </MudText>
 
 
-                                @* FECHA DE FINALIZACIÓN *@
-
-                                <MudText Typo="Typo.body2">
-
-                                    Finaliza:
-                                    @(subasta.FechaFin
-                                                                .ToLocalTime()
-                                                                .ToString("dd/MM/yyyy HH:mm"))
-
-                        </MudText>
+                                @* CONTADOR CON SEMÁFORO *@
+                                <ContadorSubasta FechaInicio="@subasta.FechaInicio"
+                                                 FechaFin="@subasta.FechaFin"
+                                                 Estado="@subasta.Estado" />
 
                             </MudStack>
 
                         </MudCardContent>
 
-
                         <MudCardActions>
-
                             <MudButton Variant="Variant.Filled"
                                        Color="Color.Primary"
                                        OnClick="@(() => VerSubasta(subasta.Id))">
-
                                 Ver subasta
-
                             </MudButton>
-
                         </MudCardActions>
 
                     </MudCard>
 
                 </MudItem>
-                }
+            }
 
         </MudGrid>
 
 
-        @* ============================= *@
-        @* PAGINACIÓN                    *@
-        @* ============================= *@
-
+        @* PAGINACIÓN *@
         @if (resultado.TotalPaginas > 1)
         {
             <div class="d-flex justify-center mt-6 mb-6">
-
                 <MudPagination Count="@resultado.TotalPaginas"
                                Selected="@pagina"
                                SelectedChanged="CambiarPagina"
                                ShowFirstButton="true"
                                ShowLastButton="true"
                                Color="Color.Primary" />
-
             </div>
         }
     }
@@ -334,75 +235,33 @@
 
 @code {
 
-    // =========================================
-    // DATOS
-    // =========================================
-
     private SubastasPaginadasResponse? resultado;
-
-    private IList<CategoriaResponse> categorias =
-        new List<CategoriaResponse>();
-
-
-    // =========================================
-    // CARGA
-    // =========================================
+    private IList<CategoriaResponse> categorias = [];
 
     private bool cargando;
-
-
-    // =========================================
-    // FILTROS
-    // =========================================
-
-    private string? estado;
-
+    private string? estado, orden, busqueda;
     private int? categoriaId;
-
-    private decimal? precioMinimo;
-
-    private decimal? precioMaximo;
-
-    private string? orden;
-
-
-    // =========================================
-    // PAGINACIÓN
-    // =========================================
+    private decimal? precioMinimo, precioMaximo;
 
     private int pagina = 1;
+    private const int tamanioPagina = 6;
 
-    private int tamanioPagina = 6;
-
-
-    // =========================================
-    // INICIALIZACIÓN
-    // =========================================
 
     protected override async Task OnInitializedAsync()
     {
         await CargarCategorias();
-
         await CargarSubastas();
     }
 
-
-    // =========================================
-    // CARGAR CATEGORÍAS
-    // =========================================
 
     private async Task CargarCategorias()
     {
         try
         {
-            var response =
-                await Http.GetFromJsonAsync<IList<CategoriaResponse>>(
-                    "api/v1/categorias");
-
-            categorias =
-                response ?? new List<CategoriaResponse>();
+            categorias = await Http.GetFromJsonAsync<IList<CategoriaResponse>>(
+                "api/v1/categorias") ?? [];
         }
-        catch (Exception)
+        catch
         {
             Snackbar.Add(
                 "No se pudieron cargar las categorías.",
@@ -411,78 +270,42 @@
     }
 
 
-    // =========================================
-    // CARGAR SUBASTAS
-    // =========================================
-
     private async Task CargarSubastas()
     {
         cargando = true;
 
         try
         {
-            var url =
-                $"api/v1/subastas" +
-                $"?pagina={pagina}" +
-                $"&tamanioPagina={tamanioPagina}";
+            var url = $"api/v1/subastas?pagina={pagina}&tamanioPagina={tamanioPagina}";
 
-
-            // ESTADO
+            if (!string.IsNullOrWhiteSpace(busqueda))
+                url += $"&busqueda={Uri.EscapeDataString(busqueda)}";
 
             if (!string.IsNullOrWhiteSpace(estado))
-            {
-                url +=
-                    $"&estado={Uri.EscapeDataString(estado)}";
-            }
-
-
-            // CATEGORÍA
+                url += $"&estado={Uri.EscapeDataString(estado)}";
 
             if (categoriaId.HasValue)
-            {
-                url +=
-                    $"&categoriaId={categoriaId.Value}";
-            }
-
-
-            // PRECIO MÍNIMO
+                url += $"&categoriaId={categoriaId}";
 
             if (precioMinimo.HasValue)
-            {
-                url +=
-                    $"&precioMinimo={precioMinimo.Value}";
-            }
-
-
-            // PRECIO MÁXIMO
+                url += $"&precioMinimo={precioMinimo}";
 
             if (precioMaximo.HasValue)
-            {
-                url +=
-                    $"&precioMaximo={precioMaximo.Value}";
-            }
-
-
-            // ORDENAMIENTO
+                url += $"&precioMaximo={precioMaximo}";
 
             if (!string.IsNullOrWhiteSpace(orden))
-            {
-                url +=
-                    $"&orden={Uri.EscapeDataString(orden)}";
-            }
+                url += $"&orden={Uri.EscapeDataString(orden)}";
 
-
-            resultado =
-                await Http.GetFromJsonAsync<SubastasPaginadasResponse>(
-                    url);
+            resultado = await Http
+                .GetFromJsonAsync<SubastasPaginadasResponse>(url);
         }
-        catch (Exception)
+        catch
         {
+            resultado = null;
+
             Snackbar.Add(
                 "No se pudieron cargar las subastas.",
                 Severity.Error);
-
-            resultado = null;
         }
         finally
         {
@@ -491,80 +314,40 @@
     }
 
 
-    // =========================================
-    // APLICAR FILTROS
-    // =========================================
-
     private async Task AplicarFiltros()
     {
         pagina = 1;
-
         await CargarSubastas();
     }
 
 
-    // =========================================
-    // LIMPIAR FILTROS
-    // =========================================
-
     private async Task LimpiarFiltros()
     {
-        estado = null;
-
+        estado = orden = busqueda = null;
         categoriaId = null;
-
-        precioMinimo = null;
-
-        precioMaximo = null;
-
-        orden = null;
-
+        precioMinimo = precioMaximo = null;
         pagina = 1;
 
         await CargarSubastas();
     }
 
-
-    // =========================================
-    // CAMBIAR PÁGINA
-    // =========================================
 
     private async Task CambiarPagina(int nuevaPagina)
     {
         pagina = nuevaPagina;
-
         await CargarSubastas();
     }
 
 
-    // =========================================
-    // VER DETALLE
-    // =========================================
-
     private void VerSubasta(int id)
+        => Navigation.NavigateTo($"/subastas/{id}");
+
+
+    private static Color ObtenerColorEstado(string estado) => estado switch
     {
-        Navigation.NavigateTo(
-            $"/subastas/{id}");
-    }
-
-
-    // =========================================
-    // COLOR DEL ESTADO
-    // =========================================
-
-    private Color ObtenerColorEstado(string estadoSubasta)
-    {
-        return estadoSubasta switch
-        {
-            "Activa" => Color.Success,
-
-            "Programada" => Color.Info,
-
-            "Finalizada" => Color.Default,
-
-            "Desierta" => Color.Warning,
-
-            _ => Color.Default
-        };
-    }
+        "Activa" => Color.Success,
+        "Programada" => Color.Info,
+        "Desierta" => Color.Warning,
+        _ => Color.Default
+    };
 }

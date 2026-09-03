@@ -25,14 +25,16 @@ namespace SubastaYa.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<SubastasPaginadasResponse>>ObtenerTodas(
+        public async Task<ActionResult<SubastasPaginadasResponse>> ObtenerTodas(
         [FromQuery] string? estado,
+        [FromQuery] string? busqueda,
         [FromQuery] int? categoriaId,
         [FromQuery] decimal? precioMinimo,
         [FromQuery] decimal? precioMaximo,
         [FromQuery] string? orden,
         [FromQuery] int pagina = 1,
         [FromQuery] int tamanioPagina = 10)
+
         {
             try
             {
@@ -44,7 +46,8 @@ namespace SubastaYa.Controllers
                     PrecioMaximo = precioMaximo,
                     Orden = orden,
                     Pagina = pagina,
-                    TamanioPagina = tamanioPagina
+                    TamanioPagina = tamanioPagina,
+                    Busqueda = busqueda
                 };
 
                 var resultado = await _listarSubastasHandler.Handle(query);

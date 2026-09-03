@@ -1,0 +1,127 @@
+﻿@implements IAsyncDisposable
+
+@if (Estado == "Finalizada" || Estado == "Desierta")
+{
+    <MudChip T="string"
+             Size="Size.Small"
+             Color="Color.Default"
+             Icon="@Icons.Material.Filled.Schedule">
+        Finalizada
+    </MudChip>
+}
+else if (Estado == "Programada")
+{
+    <div class="contador-container">
+        <MudText Typo="Typo.caption">
+            Comienza en
+        </MudText>
+
+        <MudChip T="string"
+                 Size="Size.Small"
+                 Color="Color.Info"
+                 Icon="@Icons.Material.Filled.Schedule">
+            @TextoTiempo()
+        </MudChip>
+    </div>
+}
+else
+{
+    <div class="contador-container">
+        <MudText Typo="Typo.caption">
+            Tiempo restante
+        </MudText>
+
+        <MudChip T="string"
+                 Size="Size.Small"
+                 Color="@ColorContador()"
+                 Icon="@Icons.Material.Filled.Circle">
+            @TextoTiempo()
+        </MudChip>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public DateTime FechaInicio { get; set; }
+
+    [Parameter]
+    public DateTime FechaFin { get; set; }
+
+    [Parameter]
+    public string Estado { get; set; } = "";
+
+    private TimeSpan tiempoRestante;
+    private CancellationTokenSource? cts;
+
+    protected override void OnInitialized()
+    {
+        ActualizarTiempo();
+
+        cts = new CancellationTokenSource();
+
+        _ = EjecutarTemporizador(cts.Token);
+    }
+
+    private async Task EjecutarTemporizador(CancellationToken token)
+    {
+        try
+        {
+            using var timer =
+                new PeriodicTimer(TimeSpan.FromSeconds(1));
+
+            while (await timer.WaitForNextTickAsync(token))
+            {
+                ActualizarTiempo();
+
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    private void ActualizarTiempo()
+    {
+        var objetivo = Estado == "Programada"
+            ? FechaInicio.ToLocalTime()
+            : FechaFin.ToLocalTime();
+
+        var restante = objetivo - DateTime.Now;
+
+        tiempoRestante = restante > TimeSpan.Zero
+            ? restante
+            : TimeSpan.Zero;
+    }
+
+    private string TextoTiempo()
+    {
+        if (tiempoRestante <= TimeSpan.Zero)
+            return "00:00:00";
+
+        var horas = (int)tiempoRestante.TotalHours;
+
+        return $"{horas:00}:" +
+               $"{tiempoRestante.Minutes:00}:" +
+               $"{tiempoRestante.Seconds:00}";
+    }
+
+    private Color ColorContador()
+    {
+        if (tiempoRestante <= TimeSpan.FromSeconds(30))
+            return Color.Error;
+
+        if (tiempoRestante <= TimeSpan.FromMinutes(1))
+            return Color.Warning;
+
+        return Color.Success;
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        cts?.Cancel();
+        cts?.Dispose();
+
+        return ValueTask.CompletedTask;
+    }
+}

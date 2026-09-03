@@ -20,5 +20,8 @@ namespace Aplicacion.DTOs.Response
         public decimal PrecioActual { get; set; }
 
         public DateTime FechaFin { get; set; }
+        public decimal Recaudacion { get; set; }
+        public string EstadoAdjudicacion { get; set; }
+
     }
 }
