@@ -1,54 +1,59 @@
-﻿.home-container {
-    padding-top: 30px;
-    padding-bottom: 40px;
+﻿.home-banner {
+    position: relative;
+    min-height: 360px;
+    border-radius: 10px;
+    overflow: hidden;
+    background-image: url("/imagenes/imagen_baner.png");
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
 }
 
-.home-hero {
-    padding: 45px;
-    border-radius: 16px;
-    background: #0b2948;
-    color: white;
-}
-
-.home-hero-contenido {
+.home-banner-overlay {
+    position: absolute;
+    inset: 0;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    padding: 45px;
+    background: linear-gradient( 90deg, rgba(8, 38, 70, .92) 0%, rgba(8, 38, 70, .72) 45%, rgba(8, 38, 70, .15) 100% );
 }
 
-.home-titulo {
+.home-banner-contenido {
+    max-width: 650px;
+    position: relative;
+    z-index: 1;
+}
+
+.home-banner-titulo {
     color: white !important;
-    font-weight: 700 !important;
+    font-weight: 800 !important;
 }
 
-.home-subtitulo {
-    color: #dce6ef !important;
+.home-banner-subtitulo {
+    color: #eef4fa !important;
     margin-top: 10px !important;
 }
 
-.home-icono {
-    font-size: 130px !important;
-    opacity: .15;
+.boton-banner-secundario {
+    color: white !important;
+    border-color: white !important;
 }
 
-.home-card {
-    height: 100%;
-    cursor: pointer;
-    border-radius: 12px;
-    transition: .2s;
-}
-
-    .home-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
+    .boton-banner-secundario:hover {
+        background: rgba(255, 255, 255, .12) !important;
     }
 
 @media (max-width: 700px) {
-    .home-hero {
-        padding: 25px;
+    .home-banner {
+        min-height: 280px;
     }
 
-    .home-icono {
-        display: none;
+    .home-banner-overlay {
+        padding: 25px;
+        background: rgba(8, 38, 70, .78);
+    }
+
+    .home-banner-titulo {
+        font-size: 2rem !important;
     }
 }

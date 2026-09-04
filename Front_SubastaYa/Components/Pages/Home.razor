@@ -5,44 +5,46 @@
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="home-container">
 
-    <MudPaper Class="home-hero" Elevation="0">
+   <MudPaper Class="home-banner" Elevation="0">
 
-        <div class="home-hero-contenido">
+    <div class="home-banner-overlay">
 
-            <div>
-                <MudText Typo="Typo.h3" Class="home-titulo">
-                    Bienvenido a SubastaYa
-                </MudText>
+        <div class="home-banner-contenido">
 
-                <MudText Typo="Typo.h6" Class="home-subtitulo">
-                    Publicá, ofertá y participá en subastas en tiempo real.
-                </MudText>
+            <MudText Typo="Typo.h3" Class="home-banner-titulo">
+                Bienvenido a SubastaYa
+            </MudText>
 
-                <MudStack Row="true" Spacing="2" Class="mt-5">
+            <MudText Typo="Typo.h6" Class="home-banner-subtitulo">
+                Publicá, ofertá y participá en subastas en tiempo real.
+            </MudText>
 
-                    <MudButton Variant="Variant.Filled"
-                               Color="Color.Primary"
-                               StartIcon="@Icons.Material.Filled.Search"
-                               OnClick="@(() => Ir("/subastas"))">
-                        Ver subastas
-                    </MudButton>
+            <MudStack Row="true" Spacing="2" Class="mt-5">
 
-                    <MudButton Variant="Variant.Outlined"
-                               Color="Color.Primary"
-                               StartIcon="@Icons.Material.Filled.AddCircle"
-                               OnClick="@(() => Ir("/crear-subasta"))">
-                        Publicar subasta
-                    </MudButton>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Search"
+                           OnClick="@(() => Ir("/subastas"))">
+                    Ver subastas
+                </MudButton>
 
-                </MudStack>
-            </div>
+                <MudButton Variant="Variant.Outlined"
+                           Class="boton-banner-secundario"
+                           StartIcon="@Icons.Material.Filled.AddCircle"
+                           OnClick="@(() => Ir("/crear-subasta"))">
+                    Publicar subasta
+                </MudButton>
 
-            <MudIcon Icon="@Icons.Material.Filled.Gavel"
-                     Class="home-icono" />
+            </MudStack>
 
         </div>
 
-    </MudPaper>
+    </div>
+
+</MudPaper>
+
+
+        
 
 
     <MudText Typo="Typo.h5" Class="mt-6 mb-4">
