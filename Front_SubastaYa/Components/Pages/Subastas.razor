@@ -194,7 +194,8 @@
                                 @* CONTADOR CON SEMÁFORO *@
                                 <ContadorSubasta FechaInicio="@subasta.FechaInicio"
                                                  FechaFin="@subasta.FechaFin"
-                                                 Estado="@subasta.Estado" />
+                                                 Estado="@subasta.Estado"
+                                                 OnTiempoCumplido="RefrescarEstado" />
 
                             </MudStack>
 
@@ -335,6 +336,12 @@
     private async Task CambiarPagina(int nuevaPagina)
     {
         pagina = nuevaPagina;
+        await CargarSubastas();
+    }
+
+    private async Task RefrescarEstado()
+    {
+        await Task.Delay(1500);
         await CargarSubastas();
     }
 

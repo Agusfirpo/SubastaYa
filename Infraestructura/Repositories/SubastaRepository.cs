@@ -133,7 +133,13 @@ namespace Infraestructura.Repositories
 
             return (items, totalItems);
         }
-
-
+        public async Task<IList<Subasta>> ObtenerProgramadasParaProcesarAsync(DateTime ahora)
+        {
+            return await _context.Subastas
+                .Where(s =>
+                    s.Estado == EstadoSubasta.Programada &&
+                    s.FechaInicio <= ahora)
+                .ToListAsync();
+        }
     }
 }

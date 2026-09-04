@@ -6,8 +6,7 @@ namespace SubastaYa.Workers
     {
         private readonly IServiceScopeFactory _scopeFactory;
 
-        public SubastaWorker(
-            IServiceScopeFactory scopeFactory)
+        public SubastaWorker(IServiceScopeFactory scopeFactory)
         {
             _scopeFactory = scopeFactory;
         }
@@ -17,25 +16,27 @@ namespace SubastaYa.Workers
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                using var scope =
-                    _scopeFactory.CreateScope();
+                using var scope = _scopeFactory.CreateScope();
 
-                var handler =
-                    scope.ServiceProvider
-                        .GetRequiredService<
-                            FinalizarSubastasHandler>();
+                var programadas = scope.ServiceProvider
+                    .GetRequiredService<ProcesarSubastasProgramadasHandler>();
+
+                var finalizar = scope.ServiceProvider
+                    .GetRequiredService<FinalizarSubastasHandler>();
 
                 try
                 {
-                    await handler.Handle();
+                    await programadas.Handle();
+                    await finalizar.Handle();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    // Más adelante podemos agregar logging.
+                    Console.WriteLine(
+                        $"Error procesando subastas: {ex.Message}");
                 }
 
                 await Task.Delay(
-                    TimeSpan.FromSeconds(10),
+                    TimeSpan.FromSeconds(1),
                     stoppingToken);
             }
         }
