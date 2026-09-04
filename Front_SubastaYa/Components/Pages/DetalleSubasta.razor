@@ -326,10 +326,14 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        await CargarUsuario();
+        if (!Sesion.EstaLogueado)
+            await Sesion.CargarSesion();
 
         if (!Sesion.EstaLogueado)
+        {
+            Navigation.NavigateTo("/login");
             return;
+        }
 
         await CargarSubasta();
 
@@ -337,7 +341,6 @@
             return;
 
         await CargarPujas();
-
         montoPuja = CalcularPujaMinima();
 
         await ConectarSignalR();

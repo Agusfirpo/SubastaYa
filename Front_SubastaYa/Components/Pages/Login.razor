@@ -1,10 +1,11 @@
-﻿@page "/login"
+﻿@page "/"
+@page "/login"
 
 @using System.Net.Http.Json
 @using Aplicacion.DTOs.Request
 @using Aplicacion.DTOs.Response
 @using Front_SubastaYa.Services
-
+@layout LoginLayout
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject SesionUsuarioService Sesion
@@ -44,7 +45,16 @@
             @(cargando ? "Ingresando..." : "Ingresar")
 
         </MudButton>
+        <MudButton Variant="Variant.Outlined"
+                   Color="Color.Primary"
+                   FullWidth="true"
+                   Class="mt-3"
+                   StartIcon="@Icons.Material.Filled.Storefront"
+                   OnClick="@(() => Navigation.NavigateTo("/subastas"))">
 
+            Ver subastas
+
+        </MudButton>
     </MudPaper>
 
 </MudContainer>
@@ -95,11 +105,7 @@
 
             await Sesion.IniciarSesion(usuario);
 
-            Snackbar.Add(
-                $"Bienvenido, {usuario.Nombre}.",
-                Severity.Success);
-
-            Navigation.NavigateTo("/home");
+            Navigation.NavigateTo("/home", forceLoad: true);
         }
         catch
         {

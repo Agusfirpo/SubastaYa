@@ -9,7 +9,6 @@ public class SesionUsuarioService
     private readonly IJSRuntime _js;
 
     public LoginResponse? Usuario { get; private set; }
-
     public bool EstaLogueado => Usuario != null;
 
     public SesionUsuarioService(IJSRuntime js)
