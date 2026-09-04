@@ -13,12 +13,11 @@
     <Folder Include="UseCases\Auditoria\Queries\" />
     <Folder Include="UseCases\Categoria\Command\" />
     <Folder Include="UseCases\Transaccion\Command\" />
-    <Folder Include="UseCases\Usuario\Command\" />
-    <Folder Include="UseCases\Usuario\Handler\" />
     <Folder Include="UseCases\Usuario\Queries\" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.12" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.30" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.30" />

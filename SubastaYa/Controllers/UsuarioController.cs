@@ -4,6 +4,9 @@ using Aplicacion.UseCases.Puja.Queries;
 using Aplicacion.UseCases.Subasta.Handler;
 using Aplicacion.UseCases.Subasta.Queries;
 using Microsoft.AspNetCore.Mvc;
+using Aplicacion.DTOs.Request;
+using Aplicacion.UseCases.Usuario.Command;
+using Aplicacion.UseCases.Usuario.Handler;
 
 namespace SubastaYa.Controllers
 {
@@ -13,10 +16,12 @@ namespace SubastaYa.Controllers
     {
         private readonly ListarSubastasPorVendedorHandler _listarSubastasPorVendedorHandler;
         private readonly ListarParticipacionesHandler _listarParticipacionesHandler;
-        public UsuarioController(ListarSubastasPorVendedorHandler listarSubastasPorVendedorHandler, ListarParticipacionesHandler listarParticipacionesHandler)
+        private readonly LoginHandler _loginHandler;
+        public UsuarioController(ListarSubastasPorVendedorHandler listarSubastasPorVendedorHandler, ListarParticipacionesHandler listarParticipacionesHandler, LoginHandler loginHandler)
         {
             _listarSubastasPorVendedorHandler = listarSubastasPorVendedorHandler;
             _listarParticipacionesHandler = listarParticipacionesHandler;
+            _loginHandler = loginHandler;   
         }
 
         [HttpGet("{usuarioId:int}/subastas")]
@@ -43,5 +48,26 @@ namespace SubastaYa.Controllers
 
             return Ok(resultado);
         }
+
+        [HttpPost("login")]
+        public async Task<ActionResult<LoginResponse>> Login(LoginRequest request)
+        {
+            var resultado = await _loginHandler.Handle(new LoginCommand
+            {
+                Email = request.Email,
+                Password = request.Password
+            });
+
+            if (resultado == null)
+                return Unauthorized(new
+                {
+                    mensaje = "Email o contraseña incorrectos."
+                });
+
+            return Ok(resultado);
+        }
+
+
+
     }
 }

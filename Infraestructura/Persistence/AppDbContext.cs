@@ -157,12 +157,42 @@ namespace Infraestructura.Persistence
 
             var fechaBase = new DateTime(2026, 8, 30, 12, 0, 0);
 
-            // 1. Usuarios
+            // 1.Usuarios
+            var passwordHash = "$2a$11$Lbbgrr7/PzD8nLmccgEkYuuhMiHckaCIMnKcvUeXWh8jquZ5VlfKy";
+
             modelBuilder.Entity<Usuario>().HasData(
-                new Usuario { Id = 1, Email = "vendedor@test.com", Nombre = "Vendedor", PasswordHash = "hash123", FechaRegistro = fechaBase.AddDays(-10) },
-                new Usuario { Id = 2, Email = "comprador1@test.com", Nombre = "Comprador 1", PasswordHash = "hash123", FechaRegistro = fechaBase.AddDays(-5) },
-                new Usuario { Id = 3, Email = "comprador2@test.com", Nombre = "Comprador 2", PasswordHash = "hash123", FechaRegistro = fechaBase.AddDays(-2) },
-                new Usuario { Id = 4, Email = "sinfondos@test.com", Nombre = "Sin Fondos", PasswordHash = "hash123", FechaRegistro = fechaBase.AddDays(-1) }
+                new Usuario
+                {
+                    Id = 1,
+                    Email = "vendedor@test.com",
+                    Nombre = "Vendedor",
+                    PasswordHash = passwordHash,
+                    FechaRegistro = fechaBase.AddDays(-10)
+                },
+                new Usuario
+                {
+                    Id = 2,
+                    Email = "comprador1@test.com",
+                    Nombre = "Comprador 1",
+                    PasswordHash = passwordHash,
+                    FechaRegistro = fechaBase.AddDays(-5)
+                },
+                new Usuario
+                {
+                    Id = 3,
+                    Email = "comprador2@test.com",
+                    Nombre = "Comprador 2",
+                    PasswordHash = passwordHash,
+                    FechaRegistro = fechaBase.AddDays(-2)
+                },
+                new Usuario
+                {
+                    Id = 4,
+                    Email = "sinfondos@test.com",
+                    Nombre = "Sin Fondos",
+                    PasswordHash = passwordHash,
+                    FechaRegistro = fechaBase.AddDays(-1)
+                }
             );
 
             // 2. Billeteras

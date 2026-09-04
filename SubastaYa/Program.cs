@@ -5,6 +5,7 @@ using Aplicacion.UseCases.Categoria.Handler;
 using Aplicacion.UseCases.Puja.Handler;
 using Aplicacion.UseCases.Subasta.Handler;
 using Aplicacion.UseCases.Transaccion.Handler;
+using Aplicacion.UseCases.Usuario.Handler;
 using Infraestructura.Persistence;
 using Infraestructura.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -38,7 +39,9 @@ builder.Services.AddScoped<ITransaccionRepository, TransaccionRepository>();
 builder.Services.AddScoped<IAuditoriaRepository, AuditoriaRepository>();
 builder.Services.AddScoped<IUnidadTrabajo, UnidadTrabajo>();
 builder.Services.AddScoped<INotificadorSubasta, NotificadorSubasta>();
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 
+builder.Services.AddScoped<LoginHandler>();
 builder.Services.AddScoped<ObtenerSubastaPorIdHandler>();
 builder.Services.AddScoped<ListarPujasPorSubastaHandler>();
 builder.Services.AddScoped<ListarSubastasHandler>();
@@ -52,6 +55,7 @@ builder.Services.AddScoped<ListarParticipacionesHandler>();
 builder.Services.AddScoped<ListarTransaccionesHandler>();
 builder.Services.AddScoped<RealizarPujaHandler>();
 builder.Services.AddScoped<ProcesarSubastasProgramadasHandler>();
+
 
 builder.Services.AddHostedService<SubastaWorker>();
 builder.Services.AddSignalR();
@@ -68,6 +72,9 @@ builder.Services.AddCors(options =>
 });
 
 
+
+var passwordHash = BCrypt.Net.BCrypt.HashPassword("1234");
+Console.WriteLine($"PASSWORD HASH: {passwordHash}");
 
 
 var app = builder.Build();
