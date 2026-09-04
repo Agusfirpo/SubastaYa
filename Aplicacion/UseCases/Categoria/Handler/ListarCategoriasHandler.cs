@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Aplicacion.Mappers;
 
 namespace Aplicacion.UseCases.Categoria.Handler
 {
@@ -22,13 +23,7 @@ namespace Aplicacion.UseCases.Categoria.Handler
         {
             var categorias = await _categoriasRepository.ObtenerTodasAsync();
 
-            return categorias.Select(c => new CategoriaResponse
-            {
-                Id = c.Id,
-                Nombre = c.Nombre,
-                UrlIcono = c.UrlIcono,
-            })
-                .ToList();
+            return categorias.Select(CategoriaMappers.ToResponse).ToList();
         }
     }
 }
