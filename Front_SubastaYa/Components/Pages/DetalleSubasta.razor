@@ -15,22 +15,6 @@
 @inject ISnackbar Snackbar
 
 
-
-<MudPaper Class="pa-4 mb-4" Elevation="0">
-
-    <MudText Typo="Typo.caption">
-        Tiempo restante
-    </MudText>
-
-    <MudText Typo="Typo.h4"
-             Color="@ColorTemporizador()">
-
-        @TextoTemporizador()
-
-    </MudText>
-
-</MudPaper>
-
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-6">
 
     <MudButton StartIcon="@Icons.Material.Filled.ArrowBack"
@@ -168,12 +152,16 @@
 
                         <MudText>
                             Inicio:
-                            @subasta.FechaInicio                    
+                            @subasta.FechaInicio
+                            .ToLocalTime()
+                            .ToString("dd/MM/yyyy HH:mm")
                         </MudText>
 
                         <MudText>
                             Finaliza:
                             @subasta.FechaFin
+                            .ToLocalTime()
+                            .ToString("dd/MM/yyyy HH:mm")
                         </MudText>
 
                     </MudStack>
@@ -308,6 +296,8 @@
 
                         <MudTd DataLabel="Fecha">
                             @context.FechaPuja
+                            .ToLocalTime()
+                            .ToString("dd/MM/yyyy HH:mm:ss")
                         </MudTd>
 
                     </RowTemplate>
@@ -351,7 +341,6 @@
 
         montoPuja = CalcularPujaMinima();
 
-        IniciarTemporizador();
         await ConectarSignalR();
     }
 
@@ -618,9 +607,6 @@
 
     public async ValueTask DisposeAsync()
     {
-        temporizadorCts?.Cancel();
-        temporizadorCts?.Dispose();
-
         if (hubConnection == null)
             return;
 
