@@ -2,21 +2,20 @@
 
 @using System.Net
 @using System.Net.Http.Json
+@using System.Text.Json
 @using Aplicacion.DTOs.Request
 @using Aplicacion.DTOs.Response
 @using Microsoft.AspNetCore.SignalR.Client
-@using System.Text.Json
+@using Front_SubastaYa.Components
+
 @implements IAsyncDisposable
+
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ISnackbar Snackbar
 
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-6">
-
-    @* ============================= *@
-    @* BOTÓN VOLVER                  *@
-    @* ============================= *@
 
     <MudButton StartIcon="@Icons.Material.Filled.ArrowBack"
                Variant="Variant.Text"
@@ -25,43 +24,52 @@
     </MudButton>
 
 
-    @* ============================= *@
-    @* ESTADO DE CARGA               *@
-    @* ============================= *@
-
     @if (cargando)
     {
         <div class="d-flex justify-center mt-8">
-            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            <MudProgressCircular Indeterminate="true"
+                                 Color="Color.Primary" />
         </div>
     }
-
-    @* ============================= *@
-    @* SUBASTA NO ENCONTRADA         *@
-    @* ============================= *@
-
     else if (subasta == null)
     {
         <MudAlert Severity="Severity.Error" Class="mt-4">
             No se encontró la subasta.
         </MudAlert>
     }
-
-    @* ============================= *@
-    @* SUBASTA ENCONTRADA            *@
-    @* ============================= *@
-
     else
     {
-        <MudGrid Class="mt-4">
+        @* CONTADOR *@
+        <MudPaper Class="pa-4 mt-4 mb-4" Elevation="1">
 
-            @* ============================= *@
-            @* DETALLE DE LA SUBASTA         *@
-            @* ============================= *@
+            <ContadorSubasta FechaInicio="@subasta.FechaInicio"
+                             FechaFin="@subasta.FechaFin"
+                             Estado="@subasta.Estado"
+                             OnTiempoCumplido="RefrescarSubasta" />
 
+        </MudPaper>
+
+
+        <MudGrid>
+
+            @* DETALLE *@
             <MudItem xs="12" md="8">
 
                 <MudPaper Class="pa-6" Elevation="1">
+
+                    @if (!string.IsNullOrWhiteSpace(subasta.UrlImagen))
+                    {
+                        <MudImage Src="@subasta.UrlImagen"
+                                  Alt="@subasta.Titulo"
+                                  Class="detalle-imagen mb-4" />
+                    }
+                    else
+                    {
+                        <div class="imagen-placeholder-detalle mb-4">
+                            <MudIcon Icon="@Icons.Material.Filled.Image"
+                                     Size="Size.Large" />
+                        </div>
+                    }
 
                     <MudStack Spacing="3">
 
@@ -88,33 +96,46 @@
 
                         <MudDivider />
 
-                        @* PRECIOS Y PUJAS *@
 
+                        @* PRECIOS *@
                         <MudGrid>
 
                             <MudItem xs="6">
-                                <MudText Typo="Typo.caption">Precio base</MudText>
+                                <MudText Typo="Typo.caption">
+                                    Precio base
+                                </MudText>
+
                                 <MudText Typo="Typo.h6">
                                     $ @subasta.PrecioBase.ToString("N2")
                                 </MudText>
                             </MudItem>
 
                             <MudItem xs="6">
-                                <MudText Typo="Typo.caption">Puja actual</MudText>
-                                <MudText Typo="Typo.h4" Color="Color.Primary">
+                                <MudText Typo="Typo.caption">
+                                    Puja actual
+                                </MudText>
+
+                                <MudText Typo="Typo.h4"
+                                         Color="Color.Primary">
                                     $ @subasta.PujaActual.ToString("N2")
                                 </MudText>
                             </MudItem>
 
                             <MudItem xs="6">
-                                <MudText Typo="Typo.caption">Incremento mínimo</MudText>
+                                <MudText Typo="Typo.caption">
+                                    Incremento mínimo
+                                </MudText>
+
                                 <MudText Typo="Typo.h6">
                                     $ @subasta.IncrementoMinimo.ToString("N2")
                                 </MudText>
                             </MudItem>
 
                             <MudItem xs="6">
-                                <MudText Typo="Typo.caption">Cantidad de pujas</MudText>
+                                <MudText Typo="Typo.caption">
+                                    Cantidad de pujas
+                                </MudText>
+
                                 <MudText Typo="Typo.h6">
                                     @subasta.CantidadPujas
                                 </MudText>
@@ -124,48 +145,29 @@
 
                         <MudDivider />
 
-                        @* VENDEDOR Y FECHAS *@
-
                         <MudText>
-                            Vendedor: <strong>@subasta.Vendedor</strong>
+                            Vendedor:
+                            <strong>@subasta.Vendedor</strong>
                         </MudText>
 
                         <MudText>
                             Inicio:
-                            @(subasta.FechaInicio.ToLocalTime()
-                                                    .ToString("dd/MM/yyyy HH:mm"))
-                                                                              </MudText>
+                            @subasta.FechaInicio                    
+                        </MudText>
 
                         <MudText>
                             Finaliza:
-                            @(subasta.FechaFin.ToLocalTime()
-                                                    .ToString("dd/MM/yyyy HH:mm"))
-                    </MudText>
+                            @subasta.FechaFin
+                        </MudText>
 
                     </MudStack>
-                 
-                    
-                    <MudImage Src="@subasta.UrlImagen"
-                              Alt="@subasta.Titulo"
-                              Class="detalle-imagen mb-4" />
-                    
-               
-                    
-                    <div class="imagen-placeholder-detalle mb-4">
-                        <MudIcon Icon="@Icons.Material.Filled.Image"
-                                 Size="Size.Large" />
-                    </div>
-                    
 
                 </MudPaper>
 
             </MudItem>
 
 
-            @* ============================= *@
-            @* PANEL PARA REALIZAR PUJA      *@
-            @* ============================= *@
-
+            @* PANEL DE PUJA *@
             <MudItem xs="12" md="4">
 
                 <MudPaper Class="pa-6" Elevation="1">
@@ -175,9 +177,22 @@
                     </MudText>
 
 
-                    @* SOLO PERMITIMOS PUJAR SI ESTÁ ACTIVA *@
+                    @if (Participo())
+                    {
+                        <MudAlert Severity="@(EsLider()
+                                                              ? Severity.Success
+                                                              : Severity.Warning)"
+                                                                                 Class="mb-3">
 
-                @if (subasta.Estado == "Activa")
+                            @(EsLider()
+                                                ? "Estás liderando esta subasta"
+                                                : "Tu oferta fue superada")
+
+                </MudAlert>
+                                }
+
+
+                    @if (subasta.Estado == "Activa")
                     {
                         <MudNumericField T="int"
                                          Label="ID comprador"
@@ -195,7 +210,8 @@
                                          AdornmentText="$"
                                          Class="mb-3" />
 
-                        <MudText Typo="Typo.caption" Class="mb-4">
+                        <MudText Typo="Typo.caption"
+                                 Class="mb-4">
                             Puja mínima:
                             $ @CalcularPujaMinima().ToString("N2")
                         </MudText>
@@ -220,9 +236,13 @@
                     else
                     {
                         <MudAlert Severity="Severity.Info">
-                            Esta subasta no se encuentra activa.
-                        </MudAlert>
-                    }
+
+                            @(subasta.Estado == "Programada"
+                                                ? "La subasta todavía no comenzó."
+                                                : "Esta subasta ya no se encuentra activa.")
+
+                </MudAlert>
+                                }
 
                 </MudPaper>
 
@@ -231,10 +251,7 @@
         </MudGrid>
 
 
-        @* ============================= *@
-        @* HISTORIAL DE PUJAS            *@
-        @* ============================= *@
-
+        @* HISTORIAL *@
         <MudPaper Class="pa-6 mt-6 mb-6" Elevation="1">
 
             <MudText Typo="Typo.h5" Class="mb-4">
@@ -253,7 +270,9 @@
             }
             else
             {
-                <MudTable Items="@pujas" Hover="true" Dense="true">
+                <MudTable Items="@pujas"
+                          Hover="true"
+                          Dense="true">
 
                     <HeaderContent>
                         <MudTh>Usuario</MudTh>
@@ -272,14 +291,13 @@
                         </MudTd>
 
                         <MudTd DataLabel="Fecha">
-                            @(context.FechaPuja.ToLocalTime()
-                                                .ToString("dd/MM/yyyy HH:mm:ss"))
-                </MudTd>
+                            @context.FechaPuja
+                        </MudTd>
 
                     </RowTemplate>
 
                 </MudTable>
-                }
+            }
 
         </MudPaper>
     }
@@ -289,45 +307,22 @@
 
 @code {
 
-    // =========================================
-    // ID QUE RECIBIMOS DESDE /subastas/{id}
-    // =========================================
-
     [Parameter]
     public int Id { get; set; }
 
 
-    // =========================================
-    // DATOS DE LA PÁGINA
-    // =========================================
     private HubConnection? hubConnection;
     private DetalleSubastaResponse? subasta;
-
-    private IList<PujaResponse> pujas = new List<PujaResponse>();
-
-
-    // =========================================
-    // VARIABLES PARA MOSTRAR CARGA
-    // =========================================
+    private IList<PujaResponse> pujas = [];
 
     private bool cargando = true;
     private bool cargandoPujas = true;
     private bool enviandoPuja;
 
-
-    // =========================================
-    // DATOS DEL FORMULARIO DE PUJA
-    // =========================================
-
-    // Temporal hasta que tengamos usuario logueado.
+    // Temporal hasta implementar login.
     private int compradorId = 3;
-
     private decimal montoPuja;
 
-
-    // =========================================
-    // CUANDO ABRIMOS /subastas/{id}
-    // =========================================
 
     protected override async Task OnParametersSetAsync()
     {
@@ -344,18 +339,15 @@
     }
 
 
-    // =========================================
-    // GET /api/v1/subastas/{id}
-    // =========================================
-
     private async Task CargarSubasta()
     {
         cargando = true;
 
         try
         {
-            subasta = await Http.GetFromJsonAsync<DetalleSubastaResponse>(
-                $"api/v1/subastas/{Id}");
+            subasta = await Http
+                .GetFromJsonAsync<DetalleSubastaResponse>(
+                    $"api/v1/subastas/{Id}");
         }
         catch (HttpRequestException ex)
             when (ex.StatusCode == HttpStatusCode.NotFound)
@@ -364,8 +356,11 @@
         }
         catch
         {
-            Snackbar.Add("No se pudo cargar la subasta.", Severity.Error);
             subasta = null;
+
+            Snackbar.Add(
+                "No se pudo cargar la subasta.",
+                Severity.Error);
         }
         finally
         {
@@ -374,22 +369,20 @@
     }
 
 
-    // =========================================
-    // GET /api/v1/subastas/{id}/pujas
-    // =========================================
-
     private async Task CargarPujas()
     {
         cargandoPujas = true;
 
         try
         {
-            pujas = await Http.GetFromJsonAsync<IList<PujaResponse>>(
-                $"api/v1/subastas/{Id}/pujas")
-                ?? new List<PujaResponse>();
+            pujas = await Http
+                .GetFromJsonAsync<IList<PujaResponse>>(
+                    $"api/v1/subastas/{Id}/pujas") ?? [];
         }
         catch
         {
+            pujas = [];
+
             Snackbar.Add(
                 "No se pudo cargar el historial.",
                 Severity.Error);
@@ -400,51 +393,92 @@
         }
     }
 
+
+    private async Task RefrescarSubasta()
+    {
+        // Le damos tiempo al Worker para actualizar el estado.
+        await Task.Delay(1500);
+
+        await CargarSubasta();
+
+        if (subasta == null)
+            return;
+
+        await CargarPujas();
+
+        montoPuja = CalcularPujaMinima();
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+
     private async Task ConectarSignalR()
     {
         if (hubConnection != null)
             return;
 
         hubConnection = new HubConnectionBuilder()
-            .WithUrl(new Uri(Http.BaseAddress!, "hubs/subastas"))
+            .WithUrl(new Uri(
+                Http.BaseAddress!,
+                "hubs/subastas"))
             .WithAutomaticReconnect()
             .Build();
 
-        hubConnection.On<JsonElement>("NuevaPuja", async _ =>
-        {
-            await CargarSubasta();
-            await CargarPujas();
 
-            if (subasta != null)
-                montoPuja = CalcularPujaMinima();
+        hubConnection.On<JsonElement>(
+            "NuevaPuja",
+            async evento =>
+            {
+                var extendida =
+                    evento.TryGetProperty(
+                        "tiempoExtendido",
+                        out var valor)
+                    && valor.GetBoolean();
 
-            await InvokeAsync(StateHasChanged);
-        });
+                await CargarSubasta();
+                await CargarPujas();
+
+                if (subasta != null)
+                    montoPuja = CalcularPujaMinima();
+
+                if (extendida)
+                {
+                    Snackbar.Add(
+                        "La subasta fue extendida 2 minutos por anti-sniping.",
+                        Severity.Warning);
+                }
+
+                await InvokeAsync(StateHasChanged);
+            });
+
 
         await hubConnection.StartAsync();
-        await hubConnection.InvokeAsync("UnirseASubasta", Id);
+
+        await hubConnection.InvokeAsync(
+            "UnirseASubasta",
+            Id);
     }
 
 
-
-    // =========================================
-    // CALCULAR MONTO MÍNIMO
-    // =========================================
-
-    private decimal CalcularPujaMinima()
-    {
-        if (subasta == null)
-            return 0;
-
-        return subasta.CantidadPujas == 0
-            ? subasta.PrecioBase
-            : subasta.PujaActual + subasta.IncrementoMinimo;
-    }
+    private decimal CalcularPujaMinima() =>
+        subasta == null
+            ? 0
+            : subasta.CantidadPujas == 0
+                ? subasta.PrecioBase
+                : subasta.PujaActual
+                  + subasta.IncrementoMinimo;
 
 
-    // =========================================
-    // POST /api/v1/subastas/{id}/pujas
-    // =========================================
+    private bool Participo() =>
+        pujas.Any(p =>
+            p.Usuario == $"Usuario***{compradorId}");
+
+
+    private bool EsLider() =>
+        pujas.OrderByDescending(p => p.Monto)
+             .FirstOrDefault()?.Usuario
+        == $"Usuario***{compradorId}";
+
 
     private async Task RealizarPuja()
     {
@@ -453,7 +487,10 @@
 
         if (subasta.Estado != "Activa")
         {
-            Snackbar.Add("La subasta ya no está activa.", Severity.Warning);
+            Snackbar.Add(
+                "La subasta ya no está activa.",
+                Severity.Warning);
+
             return;
         }
 
@@ -461,7 +498,10 @@
 
         if (compradorId <= 0)
         {
-            Snackbar.Add("Comprador inválido.", Severity.Warning);
+            Snackbar.Add(
+                "Comprador inválido.",
+                Severity.Warning);
+
             return;
         }
 
@@ -474,38 +514,40 @@
             return;
         }
 
+
         enviandoPuja = true;
 
         try
         {
-            var request = new RealizarPujaRequest
-            {
-                CompradorId = compradorId,
-                Monto = montoPuja
-            };
-
             var response = await Http.PostAsJsonAsync(
                 $"api/v1/subastas/{Id}/pujas",
-                request);
+                new RealizarPujaRequest
+                {
+                    CompradorId = compradorId,
+                    Monto = montoPuja
+                });
+
 
             if (!response.IsSuccessStatusCode)
             {
-                var mensaje = await ObtenerMensajeError(response);
+                var mensaje =
+                    await ObtenerMensajeError(response);
 
                 Snackbar.Add(
                     mensaje,
-                    response.StatusCode == HttpStatusCode.Conflict
+                    response.StatusCode
+                    == HttpStatusCode.Conflict
                         ? Severity.Warning
                         : Severity.Error);
 
                 return;
             }
 
+
             Snackbar.Add(
                 "Puja realizada correctamente.",
                 Severity.Success);
 
-            // Actualizamos pantalla después de pujar.
             await CargarSubasta();
             await CargarPujas();
 
@@ -523,10 +565,6 @@
         }
     }
 
-
-    // =========================================
-    // LEER EL MENSAJE QUE DEVUELVE LA API
-    // =========================================
 
     private async Task<string> ObtenerMensajeError(
         HttpResponseMessage response)
@@ -547,20 +585,12 @@
     }
 
 
-    // =========================================
-    // VOLVER AL CATÁLOGO
-    // =========================================
-
-    private void Volver()
-        => Navigation.NavigateTo("/subastas");
+    private void Volver() =>
+        Navigation.NavigateTo("/subastas");
 
 
-    // =========================================
-    // COLOR DEL ESTADO
-    // =========================================
-
-    private Color ObtenerColorEstado(string estado)
-        => estado switch
+    private static Color ObtenerColorEstado(string estado) =>
+        estado switch
         {
             "Activa" => Color.Success,
             "Programada" => Color.Info,
@@ -569,22 +599,25 @@
         };
 
 
-    // La API devuelve errores como:
-    // { "mensaje": "Saldo insuficiente." }
-
-    private class ErrorResponse
-    {
-        public string Mensaje { get; set; } = string.Empty;
-    }
-
     public async ValueTask DisposeAsync()
     {
         if (hubConnection == null)
             return;
 
-        if (hubConnection.State == HubConnectionState.Connected)
-            await hubConnection.InvokeAsync("SalirDeSubasta", Id);
+        if (hubConnection.State
+            == HubConnectionState.Connected)
+        {
+            await hubConnection.InvokeAsync(
+                "SalirDeSubasta",
+                Id);
+        }
 
         await hubConnection.DisposeAsync();
+    }
+
+
+    private class ErrorResponse
+    {
+        public string Mensaje { get; set; } = "";
     }
 }
