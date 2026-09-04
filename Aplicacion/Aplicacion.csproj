@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Helpers\" />
     <Folder Include="UseCases\Auditoria\Handler\" />
     <Folder Include="UseCases\Auditoria\Command\" />
     <Folder Include="UseCases\Auditoria\Queries\" />

@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Aplicacion.DTOs.Response;
+using Aplicacion.Helpers;
+using Aplicacion.Interfaces.Repositories;
+using Aplicacion.UseCases.Subasta.Queries;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Aplicacion.DTOs.Response;
-using Aplicacion.Interfaces.Repositories;
-using Aplicacion.UseCases.Subasta.Queries;
 
 namespace Aplicacion.UseCases.Subasta.Handler
 {
@@ -41,21 +42,7 @@ namespace Aplicacion.UseCases.Subasta.Handler
                     query.Busqueda
                     );
 
-            var items = resultado.Items
-                .Select(s => new SubastaResponse
-                {
-                    Id = s.Id,
-                    Titulo = s.Titulo,
-                    Categoria = s.Categoria.Nombre,
-                    UrlImagen = s.UrlImagen,
-                    PrecioBase = s.PrecioBase,
-                    PujaActual = s.Pujas.Any()? s.Pujas.Max(p => p.Monto): s.PrecioBase,
-                    CantidadPujas = s.Pujas.Count,
-                    FechaInicio = s.FechaInicio,
-                    FechaFin = s.FechaFin,
-                    Estado = s.Estado.ToString()
-                })
-                .ToList();
+            var items = resultado.Items.Select(SubastaMapper.ToResponse).ToList();
 
             var totalPaginas = (int)Math.Ceiling(resultado.TotalItems / (double)query.TamanioPagina);
 

@@ -1,4 +1,5 @@
 ﻿using Aplicacion.DTOs.Response;
+using Aplicacion.Helpers;
 using Aplicacion.Interfaces.Repositories;
 using Aplicacion.UseCases.Puja.Queries;
 using System;
@@ -21,15 +22,7 @@ namespace Aplicacion.UseCases.Puja.Handler
         {
             var pujas = await _pujaRepository.ObtenerPorSubastaIdAsync(query.SubastaId);
 
-            return pujas.Select(p => new PujaResponse
-            {
-                Id = p.Id,
-                SubastaId = p.SubastaId,
-                Monto = p.Monto,
-                FechaPuja = p.FechaPuja,
-                Usuario = $"Usuario***{p.CompradorId}"
-            })
-                .ToList();
+            return pujas.Select(PujaMapper.ToResponse).ToList();
         }
     }
 }

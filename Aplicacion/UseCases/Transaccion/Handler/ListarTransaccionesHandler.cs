@@ -1,5 +1,6 @@
 ﻿using Aplicacion.DTOs.Response;
 using Aplicacion.Interfaces.Repositories;
+using Aplicacion.Mappers;
 using Aplicacion.UseCases.Transaccion.Queries;
 using System;
 using System.Collections.Generic;
@@ -28,16 +29,7 @@ namespace Aplicacion.UseCases.Transaccion.Handler
 
             var transacciones = await _transaccionRepository.ObtenerPorBilleteraIdAsync(billetera.Id);
 
-            return transacciones
-                .Select(t => new TransaccionResponse
-                {
-                    Id = t.Id,
-                    Tipo = t.Tipo.ToString(),
-                    Monto = t.Monto,
-                    Fecha = t.Fecha,
-                    SubastaId = t.SubastaId
-                })
-                .ToList();
+            return transacciones.Select(TransaccionMapper.ToResponse).ToList();
         }
     }
 }
