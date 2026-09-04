@@ -2,7 +2,8 @@
 
 @using System.Net.Http.Json
 @using Aplicacion.DTOs.Response
-
+@using Front_SubastaYa.Services
+@inject SesionUsuarioService Sesion
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ISnackbar Snackbar
@@ -15,10 +16,7 @@
     </MudText>
 
     <MudStack Row="true" Class="mb-4">
-        <MudNumericField T="int"
-                         Label="Usuario"
-                         Variant="Variant.Outlined"
-                         @bind-Value="usuarioId" />
+        
 
         <MudButton Variant="Variant.Filled"
                    Color="Color.Primary"
@@ -93,7 +91,7 @@
 </MudContainer>
 
 @code {
-    private int usuarioId = 2;
+    private int usuarioId => Sesion.Usuario?.Id ?? 0;
     private bool cargando;
     private IList<ParticipacionResponse> participaciones = [];
 

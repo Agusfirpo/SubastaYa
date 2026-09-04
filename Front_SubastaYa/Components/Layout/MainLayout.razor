@@ -1,5 +1,8 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager Navigation
+@using Front_SubastaYa.Services
+@inject SesionUsuarioService Sesion
+@inject NavigationManager Navigation
 <MudThemeProvider Theme="@tema" />
 <MudPopoverProvider />
 <MudDialogProvider />
@@ -25,11 +28,31 @@
 
         <MudSpacer />
 
-        <MudChip T="string"
-                 Icon="@Icons.Material.Filled.Person"
-                 Class="usuario-chip">
-            Usuario
-        </MudChip>
+        @if (sesionCargada)
+        {
+            @if (Sesion.EstaLogueado)
+            {
+                <MudMenu Label="@Sesion.Usuario!.Nombre"
+                         StartIcon="@Icons.Material.Filled.Person"
+                         Color="Color.Inherit">
+
+                    <MudMenuItem Icon="@Icons.Material.Filled.Logout"
+                                 OnClick="CerrarSesion">
+                        Cerrar sesión
+                    </MudMenuItem>
+
+                </MudMenu>
+            }
+            else
+            {
+                <MudButton Variant="Variant.Text"
+                           Color="Color.Inherit"
+                           StartIcon="@Icons.Material.Filled.Login"
+                           Href="/login">
+                    Ingresar
+                </MudButton>
+            }
+        }
 
     </MudAppBar>
 
@@ -157,6 +180,20 @@
             DefaultBorderRadius = "12px"
         }
     };
+
+    private bool sesionCargada;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Sesion.CargarSesion();
+        sesionCargada = true;
+    }
+
+    private async Task CerrarSesion()
+    {
+        await Sesion.CerrarSesion();
+        Navigation.NavigateTo("/login");
+    }
 
     private void ToggleMenu()
         => menuAbierto = !menuAbierto;

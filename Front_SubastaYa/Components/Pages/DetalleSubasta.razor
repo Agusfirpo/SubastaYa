@@ -13,7 +13,8 @@
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ISnackbar Snackbar
-
+@using Front_SubastaYa.Services
+@inject SesionUsuarioService Sesion
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="mt-6">
 
@@ -198,12 +199,6 @@
 
                     @if (subasta.Estado == "Activa")
                     {
-                        <MudNumericField T="int"
-                                         Label="ID comprador"
-                                         Variant="Variant.Outlined"
-                                         @bind-Value="compradorId"
-                                         Min="1"
-                                         Class="mb-3" />
 
                         <MudNumericField T="decimal"
                                          Label="Monto"
@@ -326,12 +321,16 @@
     private bool enviandoPuja;
 
     // Temporal hasta implementar login.
-    private int compradorId = 3;
+    private int compradorId => Sesion.Usuario?.Id ?? 0;
     private decimal montoPuja;
-
 
     protected override async Task OnParametersSetAsync()
     {
+        await CargarUsuario();
+
+        if (!Sesion.EstaLogueado)
+            return;
+
         await CargarSubasta();
 
         if (subasta == null)
@@ -342,6 +341,15 @@
         montoPuja = CalcularPujaMinima();
 
         await ConectarSignalR();
+    }
+
+    private async Task CargarUsuario()
+    {
+        if (!Sesion.EstaLogueado)
+            await Sesion.CargarSesion();
+
+        if (!Sesion.EstaLogueado)
+            Navigation.NavigateTo("/login");
     }
 
 
