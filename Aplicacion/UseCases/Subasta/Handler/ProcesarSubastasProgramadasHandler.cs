@@ -1,10 +1,6 @@
 ﻿using Aplicacion.Interfaces.Repositories;
+using Aplicacion.UseCases.Subasta.Command;
 using Dominio.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Aplicacion.UseCases.Subasta.Handler
 {
@@ -13,20 +9,17 @@ namespace Aplicacion.UseCases.Subasta.Handler
         private readonly ISubastaRepository _subastaRepository;
         private readonly IUnidadTrabajo _unidadTrabajo;
 
-        public ProcesarSubastasProgramadasHandler(
-            ISubastaRepository subastaRepository,
-            IUnidadTrabajo unidadTrabajo)
+        public ProcesarSubastasProgramadasHandler(ISubastaRepository subastaRepository,IUnidadTrabajo unidadTrabajo)
         {
             _subastaRepository = subastaRepository;
             _unidadTrabajo = unidadTrabajo;
         }
 
-        public async Task Handle()
+        public async Task Handle(ProcesarSubastasProgramadasCommand command)
         {
             await _unidadTrabajo.EjecutarEnTransaccionAsync(async () =>
             {
-                var subastas = await _subastaRepository
-                    .ObtenerProgramadasParaProcesarAsync(DateTime.UtcNow);
+                var subastas = await _subastaRepository.ObtenerProgramadasParaProcesarAsync(command.FechaActual);
 
                 foreach (var subasta in subastas)
                 {
