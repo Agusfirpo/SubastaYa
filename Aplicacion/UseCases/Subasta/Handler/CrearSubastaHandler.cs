@@ -24,19 +24,13 @@ namespace Aplicacion.UseCases.Subasta.Handler
         public async Task<CrearSubastaResponse> Handle(CrearSubastaCommand command)
         {
             if (command.PrecioBase <= 0)
-            {
-                throw new ArgumentException("El precio base debe ser mayor a cero.");
-            }
+                throw new DomainException("El precio base debe ser mayor a cero.");
 
             if (command.IncrementoMinimo <= 0)
-            {
-                throw new ArgumentException("El incremento mínimo debe ser mayor a cero.");
-            }
+                throw new DomainException("El incremento mínimo debe ser mayor a cero.");
 
             if (command.FechaFin <= command.FechaInicio)
-            {
-                throw new ArgumentException("La fecha de finalización debe ser posterior a la fecha de inicio.");
-            }
+                throw new DomainException("La fecha de finalización debe ser posterior a la fecha de inicio.");
 
             var estado = command.FechaInicio > DateTime.UtcNow
                 ? EstadoSubasta.Programada

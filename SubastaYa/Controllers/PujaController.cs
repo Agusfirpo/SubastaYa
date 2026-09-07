@@ -12,23 +12,21 @@ namespace SubastaYa.Controllers
     [Route("api/v1/subastas/{subastaId:int}/pujas")]
     public class PujaController : ControllerBase
     {
-        private readonly ListarPujasPorSubastaHandler _listarPujasPorSubastaHandler;
-        private readonly RealizarPujaHandler _realizarPujaHandler;
-        public PujaController(ListarPujasPorSubastaHandler listarPujasPorSubastaHandler , RealizarPujaHandler realizarPujaHandler)
+        private readonly ListarPujasPorSubastaHandler _listar;
+        private readonly RealizarPujaHandler _realizar;
+        public PujaController(ListarPujasPorSubastaHandler listar, RealizarPujaHandler realizar)
         {
-            _listarPujasPorSubastaHandler = listarPujasPorSubastaHandler;
-            _realizarPujaHandler = realizarPujaHandler; 
+            _listar = listar;
+            _realizar = realizar;
         }
 
         [HttpGet]
         public async Task<ActionResult<IList<PujaResponse>>> ObtenerPorSubasta(int subastaId)
         {
-            var query = new ListarPujasPorSubastaQuery
-            {
-                SubastaId = subastaId
-            };
-
-            var resultado = await _listarPujasPorSubastaHandler.Handle(query);
+            var resultado = await _listar.Handle(new ListarPujasPorSubastaQuery
+                {
+                    SubastaId = subastaId
+                });
 
             return Ok(resultado);
         }
@@ -36,43 +34,14 @@ namespace SubastaYa.Controllers
         [HttpPost]
         public async Task<ActionResult<RealizarPujaResponse>> Realizar(int subastaId,RealizarPujaRequest request)
         {
-            try
-            {
-                var command = new RealizarPujaCommand
+            var resultado = await _realizar.Handle(new RealizarPujaCommand
                 {
                     SubastaId = subastaId,
                     CompradorId = request.CompradorId,
                     Monto = request.Monto
-                };
+                });
 
-                var resultado = await _realizarPujaHandler.Handle(command);
-
-                return Created($"/api/v1/subastas/{subastaId}/pujas", resultado);
-            }
-            catch (ConcurrenciaException ex)
-            {
-                return Conflict(new
-                {
-                    mensaje = ex.Message
-                });
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Conflict(new
-                {
-                    mensaje = ex.Message
-                });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new
-                {
-                    mensaje = ex.Message
-                });
-            }
+            return Created($"/api/v1/subastas/{subastaId}/pujas",resultado);
         }
-
-
-
     }
 }

@@ -1,13 +1,10 @@
 ﻿using Aplicacion.DTOs.Response;
+using Aplicacion.Exceptions;
 using Aplicacion.Interfaces.Repositories;
 using Aplicacion.UseCases.Billetera.Command;
 using Dominio.Entities;
 using Dominio.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Dominio.Exceptions;
 
 namespace Aplicacion.UseCases.Billetera.Handler
 {
@@ -18,11 +15,7 @@ namespace Aplicacion.UseCases.Billetera.Handler
         private readonly IAuditoriaRepository _auditoriaRepository;
         private readonly IUnidadTrabajo _unidadTrabajo;
 
-        public AcreditarSaldoHandler(
-            IBilleteraRepository billeteraRepository,
-            ITransaccionRepository transaccionRepository,
-            IAuditoriaRepository auditoriaRepository,
-            IUnidadTrabajo unidadTrabajo)
+        public AcreditarSaldoHandler(IBilleteraRepository billeteraRepository,ITransaccionRepository transaccionRepository,IAuditoriaRepository auditoriaRepository,IUnidadTrabajo unidadTrabajo)
         {
             _billeteraRepository = billeteraRepository;
             _transaccionRepository = transaccionRepository;
@@ -30,61 +23,56 @@ namespace Aplicacion.UseCases.Billetera.Handler
             _unidadTrabajo = unidadTrabajo;
         }
 
-        public async Task<BilleteraResponse?> Handle(
-            AcreditarSaldoCommand command)
+        public async Task<BilleteraResponse> Handle(AcreditarSaldoCommand command)
         {
             if (command.Monto <= 0)
-            {
-                throw new ArgumentException("El monto a acreditar debe ser mayor a cero.");
-            }
+                throw new DomainException("El monto a acreditar debe ser mayor a cero.");
 
             BilleteraResponse? resultado = null;
 
-            await _unidadTrabajo.EjecutarEnTransaccionAsync(
-                async () =>
-                {
-                    var billetera = await _billeteraRepository.ObtenerPorUsuarioAsync(command.UsuarioId);
+            await _unidadTrabajo.EjecutarEnTransaccionAsync(async () =>
+            {
+                var billetera = await _billeteraRepository.ObtenerPorUsuarioAsync(command.UsuarioId);
 
-                    if (billetera == null)
-                        return;
+                if (billetera == null)
+                    throw new RecursoNoEncontradoException("No se encontró la billetera del usuario.");
 
-                    billetera.SaldoTotal += command.Monto;
+                billetera.SaldoTotal += command.Monto;
+                billetera.Version++;
 
-                    billetera.Version++;
+                var ahora = DateTime.UtcNow;
 
-                    var transaccion = new TransaccionLedger
+                await _transaccionRepository.AgregarAsync(new TransaccionLedger
                     {
                         BilleteraId = billetera.Id,
                         Tipo = TipoTransaccion.Deposito,
                         Monto = command.Monto,
-                        Fecha = DateTime.UtcNow,
+                        Fecha = ahora,
                         SubastaId = null
-                    };
+                    });
 
-                    await _transaccionRepository.AgregarAsync(transaccion);
-
-                    var auditoria = new AuditoriaLog
+                await _auditoriaRepository.AgregarAsync(new AuditoriaLog
                     {
                         Entidad = "Billetera",
                         EntidadId = billetera.Id,
                         Accion = "ACREDITACION_SALDO",
                         UsuarioId = command.UsuarioId,
-                        DetalleJson = $"{{\"monto\":{command.Monto}}}",
-                        Fecha = DateTime.UtcNow
-                    };
+                        DetalleJson =
+                            $"{{\"monto\":{command.Monto}}}",
+                        Fecha = ahora
+                    });
 
-                    await _auditoriaRepository.AgregarAsync(auditoria);
+                resultado = new BilleteraResponse
+                {
+                    Id = billetera.Id,
+                    UsuarioId = billetera.UsuarioId,
+                    SaldoTotal = billetera.SaldoTotal,
+                    SaldoRetenido = billetera.SaldoRetenido,
+                    SaldoDisponible = billetera.SaldoDisponible
+                };
+            });
 
-                    resultado = new BilleteraResponse
-                    {
-                        Id = billetera.Id,
-                        UsuarioId = billetera.UsuarioId,
-                        SaldoTotal = billetera.SaldoTotal,
-                        SaldoRetenido = billetera.SaldoRetenido,
-                        SaldoDisponible = billetera.SaldoDisponible
-                    };
-                });
-            return resultado;
+            return resultado!;
         }
     }
 }

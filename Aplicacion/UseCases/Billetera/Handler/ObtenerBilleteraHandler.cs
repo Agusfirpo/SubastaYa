@@ -1,28 +1,25 @@
 ﻿using Aplicacion.DTOs.Response;
+using Aplicacion.Exceptions;
 using Aplicacion.Interfaces.Repositories;
 using Aplicacion.UseCases.Billetera.Queries;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Dominio.Exceptions;
 
 namespace Aplicacion.UseCases.Billetera.Handler
 {
     public class ObtenerBilleteraHandler
     {
         private readonly IBilleteraRepository _billeteraRepository;
-
         public ObtenerBilleteraHandler(IBilleteraRepository billeteraRepository)
         {
             _billeteraRepository = billeteraRepository;
         }
-        public async Task<BilleteraResponse?> Handle(ObtenerBilleteraQuery query)
+
+        public async Task<BilleteraResponse> Handle(ObtenerBilleteraQuery query)
         {
             var billetera = await _billeteraRepository.ObtenerPorUsuarioAsync(query.UsuarioId);
 
             if (billetera == null)
-                return null;
+                throw new RecursoNoEncontradoException("No se encontró la billetera del usuario.");
 
             return new BilleteraResponse
             {

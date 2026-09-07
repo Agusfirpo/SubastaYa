@@ -14,37 +14,35 @@ namespace SubastaYa.Controllers
     [Route("api/v1/usuarios")]
     public class UsuarioController : ControllerBase
     {
-        private readonly ListarSubastasPorVendedorHandler _listarSubastasPorVendedorHandler;
-        private readonly ListarParticipacionesHandler _listarParticipacionesHandler;
-        private readonly LoginHandler _loginHandler;
-        public UsuarioController(ListarSubastasPorVendedorHandler listarSubastasPorVendedorHandler, ListarParticipacionesHandler listarParticipacionesHandler, LoginHandler loginHandler)
+        private readonly ListarSubastasPorVendedorHandler _publicaciones;
+        private readonly ListarParticipacionesHandler _participaciones;
+        private readonly LoginHandler _login;
+
+        public UsuarioController(ListarSubastasPorVendedorHandler publicaciones, ListarParticipacionesHandler participaciones, LoginHandler login)
         {
-            _listarSubastasPorVendedorHandler = listarSubastasPorVendedorHandler;
-            _listarParticipacionesHandler = listarParticipacionesHandler;
-            _loginHandler = loginHandler;   
+            _publicaciones = publicaciones;
+            _participaciones = participaciones;
+            _login = login;
         }
 
         [HttpGet("{usuarioId:int}/subastas")]
-        public async Task<ActionResult<IList<PublicacionResponse>>>ObtenerPublicaciones(int usuarioId)
+        public async Task<ActionResult<IList<PublicacionResponse>>> ObtenerPublicaciones(int usuarioId)
         {
-            var query = new ListarSubastasPorVendedorQuery
+            var resultado = await _publicaciones.Handle(new ListarSubastasPorVendedorQuery
             {
                 VendedorId = usuarioId
-            };
-
-            var resultado = await _listarSubastasPorVendedorHandler.Handle(query);
+            });
 
             return Ok(resultado);
         }
+
         [HttpGet("{usuarioId:int}/pujas")]
-        public async Task<ActionResult<IList<ParticipacionResponse>>>ObtenerParticipaciones(int usuarioId)
+        public async Task<ActionResult<IList<ParticipacionResponse>>> ObtenerParticipaciones(int usuarioId)
         {
-            var query = new ListarParticipacionesQuery
+            var resultado = await _participaciones.Handle(new ListarParticipacionesQuery
             {
                 CompradorId = usuarioId
-            };
-
-            var resultado = await _listarParticipacionesHandler.Handle(query);
+            });
 
             return Ok(resultado);
         }
@@ -52,22 +50,18 @@ namespace SubastaYa.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<LoginResponse>> Login(LoginRequest request)
         {
-            var resultado = await _loginHandler.Handle(new LoginCommand
+            var resultado = await _login.Handle(new LoginCommand
             {
                 Email = request.Email,
                 Password = request.Password
             });
 
-            if (resultado == null)
-                return Unauthorized(new
+            return resultado == null
+                ? Unauthorized(new
                 {
                     mensaje = "Email o contraseña incorrectos."
-                });
-
-            return Ok(resultado);
+                })
+                : Ok(resultado);
         }
-
-
-
     }
 }
