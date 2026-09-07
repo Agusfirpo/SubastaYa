@@ -3,6 +3,7 @@ using Aplicacion.Interfaces.Repositories;
 using Aplicacion.UseCases.Subasta.Command;
 using Dominio.Entities;
 using Dominio.Enums;
+using Dominio.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +32,7 @@ namespace Aplicacion.UseCases.Subasta.Handler
 
             if (command.FechaFin <= command.FechaInicio)
                 throw new DomainException("La fecha de finalización debe ser posterior a la fecha de inicio.");
+
 
             var estado = command.FechaInicio > DateTime.UtcNow
                 ? EstadoSubasta.Programada
