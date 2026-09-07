@@ -1,2 +1,96 @@
-﻿body {
+﻿.billetera-page {
+    padding-bottom: 40px;
+}
+
+.billetera-titulo {
+    font-weight: 800 !important;
+    color: #10233f;
+}
+
+.btn-consultar {
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    text-transform: none !important;
+}
+
+.saldo-card {
+    min-height: 125px;
+    border-radius: 16px !important;
+    background: #ffffff;
+    border: 1px solid #e7ebf0;
+    box-shadow: 0 6px 18px rgba(16, 35, 63, 0.08) !important;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+    .saldo-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 24px rgba(16, 35, 63, 0.13) !important;
+    }
+
+    .saldo-card .mud-typography-caption {
+        color: #6b7280;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+    }
+
+    .saldo-card .mud-typography-h6 {
+        margin-top: 8px;
+        font-size: 1.45rem;
+        font-weight: 800;
+        color: #10233f;
+    }
+
+.saldo-total {
+    border-top: 4px solid #10233f;
+}
+
+.saldo-retenido {
+    border-top: 4px solid #f59e0b;
+}
+
+.saldo-disponible {
+    border-top: 4px solid #22c55e;
+}
+
+.deposito-card {
+    border-radius: 16px !important;
+    border: 1px solid #e7ebf0;
+    box-shadow: 0 6px 18px rgba(16, 35, 63, 0.07) !important;
+}
+
+    .deposito-card .mud-typography-h6 {
+        color: #10233f;
+        font-weight: 700;
+    }
+
+.movimientos-table {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #e7ebf0;
+    box-shadow: 0 5px 16px rgba(16, 35, 63, 0.06);
+}
+
+    .movimientos-table thead {
+        background: #10233f;
+    }
+
+        .movimientos-table thead th {
+            color: white !important;
+            font-weight: 700 !important;
+        }
+
+    .movimientos-table tbody tr:hover {
+        background: #fff7ed !important;
+    }
+
+@media (max-width: 600px) {
+    .billetera-page {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .saldo-card {
+        min-height: 105px;
+    }
 }
