@@ -1,57 +1,47 @@
-﻿using Aplicacion.UseCases.Subasta.Command;
-using Aplicacion.UseCases.Subasta.Handler;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Aplicacion.Exceptions;
+using Aplicacion.Interfaces.Repositories;
+using Infraestructura.Persistence;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace SubastaYa.Workers
+namespace Infraestructura.Repositories
 {
-    public class SubastaWorker : BackgroundService
+    public class UnidadTrabajo : IUnidadTrabajo
     {
-        private readonly IServiceScopeFactory _scopeFactory;
-
-        public SubastaWorker(IServiceScopeFactory scopeFactory)
+        private readonly AppDbContext _context;
+        public UnidadTrabajo(AppDbContext context)
         {
-            _scopeFactory = scopeFactory;
+            _context = context;
         }
-
-        protected override async Task ExecuteAsync(
-            CancellationToken stoppingToken)
+        public async Task EjecutarEnTransaccionAsync(Func<Task> accion)
         {
-            while (!stoppingToken.IsCancellationRequested)
+            await using var transaccion = await _context.Database.BeginTransactionAsync();
+
+            try
             {
-                using var scope = _scopeFactory.CreateScope();
+                await accion();
 
-                var programadas = scope.ServiceProvider
-                    .GetRequiredService<ProcesarSubastasProgramadasHandler>();
+                await _context.SaveChangesAsync();
 
-                var finalizar = scope.ServiceProvider
-                    .GetRequiredService<FinalizarSubastasHandler>();
+                await transaccion.CommitAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                await transaccion.RollbackAsync();
 
-                try
-                {
-                    var ahora = DateTime.UtcNow;
+                _context.ChangeTracker.Clear();
 
-                    await programadas.Handle(
-                        new ProcesarSubastasProgramadasCommand
-                        {
-                            FechaActual = ahora
-                        });
+                throw new ConcurrenciaException("La información fue modificada por otro usuario.");
+            }
+            catch
+            {
+                await transaccion.RollbackAsync();
 
-                    await finalizar.Handle(
-                        new FinalizarSubastasCommand
-                        {
-                            FechaActual = ahora
-                        });
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(
-                        $"Error procesando subastas: {ex.Message}");
-                }
-
-                await Task.Delay(
-                    TimeSpan.FromSeconds(1),
-                    stoppingToken);
+                throw;
             }
         }
     }
