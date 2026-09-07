@@ -26,7 +26,7 @@ namespace Infraestructura.Repositories
         {
             await _context.Subastas.AddAsync(subasta);
 
-            await _context.SaveChangesAsync();
+             
         }
         public async Task<Subasta?> ObtenerPorIdAsync(int id)
         {

@@ -1,23 +1,25 @@
-﻿using System;
+﻿using Aplicacion.DTOs.Response;
+using Aplicacion.Interfaces.Repositories;
+using Aplicacion.UseCases.Subasta.Command;
+using Dominio.Entities;
+using Dominio.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Aplicacion.DTOs.Response;
-using Aplicacion.Interfaces.Repositories;
-using Aplicacion.UseCases.Subasta.Command;
-using Dominio.Enums;
 
 namespace Aplicacion.UseCases.Subasta.Handler
 {
     public class CrearSubastaHandler
     {
         private readonly ISubastaRepository _subastaRepository;
-
+        private readonly IUnidadTrabajo _unidadTrabajo;
         public CrearSubastaHandler(
-            ISubastaRepository subastaRepository)
+            ISubastaRepository subastaRepository , IUnidadTrabajo unidadTrabajo)
         {
             _subastaRepository = subastaRepository;
+            _unidadTrabajo = unidadTrabajo;
         }
         public async Task<CrearSubastaResponse> Handle(CrearSubastaCommand command)
         {
@@ -55,7 +57,11 @@ namespace Aplicacion.UseCases.Subasta.Handler
                 Version = 0
             };
 
-            await _subastaRepository.AgregarAsync(subasta);
+            await _unidadTrabajo.EjecutarEnTransaccionAsync(async () =>
+            {
+                await _subastaRepository.AgregarAsync(subasta);
+            });
+
 
             return new CrearSubastaResponse
             {
@@ -64,5 +70,10 @@ namespace Aplicacion.UseCases.Subasta.Handler
                 Estado = subasta.Estado.ToString()
             };
         }
+
+
+        
+
+
     }
 }

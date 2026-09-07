@@ -9,5 +9,7 @@ namespace Aplicacion.Interfaces.Repositories
     public interface IUnidadTrabajo
     {
         Task EjecutarEnTransaccionAsync(Func<Task> accion);
+
+        
     }
 }
