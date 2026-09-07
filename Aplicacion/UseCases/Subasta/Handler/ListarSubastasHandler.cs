@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dominio.Exceptions;
 
 namespace Aplicacion.UseCases.Subasta.Handler
 {
@@ -22,12 +23,12 @@ namespace Aplicacion.UseCases.Subasta.Handler
         {
             if (query.Pagina <= 0)
             {
-                throw new ArgumentException("La página debe ser mayor a cero.");
+                throw new DomainException ("La página debe ser mayor a cero.");
             }
 
             if (query.TamanioPagina <= 0 || query.TamanioPagina > 100)
             {
-                throw new ArgumentException("El tamaño de página debe estar entre 1 y 100.");
+                throw new DomainException("El tamaño de página debe estar entre 1 y 100.");
             }
 
             var resultado =

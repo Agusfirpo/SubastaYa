@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Aplicacion.Interfaces.Repositories;
 using Dominio.Entities;
 using Dominio.Enums;
-
+using Dominio.Exceptions;
 namespace Aplicacion.UseCases.Subasta.Handler
 {
     public class FinalizarSubastasHandler
@@ -74,7 +74,7 @@ namespace Aplicacion.UseCases.Subasta.Handler
                 if (billeteraComprador == null ||
                     billeteraVendedor == null)
                 {
-                    throw new InvalidOperationException("No se encontraron las billeteras necesarias para liquidar la subasta.");
+                    throw new RecursoNoEncontradoException("No se encontraron las billeteras necesarias para liquidar la subasta.");
                 }
 
                 // LIQUIDACIÓN

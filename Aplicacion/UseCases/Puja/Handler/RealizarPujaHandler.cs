@@ -55,6 +55,8 @@ namespace Aplicacion.UseCases.Puja.Handler
                 if (subasta == null)
                     throw new RecursoNoEncontradoException("La subasta no existe.");
 
+                  
+
                 if (subasta.Estado != EstadoSubasta.Activa)
                     throw new DomainException("La subasta no está activa.");
 
