@@ -1,14 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Aplicacion.DTOs.Response;
+﻿using Aplicacion.DTOs.Response;
+using Aplicacion.Exceptions;
 using Aplicacion.Interfaces.Handlers;
 using Aplicacion.Interfaces.Repositories;
 using Aplicacion.UseCases.Puja.Command;
 using Dominio.Entities;
 using Dominio.Enums;
+using Dominio.Exceptions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
 
 namespace Aplicacion.UseCases.Puja.Handler
 {
@@ -50,16 +53,16 @@ namespace Aplicacion.UseCases.Puja.Handler
                 var subasta =
                     await _subastaRepository.ObtenerPorIdParaActualizarAsync(command.SubastaId);
                 if (subasta == null)
-                    throw new ArgumentException("La subasta no existe.");
+                    throw new RecursoNoEncontradoException("La subasta no existe.");
 
                 if (subasta.Estado != EstadoSubasta.Activa)
-                    throw new InvalidOperationException("La subasta no está activa.");
+                    throw new DomainException("La subasta no está activa.");
 
                 if (ahora < subasta.FechaInicio)
-                    throw new InvalidOperationException("La subasta todavía no comenzó.");
+                    throw new DomainException("La subasta todavía no comenzó.");
 
                 if (ahora >= subasta.FechaFin)
-                    throw new InvalidOperationException("La subasta ya finalizó.");
+                    throw new DomainException("La subasta ya finalizó.");
 
                 //PUJA ACTUAL
                 var pujaAnterior =await _pujaRepository.ObtenerMayorPorSubastaIdAsync(command.SubastaId);
@@ -76,15 +79,13 @@ namespace Aplicacion.UseCases.Puja.Handler
                 }
 
                 if (command.Monto < montoMinimo)
-                {
-                    throw new ArgumentException( $"La puja mínima es ${montoMinimo}.");
-                }
+                    throw new DomainException($"La puja mínima es ${montoMinimo:N2}.");
 
                 // BILLETERA NUEVO POSTOR
                 var billeteraNueva =await _billeteraRepository.ObtenerPorUsuarioAsync(command.CompradorId);
 
                 if (billeteraNueva == null)
-                    throw new ArgumentException("El comprador no posee billetera.");
+                    throw new RecursoNoEncontradoException("El comprador no posee billetera.");
 
                 // SI EL MISMO LÍDER VUELVE A OFERTAR
                 if (pujaAnterior != null && pujaAnterior.CompradorId == command.CompradorId)
@@ -93,7 +94,7 @@ namespace Aplicacion.UseCases.Puja.Handler
 
                     if (billeteraNueva.SaldoDisponible < diferencia)
                     {
-                        throw new ArgumentException("Saldo insuficiente.");
+                        throw new DomainException("Saldo insuficiente.");
                     }
 
                     billeteraNueva.SaldoRetenido += diferencia;
@@ -114,7 +115,7 @@ namespace Aplicacion.UseCases.Puja.Handler
                     // NUEVO LÍDER
                     if (billeteraNueva.SaldoDisponible < command.Monto)
                     {
-                        throw new ArgumentException("Saldo insuficiente.");
+                        throw new DomainException("Saldo insuficiente.");
                     }
 
                     // Liberar líder anterior

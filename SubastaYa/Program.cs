@@ -11,6 +11,7 @@ using Infraestructura.Repositories;
 using Microsoft.EntityFrameworkCore;
 using SubastaYa.Hubs;
 using SubastaYa.Workers;
+using SubastaYa.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -87,6 +88,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseAuthorization();
 

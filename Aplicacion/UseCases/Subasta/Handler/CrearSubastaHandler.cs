@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Aplicacion.DTOs.Response;
+using Aplicacion.Interfaces.Repositories;
+using Aplicacion.UseCases.Subasta.Command;
+using Dominio.Enums;
+using Dominio.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Aplicacion.DTOs.Response;
-using Aplicacion.Interfaces.Repositories;
-using Aplicacion.UseCases.Subasta.Command;
-using Dominio.Enums;
 
 namespace Aplicacion.UseCases.Subasta.Handler
 {
@@ -22,19 +23,13 @@ namespace Aplicacion.UseCases.Subasta.Handler
         public async Task<CrearSubastaResponse> Handle(CrearSubastaCommand command)
         {
             if (command.PrecioBase <= 0)
-            {
-                throw new ArgumentException("El precio base debe ser mayor a cero.");
-            }
+                throw new DomainException("El precio base debe ser mayor a cero.");
 
             if (command.IncrementoMinimo <= 0)
-            {
-                throw new ArgumentException("El incremento mínimo debe ser mayor a cero.");
-            }
+                throw new DomainException("El incremento mínimo debe ser mayor a cero.");
 
             if (command.FechaFin <= command.FechaInicio)
-            {
-                throw new ArgumentException("La fecha de finalización debe ser posterior a la fecha de inicio.");
-            }
+                throw new DomainException("La fecha de finalización debe ser posterior a la fecha de inicio.");
 
             var estado = command.FechaInicio > DateTime.UtcNow
                 ? EstadoSubasta.Programada
