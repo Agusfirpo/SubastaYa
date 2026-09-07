@@ -1,4 +1,5 @@
-﻿using Aplicacion.UseCases.Subasta.Handler;
+﻿using Aplicacion.UseCases.Subasta.Command;
+using Aplicacion.UseCases.Subasta.Handler;
 
 namespace SubastaYa.Workers
 {
@@ -26,8 +27,19 @@ namespace SubastaYa.Workers
 
                 try
                 {
-                    await programadas.Handle();
-                    await finalizar.Handle();
+                    var ahora = DateTime.UtcNow;
+
+                    await programadas.Handle(
+                        new ProcesarSubastasProgramadasCommand
+                        {
+                            FechaActual = ahora
+                        });
+
+                    await finalizar.Handle(
+                        new FinalizarSubastasCommand
+                        {
+                            FechaActual = ahora
+                        });
                 }
                 catch (Exception ex)
                 {

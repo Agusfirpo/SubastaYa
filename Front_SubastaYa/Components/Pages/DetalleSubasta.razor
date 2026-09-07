@@ -154,15 +154,11 @@
                         <MudText>
                             Inicio:
                             @subasta.FechaInicio
-                            .ToLocalTime()
-                            .ToString("dd/MM/yyyy HH:mm")
                         </MudText>
 
                         <MudText>
                             Finaliza:
                             @subasta.FechaFin
-                            .ToLocalTime()
-                            .ToString("dd/MM/yyyy HH:mm")
                         </MudText>
 
                     </MudStack>
@@ -291,8 +287,6 @@
 
                         <MudTd DataLabel="Fecha">
                             @context.FechaPuja
-                            .ToLocalTime()
-                            .ToString("dd/MM/yyyy HH:mm:ss")
                         </MudTd>
 
                     </RowTemplate>

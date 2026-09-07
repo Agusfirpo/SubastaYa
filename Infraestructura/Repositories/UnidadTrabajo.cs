@@ -35,7 +35,7 @@ namespace Infraestructura.Repositories
 
                 _context.ChangeTracker.Clear();
 
-                throw new ConcurrenciaException("La subasta fue modificada por otro usuario.");
+                throw new ConcurrenciaException("La información fue modificada por otro usuario.");
             }
             catch
             {
