@@ -1,0 +1,57 @@
+﻿.login-background {
+    min-height: 100vh;
+    width: 100%;
+    background-image: url("/imagenes/pexels-codioful-7130565.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 450px;
+    border-radius: 15px;
+    background-color: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    text-align: center;
+}
+
+.login-icon-wrapper {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background-color: rgba(99, 91, 255, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px auto;
+}
+
+.login-subtitle-link {
+    font-weight: 600;
+}
+
+.login-options-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+}
+
+.login-forgot-link {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.login-register-text {
+    margin-top: 16px;
+}
