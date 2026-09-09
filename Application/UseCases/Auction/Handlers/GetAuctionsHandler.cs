@@ -23,12 +23,12 @@ namespace Application.UseCases.Subasta.Handler
         {
             if (query.Pagina <= 0)
             {
-                throw new DomainException ("La página debe ser mayor a cero.");
+                throw new ValidationException ("La página debe ser mayor a cero.");
             }
 
             if (query.TamanioPagina <= 0 || query.TamanioPagina > 100)
             {
-                throw new DomainException("El tamaño de página debe estar entre 1 y 100.");
+                throw new ValidationException("El tamaño de página debe estar entre 1 y 100.");
             }
 
             var resultado =

@@ -1,5 +1,4 @@
 using Application.DTOs.Response;
-using Application.Exceptions;
 using Application.Interfaces.Handlers;
 using Application.Interfaces.Repositories;
 using Application.UseCases.Puja.Command;
@@ -58,13 +57,13 @@ namespace Application.UseCases.Puja.Handler
                   
 
                 if (subasta.Estado != AuctionStatus.Activa)
-                    throw new DomainException("La subasta no está activa.");
+                    throw new ValidationException("La subasta no está activa.");
 
                 if (ahora < subasta.FechaInicio)
-                    throw new DomainException("La subasta todavía no comenzó.");
+                    throw new ValidationException("La subasta todavía no comenzó.");
 
                 if (ahora >= subasta.FechaFin)
-                    throw new DomainException("La subasta ya finalizó.");
+                    throw new ValidationException("La subasta ya finalizó.");
 
                 //PUJA ACTUAL
                 var pujaAnterior =await _pujaRepository.ObtenerMayorPorSubastaIdAsync(command.SubastaId);
@@ -81,7 +80,7 @@ namespace Application.UseCases.Puja.Handler
                 }
 
                 if (command.Monto < montoMinimo)
-                    throw new DomainException($"La puja mínima es ${montoMinimo:N2}.");
+                    throw new ValidationException($"La puja mínima es ${montoMinimo:N2}.");
 
                 // BILLETERA NUEVO POSTOR
                 var billeteraNueva =await _billeteraRepository.ObtenerPorUsuarioAsync(command.CompradorId);
@@ -96,7 +95,7 @@ namespace Application.UseCases.Puja.Handler
 
                     if (billeteraNueva.SaldoDisponible < diferencia)
                     {
-                        throw new DomainException("Saldo insuficiente.");
+                        throw new ValidationException("Saldo insuficiente.");
                     }
 
                     billeteraNueva.SaldoRetenido += diferencia;
@@ -117,7 +116,7 @@ namespace Application.UseCases.Puja.Handler
                     // NUEVO LÍDER
                     if (billeteraNueva.SaldoDisponible < command.Monto)
                     {
-                        throw new DomainException("Saldo insuficiente.");
+                        throw new ValidationException("Saldo insuficiente.");
                     }
 
                     // Liberar líder anterior

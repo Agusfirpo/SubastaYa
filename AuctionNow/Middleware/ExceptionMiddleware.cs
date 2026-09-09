@@ -1,7 +1,7 @@
+using Domain.Exceptions;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Text.Json;
-using Application.Exceptions;
-using Domain.Exceptions;
 
 namespace Api_SubastaYa.Middlewares
 {
@@ -24,39 +24,53 @@ namespace Api_SubastaYa.Middlewares
             {
                 await _next(context);
             }
-            catch (DomainException ex)
+            catch (ValidationException ex)
             {
-                await Responder(context, HttpStatusCode.BadRequest, ex.Message);
+                await Respond(
+                    context,
+                    HttpStatusCode.BadRequest,
+                    ex.Message);
             }
             catch (NotFoundException ex)
             {
-                await Responder(context, HttpStatusCode.NotFound, ex.Message);
+                await Respond(
+                    context,
+                    HttpStatusCode.NotFound,
+                    ex.Message);
             }
-            catch (ConcurrencyException ex)
+            catch (DbUpdateConcurrencyException)
             {
-                await Responder(context, HttpStatusCode.Conflict, ex.Message);
+                await Respond(
+                    context,
+                    HttpStatusCode.Conflict,
+                    "La información fue modificada por otro usuario.");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error interno no controlado.");
+                _logger.LogError(
+                    ex,
+                    "Unhandled internal server error.");
 
-                await Responder(
+                await Respond(
                     context,
                     HttpStatusCode.InternalServerError,
                     "Ocurrió un error interno.");
             }
         }
 
-        private static async Task Responder(
+        private static async Task Respond(
             HttpContext context,
             HttpStatusCode status,
-            string mensaje)
+            string message)
         {
             context.Response.StatusCode = (int)status;
             context.Response.ContentType = "application/json";
 
             await context.Response.WriteAsync(
-                JsonSerializer.Serialize(new { mensaje }));
+                JsonSerializer.Serialize(new
+                {
+                    mensaje = message
+                }));
         }
     }
 }

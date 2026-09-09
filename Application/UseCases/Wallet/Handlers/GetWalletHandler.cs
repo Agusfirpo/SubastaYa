@@ -1,5 +1,4 @@
 using Application.DTOs.Response;
-using Application.Exceptions;
 using Application.Interfaces.Repositories;
 using Application.UseCases.Billetera.Queries;
 using Domain.Exceptions;

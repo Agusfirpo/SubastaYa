@@ -1,45 +1,42 @@
-using Application.Exceptions;
 using Application.Interfaces.Repositories;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
 {
     public class UnitOfWork : IUnitOfWork
     {
         private readonly AppDbContext _context;
+
         public UnitOfWork(AppDbContext context)
         {
             _context = context;
         }
-        public async Task EjecutarEnTransaccionAsync(Func<Task> accion)
+
+        public async Task EjecutarEnTransaccionAsync(Func<Task> action)
         {
-            await using var transaccion = await _context.Database.BeginTransactionAsync();
+            await using var transaction =
+                await _context.Database.BeginTransactionAsync();
 
             try
             {
-                await accion();
+                await action();
 
                 await _context.SaveChangesAsync();
 
-                await transaccion.CommitAsync();
+                await transaction.CommitAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                await transaccion.RollbackAsync();
+                await transaction.RollbackAsync();
 
                 _context.ChangeTracker.Clear();
 
-                throw new ConcurrencyException("La información fue modificada por otro usuario.");
+                throw;
             }
             catch
             {
-                await transaccion.RollbackAsync();
+                await transaction.RollbackAsync();
 
                 throw;
             }

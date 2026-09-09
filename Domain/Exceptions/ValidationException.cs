@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Domain.Exceptions
 {
-    public class DomainException : Exception
+    public class ValidationException : Exception
     {
-        public DomainException(string mensaje) : base(mensaje) { }
+        public ValidationException(string mensaje) : base(mensaje) { }
     }
 }

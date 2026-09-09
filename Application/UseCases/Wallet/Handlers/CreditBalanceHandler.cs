@@ -1,5 +1,4 @@
 using Application.DTOs.Response;
-using Application.Exceptions;
 using Application.Interfaces.Repositories;
 using Application.UseCases.Billetera.Command;
 using Domain.Entities;
@@ -26,7 +25,7 @@ namespace Application.UseCases.Billetera.Handler
         public async Task<WalletResponse> Handle(CreditBalanceCommand command)
         {
             if (command.Monto <= 0)
-                throw new DomainException("El monto a acreditar debe ser mayor a cero.");
+                throw new ValidationException("El monto a acreditar debe ser mayor a cero.");
 
             WalletResponse? resultado = null;
 

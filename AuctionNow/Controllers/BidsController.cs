@@ -1,6 +1,5 @@
 using Application.DTOs.Request;
 using Application.DTOs.Response;
-using Application.Exceptions;
 using Application.UseCases.Puja.Command;
 using Application.UseCases.Puja.Handler;
 using Application.UseCases.Puja.Queries;

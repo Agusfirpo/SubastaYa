@@ -1,11 +1,10 @@
-using Application.Exceptions;
 using Application.Interfaces.Repositories;
 using Application.UseCases.Subasta.Command;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.Exceptions;
 
-using Domain.Exceptions;
+
 namespace Application.UseCases.Subasta.Handler
 {
     public class FinishAuctionsHandler
