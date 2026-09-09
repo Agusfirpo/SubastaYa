@@ -17,7 +17,12 @@
     align-items: center;
     justify-content: center;
 }
-
+/* Forzar visibilidad de la barra superior/header del selector de hora */
+.mud-picker-timepicker-toolbar {
+    display: flex !important;
+    background-color: #1956E3 !important;
+    color: #ffffff !important;
+}
     .btn-publicar:hover:not(:disabled) {
         background-color: #1347BF;
     }
