@@ -7,304 +7,309 @@
 @using Aplicacion.DTOs.Response
 @using Microsoft.AspNetCore.SignalR.Client
 @using Front_SubastaYa.Components
+@using Front_SubastaYa.Services
 
 @implements IAsyncDisposable
 
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ISnackbar Snackbar
-@using Front_SubastaYa.Services
 @inject SesionUsuarioService Sesion
 
-<MudContainer MaxWidth="MaxWidth.Large" Class="mt-6">
+<PageTitle>SubastaYa - @(subasta?.Titulo ?? "Detalle de Subasta")</PageTitle>
 
-    <MudButton StartIcon="@Icons.Material.Filled.ArrowBack"
-               Variant="Variant.Text"
-               OnClick="Volver">
-        Volver a subastas
-    </MudButton>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
+    <!-- Botón Volver -->
+    <div class="mb-6">
+        <button type="button" class="btn-back-link" @onclick="Volver">
+            <span class="material-symbols-outlined text-sm">arrow_back</span>
+            <span>VOLVER A SUBASTAS</span>
+        </button>
+    </div>
 
     @if (cargando)
     {
-        <div class="d-flex justify-center mt-8">
-            <MudProgressCircular Indeterminate="true"
-                                 Color="Color.Primary" />
+        <div class="flex flex-col justify-center items-center py-36">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" />
+            <span class="text-xs font-semibold text-slate-500 mt-4 tracking-wide">Cargando subasta...</span>
         </div>
     }
     else if (subasta == null)
     {
-        <MudAlert Severity="Severity.Error" Class="mt-4">
-            No se encontró la subasta.
-        </MudAlert>
+        <div class="glass-panel-card rounded-2xl p-8 text-center max-w-lg mx-auto shadow-sm">
+            <div class="w-12 h-12 rounded-xl bg-red-50 text-red-600 flex items-center justify-center mx-auto mb-3 border border-red-200">
+                <span class="material-symbols-outlined text-2xl">error</span>
+            </div>
+            <h3 class="text-base font-bold text-slate-900 m-0">No se encontró la subasta</h3>
+            <p class="text-xs text-slate-500 mt-1 mb-4">El lote solicitado no existe o fue dado de baja.</p>
+            <button type="button" class="btn-back-link text-blue-600 font-bold" @onclick="Volver">
+                Regresar al listado
+            </button>
+        </div>
     }
     else
     {
-        @* CONTADOR *@
-        <MudPaper Class="pa-4 mt-4 mb-4" Elevation="1">
-
+        <!-- CONTADOR EN TIEMPO REAL -->
+        <div class="glass-panel-card rounded-2xl p-4 sm:p-5 mb-6 shadow-sm">
             <ContadorSubasta FechaInicio="@subasta.FechaInicio"
                              FechaFin="@subasta.FechaFin"
                              Estado="@subasta.Estado"
                              OnTiempoCumplido="RefrescarSubasta" />
+        </div>
 
-        </MudPaper>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
+            <!-- COLUMNA IZQUIERDA: DETALLE DEL LOTE (8 cols) -->
+            <div class="lg:col-span-8 space-y-6">
 
-        <MudGrid>
+                <div class="glass-panel-card rounded-2xl p-6 sm:p-8 shadow-sm">
 
-            @* DETALLE *@
-            <MudItem xs="12" md="8">
+                    <!-- Imagen de la subasta -->
+                    <div class="rounded-2xl overflow-hidden mb-6 product-image-container flex items-center justify-center bg-slate-100/60">
+                        @if (!string.IsNullOrWhiteSpace(subasta.UrlImagen))
+                        {
+                            <img src="@subasta.UrlImagen"
+                                 alt="@subasta.Titulo"
+                                 class="w-full h-full max-h-[460px] object-cover" />
+                        }
+                        else
+                        {
+                            <div class="flex flex-col items-center justify-center py-20 text-slate-400">
+                                <span class="material-symbols-outlined text-6xl">image</span>
+                                <span class="text-xs font-semibold mt-2">Sin imagen disponible</span>
+                            </div>
+                        }
+                    </div>
 
-                <MudPaper Class="pa-6" Elevation="1">
-
-                    @if (!string.IsNullOrWhiteSpace(subasta.UrlImagen))
-                    {
-                        <MudImage Src="@subasta.UrlImagen"
-                                  Alt="@subasta.Titulo"
-                                  Class="detalle-imagen mb-4" />
-                    }
-                    else
-                    {
-                        <div class="imagen-placeholder-detalle mb-4">
-                            <MudIcon Icon="@Icons.Material.Filled.Image"
-                                     Size="Size.Large" />
-                        </div>
-                    }
-
-                    <MudStack Spacing="3">
-
-                        <div class="d-flex justify-space-between align-center">
-
-                            <MudText Typo="Typo.h4">
+                    <!-- Cabecera de Información -->
+                    <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
+                        <div class="flex-1 min-w-[240px]">
+                            <span class="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-md border border-blue-100 mb-2 inline-block">
+                                @subasta.Categoria
+                            </span>
+                            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight m-0">
                                 @subasta.Titulo
-                            </MudText>
+                            </h1>
+                        </div>
+                        <span class="status-top-badge @(subasta.Estado == "Activa" ? "status-badge-active" : "status-badge-finished")">
+                            @if (subasta.Estado == "Activa")
+                            {
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse mr-1"></span>
+                            }
+                            @subasta.Estado
+                        </span>
+                    </div>
 
-                            <MudChip T="string"
-                                     Color="@ObtenerColorEstado(subasta.Estado)">
-                                @subasta.Estado
-                            </MudChip>
+                    <!-- Descripción -->
+                    <p class="text-slate-600 text-sm sm:text-base leading-relaxed mb-6 mt-4">
+                        @subasta.Descripcion
+                    </p>
 
+                    <div class="h-px bg-slate-200/80 my-6"></div>
+
+                    <!-- MÉTRICAS FINANCIERAS (Grid 2x2) -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-slate-50/80 border border-slate-200/70 mb-6">
+                        <div>
+                            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Precio base</span>
+                            <span class="text-base sm:text-lg font-bold font-mono text-slate-800 mt-0.5 block">
+                                $ @subasta.PrecioBase.ToString("N2")
+                            </span>
                         </div>
 
-                        <MudText Color="Color.Secondary">
-                            @subasta.Categoria
-                        </MudText>
+                        <div>
+                            <span class="text-[11px] font-bold text-blue-600 uppercase tracking-wider block">Puja actual</span>
+                            <span class="text-lg sm:text-2xl font-black font-mono text-blue-600 mt-0.5 block">
+                                $ @subasta.PujaActual.ToString("N2")
+                            </span>
+                        </div>
 
-                        <MudText>
-                            @subasta.Descripcion
-                        </MudText>
+                        <div>
+                            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Incremento mín.</span>
+                            <span class="text-base sm:text-lg font-bold font-mono text-slate-800 mt-0.5 block">
+                                $ @subasta.IncrementoMinimo.ToString("N2")
+                            </span>
+                        </div>
 
-                        <MudDivider />
+                        <div>
+                            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Pujas</span>
+                            <span class="text-base sm:text-lg font-bold font-mono text-slate-800 mt-0.5 block">
+                                @subasta.CantidadPujas
+                            </span>
+                        </div>
+                    </div>
 
+                    <!-- Datos Operativos del Lote -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-600 pt-2">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-slate-400 text-base">person</span>
+                            <span>Vendedor: <strong class="text-slate-900">@subasta.Vendedor</strong></span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-slate-400 text-base">event</span>
+                            <span>Inicio: @subasta.FechaInicio.ToLocalTime().ToString("dd/MM/yy HH:mm")</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-slate-400 text-base">schedule</span>
+                            <span>Finaliza: @subasta.FechaFin.ToLocalTime().ToString("dd/MM/yy HH:mm")</span>
+                        </div>
+                    </div>
 
-                        @* PRECIOS *@
-                        <MudGrid>
+                </div>
 
-                            <MudItem xs="6">
-                                <MudText Typo="Typo.caption">
-                                    Precio base
-                                </MudText>
+            </div>
 
-                                <MudText Typo="Typo.h6">
-                                    $ @subasta.PrecioBase.ToString("N2")
-                                </MudText>
-                            </MudItem>
+            <!-- COLUMNA DERECHA: PANEL DE OFERTA (4 cols) -->
+            <div class="lg:col-span-4 space-y-6">
 
-                            <MudItem xs="6">
-                                <MudText Typo="Typo.caption">
-                                    Puja actual
-                                </MudText>
-
-                                <MudText Typo="Typo.h4"
-                                         Color="Color.Primary">
-                                    $ @subasta.PujaActual.ToString("N2")
-                                </MudText>
-                            </MudItem>
-
-                            <MudItem xs="6">
-                                <MudText Typo="Typo.caption">
-                                    Incremento mínimo
-                                </MudText>
-
-                                <MudText Typo="Typo.h6">
-                                    $ @subasta.IncrementoMinimo.ToString("N2")
-                                </MudText>
-                            </MudItem>
-
-                            <MudItem xs="6">
-                                <MudText Typo="Typo.caption">
-                                    Cantidad de pujas
-                                </MudText>
-
-                                <MudText Typo="Typo.h6">
-                                    @subasta.CantidadPujas
-                                </MudText>
-                            </MudItem>
-
-                        </MudGrid>
-
-                        <MudDivider />
-
-                        <MudText>
-                            Vendedor:
-                            <strong>@subasta.Vendedor</strong>
-                        </MudText>
-
-                        <MudText>
-                            Inicio:
-                            @subasta.FechaInicio.ToLocalTime()
-                        </MudText>
-
-                        <MudText>
-                            Finaliza:
-                            @subasta.FechaFin.ToLocalTime()
-                        </MudText>
-
-                    </MudStack>
-
-                </MudPaper>
-
-            </MudItem>
-
-
-            @* PANEL DE PUJA *@
-            <MudItem xs="12" md="4">
-
-                <MudPaper Class="pa-6" Elevation="1">
-
-                    <MudText Typo="Typo.h5" Class="mb-4">
-                        Realizar puja
-                    </MudText>
-
+                <div class="glass-panel-card rounded-2xl p-6 shadow-sm relative overflow-hidden">
+                    <div class="flex items-center justify-between mb-5">
+                        <h2 class="text-base font-bold text-slate-900 m-0">Realizar puja</h2>
+                        <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 flex items-center justify-center border border-blue-500/20">
+                            <span class="material-symbols-outlined text-lg">gavel</span>
+                        </div>
+                    </div>
 
                     @if (Participo())
                     {
-                        <MudAlert Severity="@(EsLider()
-                                                              ? Severity.Success
-                                                              : Severity.Warning)"
-                                                                                 Class="mb-3">
-
-                            @(EsLider()
-                                                ? "Estás liderando esta subasta"
-                                                : "Tu oferta fue superada")
-
-                </MudAlert>
-                                }
-
+                        <div class="p-3.5 rounded-xl mb-4 border @(EsLider() ? "bg-emerald-50 border-emerald-200 text-emerald-800" : "bg-amber-50 border-amber-200 text-amber-800") flex items-center gap-2.5">
+                            <span class="material-symbols-outlined text-lg">
+                                @(EsLider() ? "verified" : "warning")
+                            </span>
+                            <span class="text-xs font-bold">
+                                @(EsLider() ? "Estás liderando esta subasta" : "Tu oferta fue superada")
+                            </span>
+                        </div>
+                    }
 
                     @if (subasta.Estado == "Activa")
                     {
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
+                                    Tu oferta (ARS)
+                                </label>
+                                <MudNumericField T="decimal"
+                                                 @bind-Value="montoPuja"
+                                                 Variant="Variant.Outlined"
+                                                 Margin="Margin.Dense"
+                                                 Format="N2"
+                                                 Min="0"
+                                                 Adornment="Adornment.Start"
+                                                 AdornmentText="$"
+                                                 Class="monto-numeric-field bg-white/90 rounded-xl" />
+                            </div>
 
-                        <MudNumericField T="decimal"
-                                         Label="Monto"
-                                         Variant="Variant.Outlined"
-                                         @bind-Value="montoPuja"
-                                         Min="0"
-                                         Adornment="Adornment.Start"
-                                         AdornmentText="$"
-                                         Class="mb-3" />
+                            <div class="p-3 rounded-xl bg-blue-50/70 border border-blue-100 flex items-center justify-between text-xs">
+                                <span class="text-slate-600 font-medium">Puja mínima requerida:</span>
+                                <span class="font-bold font-mono text-blue-700">$ @CalcularPujaMinima().ToString("N2")</span>
+                            </div>
 
-                        <MudText Typo="Typo.caption"
-                                 Class="mb-4">
-                            Puja mínima:
-                            $ @CalcularPujaMinima().ToString("N2")
-                        </MudText>
+                            <button type="button"
+                                    class="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-extrabold text-sm tracking-wider uppercase shadow-lg shadow-blue-600/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+                                    disabled="@enviandoPuja"
+                                    @onclick="RealizarPuja">
+                                @if (enviandoPuja)
+                                {
+                                    <MudProgressCircular Indeterminate="true" Size="Size.Small" Color="Color.Surface" />
+                                    <span>Enviando oferta...</span>
+                                }
+                                else
+                                {
+                                    <span>OFERTAR $ @montoPuja.ToString("N0")</span>
+                                }
+                            </button>
 
-                        <MudButton Variant="Variant.Filled"
-                                   Color="Color.Primary"
-                                   FullWidth="true"
-                                   Disabled="@enviandoPuja"
-                                   OnClick="RealizarPuja">
-
-                            @if (enviandoPuja)
-                            {
-                                <MudProgressCircular Indeterminate="true"
-                                                     Size="Size.Small"
-                                                     Class="mr-2" />
-                            }
-
-                            Ofertar
-
-                        </MudButton>
+                            <div class="flex items-center justify-center space-x-1.5 pt-1 text-[11px] text-slate-500">
+                                <span class="material-symbols-outlined text-xs text-emerald-600">lock</span>
+                                <span>Garantía retenida automáticamente con 1-click</span>
+                            </div>
+                        </div>
                     }
                     else
                     {
-                        <MudAlert Severity="Severity.Info">
-
-                            @(subasta.Estado == "Programada"
-                                                ? "La subasta todavía no comenzó."
-                                                : "Esta subasta ya no se encuentra activa.")
-
-                </MudAlert>
+                        <div class="auction-inactive-alert p-4 rounded-xl text-center">
+                            <span class="material-symbols-outlined text-blue-600 text-2xl mb-1 block">info</span>
+                            <p class="text-xs font-semibold text-slate-700 m-0">
+                                @(subasta.Estado == "Programada"
+                                                        ? "La subasta todavía no comenzó."
+                                                        : "Esta subasta ya no se encuentra activa.")
+                    </p>
+                </div>
                                 }
+                </div>
 
-                </MudPaper>
+            </div>
 
-            </MudItem>
+        </div>
 
-        </MudGrid>
-
-
-        @* HISTORIAL *@
-        <MudPaper Class="pa-6 mt-6 mb-6" Elevation="1">
-
-            <MudText Typo="Typo.h5" Class="mb-4">
-                Historial de pujas
-            </MudText>
+        <!-- HISTORIAL DE PUJAS (Ancho Completo) -->
+        <div class="glass-panel-card rounded-2xl overflow-hidden shadow-sm mt-8">
+            <div class="p-5 border-b border-slate-200/80 flex items-center justify-between">
+                <div>
+                    <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">Historial de pujas</h2>
+                    <p class="text-xs text-slate-500 mt-0.5 m-0">Ofertas recibidas en tiempo real</p>
+                </div>
+                <span class="text-xs font-bold text-slate-600 bg-white/90 px-3 py-1 rounded-full border border-slate-200 shadow-xs">
+                    @pujas.Count ofertas
+                </span>
+            </div>
 
             @if (cargandoPujas)
             {
-                <MudProgressCircular Indeterminate="true" />
+                <div class="py-12 flex justify-center">
+                    <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Medium" />
+                </div>
             }
             else if (pujas.Count == 0)
             {
-                <MudAlert Severity="Severity.Info">
-                    Esta subasta todavía no recibió pujas.
-                </MudAlert>
+                <div class="auction-empty-history-alert p-8 text-center">
+                    <span class="material-symbols-outlined text-blue-500 text-3xl mb-1">history_toggle_off</span>
+                    <p class="text-xs font-bold text-slate-700 m-0">Esta subasta todavía no recibió pujas.</p>
+                    <span class="text-[11px] text-slate-500">Sé el primero en realizar una oferta.</span>
+                </div>
             }
             else
             {
-                <MudTable Items="@pujas"
-                          Hover="true"
-                          Dense="true">
-
-                    <HeaderContent>
-                        <MudTh>Usuario</MudTh>
-                        <MudTh>Monto</MudTh>
-                        <MudTh>Fecha</MudTh>
-                    </HeaderContent>
-
-                    <RowTemplate>
-
-                        <MudTd DataLabel="Usuario">
-                            @context.Usuario
-                        </MudTd>
-
-                        <MudTd DataLabel="Monto">
-                            $ @context.Monto.ToString("N2")
-                        </MudTd>
-
-                        <MudTd DataLabel="Fecha">
-                            @context.FechaPuja
-                        </MudTd>
-
-                    </RowTemplate>
-
-                </MudTable>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-slate-200/70 text-left text-sm">
+                        <thead>
+                            <tr class="bg-slate-50/90 text-slate-500 text-[11px] font-bold uppercase tracking-wider">
+                                <th class="py-3.5 px-5" scope="col">Usuario</th>
+                                <th class="py-3.5 px-5" scope="col">Monto</th>
+                                <th class="py-3.5 px-5" scope="col">Fecha y Hora</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200/60 text-slate-700">
+                            @foreach (var p in pujas)
+                            {
+                                <tr class="hover:bg-white/80 transition-colors">
+                                    <td class="py-3.5 px-5 font-medium text-slate-900 flex items-center gap-2">
+                                        <div class="w-7 h-7 rounded-full bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center">
+                                            @p.Usuario.Substring(0, Math.Min(2, p.Usuario.Length))
+                                        </div>
+                                        <span>@p.Usuario</span>
+                                    </td>
+                                    <td class="py-3.5 px-5 font-mono font-bold text-blue-600 text-sm">
+                                        $ @p.Monto.ToString("N2")
+                                    </td>
+                                    <td class="py-3.5 px-5 text-xs text-slate-500 whitespace-nowrap">
+                                        @p.FechaPuja
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             }
-
-        </MudPaper>
+        </div>
     }
 
-</MudContainer>
-
+</div>
 
 @code {
-
     [Parameter]
     public int Id { get; set; }
-
 
     private HubConnection? hubConnection;
     private DetalleSubastaResponse? subasta;
@@ -314,7 +319,6 @@
     private bool cargandoPujas = true;
     private bool enviandoPuja;
 
-    // Temporal hasta implementar login.
     private int compradorId => Sesion.Usuario?.Id ?? 0;
     private decimal montoPuja;
 
@@ -340,16 +344,6 @@
         await ConectarSignalR();
     }
 
-    private async Task CargarUsuario()
-    {
-        if (!Sesion.EstaLogueado)
-            await Sesion.CargarSesion();
-
-        if (!Sesion.EstaLogueado)
-            Navigation.NavigateTo("/login");
-    }
-
-
     private async Task CargarSubasta()
     {
         cargando = true;
@@ -360,25 +354,20 @@
                 .GetFromJsonAsync<DetalleSubastaResponse>(
                     $"api/v1/subastas/{Id}");
         }
-        catch (HttpRequestException ex)
-            when (ex.StatusCode == HttpStatusCode.NotFound)
+        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
         {
             subasta = null;
         }
         catch
         {
             subasta = null;
-
-            Snackbar.Add(
-                "No se pudo cargar la subasta.",
-                Severity.Error);
+            Snackbar.Add("No se pudo cargar la subasta.", Severity.Error);
         }
         finally
         {
             cargando = false;
         }
     }
-
 
     private async Task CargarPujas()
     {
@@ -393,10 +382,7 @@
         catch
         {
             pujas = [];
-
-            Snackbar.Add(
-                "No se pudo cargar el historial.",
-                Severity.Error);
+            Snackbar.Add("No se pudo cargar el historial.", Severity.Error);
         }
         finally
         {
@@ -404,10 +390,8 @@
         }
     }
 
-
     private async Task RefrescarSubasta()
     {
-        // Le damos tiempo al Worker para actualizar el estado.
         await Task.Delay(1500);
 
         await CargarSubasta();
@@ -416,12 +400,10 @@
             return;
 
         await CargarPujas();
-
         montoPuja = CalcularPujaMinima();
 
         await InvokeAsync(StateHasChanged);
     }
-
 
     private async Task ConectarSignalR()
     {
@@ -429,22 +411,15 @@
             return;
 
         hubConnection = new HubConnectionBuilder()
-            .WithUrl(new Uri(
-                Http.BaseAddress!,
-                "hubs/subastas"))
+            .WithUrl(new Uri(Http.BaseAddress!, "hubs/subastas"))
             .WithAutomaticReconnect()
             .Build();
-
 
         hubConnection.On<JsonElement>(
             "NuevaPuja",
             async evento =>
             {
-                var extendida =
-                    evento.TryGetProperty(
-                        "tiempoExtendido",
-                        out var valor)
-                    && valor.GetBoolean();
+                var extendida = evento.TryGetProperty("tiempoExtendido", out var valor) && valor.GetBoolean();
 
                 await CargarSubasta();
                 await CargarPujas();
@@ -462,34 +437,24 @@
                 await InvokeAsync(StateHasChanged);
             });
 
-
         await hubConnection.StartAsync();
 
-        await hubConnection.InvokeAsync(
-            "UnirseASubasta",
-            Id);
+        await hubConnection.InvokeAsync("UnirseASubasta", Id);
     }
-
 
     private decimal CalcularPujaMinima() =>
         subasta == null
             ? 0
             : subasta.CantidadPujas == 0
                 ? subasta.PrecioBase
-                : subasta.PujaActual
-                  + subasta.IncrementoMinimo;
-
+                : subasta.PujaActual + subasta.IncrementoMinimo;
 
     private bool Participo() =>
-        pujas.Any(p =>
-            p.Usuario == $"Usuario***{compradorId}");
-
+        pujas.Any(p => p.Usuario == $"Usuario***{compradorId}");
 
     private bool EsLider() =>
         pujas.OrderByDescending(p => p.Monto)
-             .FirstOrDefault()?.Usuario
-        == $"Usuario***{compradorId}";
-
+             .FirstOrDefault()?.Usuario == $"Usuario***{compradorId}";
 
     private async Task RealizarPuja()
     {
@@ -498,10 +463,7 @@
 
         if (subasta.Estado != "Activa")
         {
-            Snackbar.Add(
-                "La subasta ya no está activa.",
-                Severity.Warning);
-
+            Snackbar.Add("La subasta ya no está activa.", Severity.Warning);
             return;
         }
 
@@ -509,22 +471,15 @@
 
         if (compradorId <= 0)
         {
-            Snackbar.Add(
-                "Comprador inválido.",
-                Severity.Warning);
-
+            Snackbar.Add("Comprador inválido.", Severity.Warning);
             return;
         }
 
         if (montoPuja < minimo)
         {
-            Snackbar.Add(
-                $"La puja mínima es $ {minimo:N2}.",
-                Severity.Warning);
-
+            Snackbar.Add($"La puja mínima es $ {minimo:N2}.", Severity.Warning);
             return;
         }
-
 
         enviandoPuja = true;
 
@@ -538,26 +493,20 @@
                     Monto = montoPuja
                 });
 
-
             if (!response.IsSuccessStatusCode)
             {
-                var mensaje =
-                    await ObtenerMensajeError(response);
+                var mensaje = await ObtenerMensajeError(response);
 
                 Snackbar.Add(
                     mensaje,
-                    response.StatusCode
-                    == HttpStatusCode.Conflict
+                    response.StatusCode == HttpStatusCode.Conflict
                         ? Severity.Warning
                         : Severity.Error);
 
                 return;
             }
 
-
-            Snackbar.Add(
-                "Puja realizada correctamente.",
-                Severity.Success);
+            Snackbar.Add("Puja realizada correctamente.", Severity.Success);
 
             await CargarSubasta();
             await CargarPujas();
@@ -566,9 +515,7 @@
         }
         catch
         {
-            Snackbar.Add(
-                "Ocurrió un error al realizar la puja.",
-                Severity.Error);
+            Snackbar.Add("Ocurrió un error al realizar la puja.", Severity.Error);
         }
         finally
         {
@@ -576,15 +523,11 @@
         }
     }
 
-
-    private async Task<string> ObtenerMensajeError(
-        HttpResponseMessage response)
+    private async Task<string> ObtenerMensajeError(HttpResponseMessage response)
     {
         try
         {
-            var error = await response.Content
-                .ReadFromJsonAsync<ErrorResponse>();
-
+            var error = await response.Content.ReadFromJsonAsync<ErrorResponse>();
             if (!string.IsNullOrWhiteSpace(error?.Mensaje))
                 return error.Mensaje;
         }
@@ -595,37 +538,20 @@
         return "No se pudo realizar la puja.";
     }
 
-
-    private void Volver() =>
-        Navigation.NavigateTo("/subastas");
-
-
-    private static Color ObtenerColorEstado(string estado) =>
-        estado switch
-        {
-            "Activa" => Color.Success,
-            "Programada" => Color.Info,
-            "Desierta" => Color.Warning,
-            _ => Color.Default
-        };
-
+    private void Volver() => Navigation.NavigateTo("/subastas");
 
     public async ValueTask DisposeAsync()
     {
         if (hubConnection == null)
             return;
 
-        if (hubConnection.State
-            == HubConnectionState.Connected)
+        if (hubConnection.State == HubConnectionState.Connected)
         {
-            await hubConnection.InvokeAsync(
-                "SalirDeSubasta",
-                Id);
+            await hubConnection.InvokeAsync("SalirDeSubasta", Id);
         }
 
         await hubConnection.DisposeAsync();
     }
-
 
     private class ErrorResponse
     {

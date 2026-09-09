@@ -11,10 +11,6 @@
 @inject NavigationManager Navigation
 @inject ISnackbar Snackbar
 
-<!--
-  Usamos el operador relativo tilde (~) para que Blazor resuelva la ruta
-  exacta desde la carpeta wwwroot sin importar en qué subruta estés.
--->
 <div class="subastas-background" style="background-image: url('imagenes/pexels-codioful-7130565.jpg');">
     <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-6">
 
@@ -39,7 +35,7 @@
                     <div class="stats-badge">
                         <span class="active-dot"></span>
                         <span class="text-xs text-slate-600 font-medium">
-                            
+                            @resultado.TotalItems subastas registradas
                         </span>
                     </div>
                 </div>
@@ -50,16 +46,22 @@
         <MudPaper Class="pa-4 mb-6 rounded-2xl bg-white/90 backdrop-blur-md shadow-sm border border-slate-200/80" Elevation="0">
             <MudGrid Spacing="2">
 
-                <!-- Buscar -->
+                <!-- Buscar con Autocompletado Reactivo -->
                 <MudItem xs="12" md="4">
-                    <MudTextField T="string"
-                                  Label="Buscar lote"
-                                  Placeholder="Título, marca o palabra clave..."
-                                  Variant="Variant.Outlined"
-                                  Adornment="Adornment.Start"
-                                  AdornmentIcon="@Icons.Material.Filled.Search"
-                                  @bind-Value="busqueda"
-                                  Class="bg-slate-50 rounded-xl" />
+                    <MudAutocomplete T="string"
+                                     Label="Buscar lote"
+                                     Placeholder="Título o número de lote..."
+                                     Value="busqueda"
+                                     ValueChanged="OnBusquedaChanged"
+                                     SearchFunc="BuscarSugerencias"
+                                     ResetValueOnEmptyText="true"
+                                     CoerceText="true"
+                                     Clearable="true"
+                                     MaxItems="8"
+                                     Variant="Variant.Outlined"
+                                     Adornment="Adornment.Start"
+                                     AdornmentIcon="@Icons.Material.Filled.Search"
+                                     Class="bg-slate-50 rounded-xl" />
                 </MudItem>
 
                 <!-- Estado -->
@@ -130,7 +132,7 @@
                 </MudItem>
 
                 <!-- Botones de Acción -->
-                <MudItem xs="12" Class="d-flex justify-end gap-2 pt-2">
+                <MudItem xs="12" md="6" Class="d-flex justify-end items-center gap-2 pt-2">
                     <MudButton Variant="Variant.Outlined"
                                Color="Color.Default"
                                StartIcon="@Icons.Material.Filled.RestartAlt"
@@ -266,9 +268,11 @@
 </div>
 
 @code {
-
     private SubastasPaginadasResponse? resultado;
     private IList<CategoriaResponse> categorias = [];
+
+    // Lista en memoria para que las sugerencias nunca se queden vacías
+    private List<string> titulosSugerencias = [];
 
     private bool cargando;
     private string? estado, orden, busqueda;
@@ -278,7 +282,6 @@
     private int pagina = 1;
     private const int tamanioPagina = 6;
 
-
     protected override async Task OnInitializedAsync()
     {
         await Sesion.CargarSesion();
@@ -286,6 +289,34 @@
         await CargarSubastas();
     }
 
+    // Se dispara cada vez que seleccionas una opción, la borras o tocas la 'X'
+    private async Task OnBusquedaChanged(string? nuevoValor)
+    {
+        busqueda = nuevoValor;
+
+        // Si se borró el texto o se seleccionó una opción, refresca la grilla automáticamente
+        if (string.IsNullOrWhiteSpace(busqueda))
+        {
+            pagina = 1;
+            await CargarSubastas();
+        }
+    }
+
+    private async Task<IEnumerable<string>> BuscarSugerencias(string valor, CancellationToken token)
+    {
+        // Si no escribió nada, muestra hasta 6 títulos del catálogo global
+        if (string.IsNullOrWhiteSpace(valor))
+            return titulosSugerencias.Take(6);
+
+        var filtro = valor.Trim().ToLowerInvariant();
+
+        // Busca sobre la lista acumulada en memoria
+        var coincidencias = titulosSugerencias
+            .Where(t => t.ToLowerInvariant().Contains(filtro))
+            .Distinct();
+
+        return await Task.FromResult(coincidencias);
+    }
 
     private async Task CargarCategorias()
     {
@@ -296,12 +327,9 @@
         }
         catch
         {
-            Snackbar.Add(
-                "No se pudieron cargar las categorías.",
-                Severity.Error);
+            Snackbar.Add("No se pudieron cargar las categorías.", Severity.Error);
         }
     }
-
 
     private async Task CargarSubastas()
     {
@@ -329,16 +357,22 @@
             if (!string.IsNullOrWhiteSpace(orden))
                 url += $"&orden={Uri.EscapeDataString(orden)}";
 
-            resultado = await Http
-                .GetFromJsonAsync<SubastasPaginadasResponse>(url);
+            resultado = await Http.GetFromJsonAsync<SubastasPaginadasResponse>(url);
+
+            // Guardamos los títulos en la caché local de sugerencias
+            if (resultado?.Items != null)
+            {
+                foreach (var item in resultado.Items.Where(i => !string.IsNullOrEmpty(i.Titulo)))
+                {
+                    if (!titulosSugerencias.Contains(item.Titulo))
+                        titulosSugerencias.Add(item.Titulo);
+                }
+            }
         }
         catch
         {
             resultado = null;
-
-            Snackbar.Add(
-                "No se pudieron cargar las subastas.",
-                Severity.Error);
+            Snackbar.Add("No se pudieron cargar las subastas.", Severity.Error);
         }
         finally
         {
@@ -346,13 +380,11 @@
         }
     }
 
-
     private async Task AplicarFiltros()
     {
         pagina = 1;
         await CargarSubastas();
     }
-
 
     private async Task LimpiarFiltros()
     {
@@ -363,7 +395,6 @@
 
         await CargarSubastas();
     }
-
 
     private async Task CambiarPagina(int nuevaPagina)
     {
@@ -377,7 +408,6 @@
         await CargarSubastas();
     }
 
-
     private async Task VerSubasta(int id)
     {
         if (Sesion.EstaLogueado)
@@ -386,16 +416,15 @@
             return;
         }
 
-        var resultado = await DialogService.ShowMessageBoxAsync(
+        var dialogResult = await DialogService.ShowMessageBoxAsync(
             "Inicio de sesión requerido",
             "Para ingresar a una subasta tenés que iniciar sesión.",
             yesText: "Iniciar sesión",
             cancelText: "Seguir mirando");
 
-        if (resultado == true)
+        if (dialogResult == true)
             Navigation.NavigateTo("/login");
     }
-
 
     private static Color ObtenerColorEstado(string estado) => estado switch
     {
