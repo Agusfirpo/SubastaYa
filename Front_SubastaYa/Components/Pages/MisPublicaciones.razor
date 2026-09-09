@@ -8,97 +8,152 @@
 @inject NavigationManager Navigation
 @inject ISnackbar Snackbar
 
-<MudContainer MaxWidth="MaxWidth.Large" Class="mt-6">
+<PageTitle>SubastaYa - Mis Publicaciones</PageTitle>
 
-    <MudText Typo="Typo.h4">Mis publicaciones</MudText>
-    <MudText Color="Color.Secondary" Class="mb-4">
-        Subastas publicadas por el usuario
-    </MudText>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-    <MudStack Row="true" Class="mb-4">
-        
+    <!-- Encabezado de Página -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="text-xs font-bold uppercase tracking-wider text-blue-700 bg-white/90 backdrop-blur-md px-2.5 py-0.5 rounded-md border border-white/80 shadow-xs">
+                    Gestión de Lotes
+                </span>
+                <span class="text-xs text-slate-400">•</span>
+                <span class="text-xs text-slate-600 font-medium">Panel de Vendedor</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight m-0">Mis publicaciones</h1>
+            <p class="text-xs sm:text-sm text-slate-600 mt-1 m-0">Subastas publicadas por el usuario</p>
+        </div>
 
-        <MudButton Variant="Variant.Filled"
-                   Color="Color.Primary"
-                   OnClick="Cargar">
-            Consultar
-        </MudButton>
-    </MudStack>
+        <!-- Botón de actualización manual -->
+        <div>
+            <button type="button"
+                    class="btn-consultar inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs sm:text-sm font-bold shadow-md shadow-blue-600/25 transition-all disabled:opacity-50 cursor-pointer"
+                    disabled="@cargando"
+                    @onclick="Cargar">
+                <span class="material-symbols-outlined text-base @(cargando ? "animate-spin" : "")">sync</span>
+                <span>@(cargando ? "Consultando..." : "Consultar")</span>
+            </button>
+        </div>
+    </div>
 
     @if (cargando)
     {
-        <MudProgressCircular Indeterminate="true" />
+        <div class="flex flex-col justify-center items-center py-32">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" />
+            <span class="text-xs font-semibold text-slate-500 mt-4 tracking-wide">Cargando publicaciones...</span>
+        </div>
     }
     else if (publicaciones.Count == 0)
     {
-        <MudAlert Severity="Severity.Info">
-            El usuario no tiene publicaciones.
-        </MudAlert>
+        <div class="glass-panel-card rounded-2xl p-10 text-center shadow-sm">
+            <div class="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-600 flex items-center justify-center mx-auto mb-3 border border-blue-500/20">
+                <span class="material-symbols-outlined text-2xl">inventory_2</span>
+            </div>
+            <h3 class="text-base font-bold text-slate-900 m-0">Sin publicaciones</h3>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1 m-0">El usuario no tiene publicaciones registradas actualmente.</p>
+        </div>
     }
     else
     {
-        <MudTable T="PublicacionResponse"
-                  Items="@publicaciones"
-                  Hover="true">
+        <!-- Tabla de Publicaciones Glassmorphism -->
+        <div class="glass-panel-card rounded-2xl overflow-hidden shadow-sm">
 
-            <HeaderContent>
-                <MudTh>Subasta</MudTh>
-                <MudTh>Estado</MudTh>
-                <MudTh>Pujas</MudTh>
-                <MudTh>Precio actual</MudTh>
-                <MudTh>Finaliza</MudTh>
-                <MudTh>Recaudación</MudTh>
-                <MudTh>Adjudicación</MudTh>
-                <MudTh></MudTh>
-            </HeaderContent>
+            <div class="p-4 sm:p-5 border-b border-slate-200/80 flex items-center justify-between">
+                <div>
+                    <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">Listado de Subastas</h2>
+                    <p class="text-xs text-slate-500 mt-0.5 m-0">Seguimiento de ofertas, recaudación y cierre</p>
+                </div>
+                <span class="text-xs font-bold text-slate-600 bg-white/90 px-3 py-1 rounded-full border border-slate-200 shadow-xs">
+                    @publicaciones.Count registros
+                </span>
+            </div>
 
-            <RowTemplate>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-200/70 text-left text-sm">
+                    <thead>
+                        <tr class="bg-slate-50/90 text-slate-500 text-[11px] font-bold uppercase tracking-wider">
+                            <th class="py-3 px-5" scope="col">Subasta</th>
+                            <th class="py-3 px-4" scope="col">Estado</th>
+                            <th class="py-3 px-4 text-center" scope="col">Pujas</th>
+                            <th class="py-3 px-4" scope="col">Precio actual</th>
+                            <th class="py-3 px-4" scope="col">Recaudación</th>
+                            <th class="py-3 px-4" scope="col">Adjudicación</th>
+                            <th class="py-3 px-4" scope="col">Finaliza</th>
+                            <th class="py-3 px-5 text-center" scope="col">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200/60 text-slate-700">
+                        @foreach (var context in publicaciones)
+                        {
+                            <tr class="pub-table-row transition-colors">
 
-                <MudTd>
-                    <strong>@context.Titulo</strong><br />
-                    <small>@context.Categoria</small>
-                </MudTd>
+                                <!-- Título y Categoría -->
+                                <td class="py-3.5 px-5">
+                                    <div class="font-bold text-slate-900 text-sm hover:text-blue-600 transition-colors cursor-pointer"
+                                         @onclick="@(() => Ver(context.Id))">
+                                        @context.Titulo
+                                    </div>
+                                    <span class="text-xs text-slate-400 font-medium">@context.Categoria</span>
+                                </td>
 
-                <MudTd>
-                    <MudChip T="string"
-                             Size="Size.Small"
-                             Color="@ColorEstado(context.Estado)">
-                        @context.Estado
-                    </MudChip>
-                </MudTd>
+                                <!-- Badge de Estado -->
+                                <td class="py-3.5 px-4 whitespace-nowrap">
+                                    <span class="status-badge @ObtenerClaseBadge(context.Estado)">
+                                        @if (context.Estado.Equals("Activa", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            <span class="pulse-dot mr-1.5"></span>
+                                        }
+                                        @context.Estado
+                                    </span>
+                                </td>
 
-                <MudTd>@context.CantidadPujas</MudTd>
+                                <!-- Cantidad de Pujas -->
+                                <td class="py-3.5 px-4 text-center font-mono font-bold text-xs text-slate-700">
+                                    @context.CantidadPujas
+                                </td>
 
-                <MudTd>
-                    $ @context.PrecioActual.ToString("N2")
-                </MudTd>
+                                <!-- Precio Actual -->
+                                <td class="py-3.5 px-4 font-mono font-bold text-slate-900 whitespace-nowrap text-xs sm:text-sm">
+                                    $ @context.PrecioActual.ToString("N2")
+                                </td>
 
-                <MudTd>
-                    $ @context.Recaudacion.ToString("N2")
-                </MudTd>
+                                <!-- Recaudación -->
+                                <td class="py-3.5 px-4 font-mono font-semibold whitespace-nowrap text-xs sm:text-sm text-slate-900">
+                                    $ @context.Recaudacion.ToString("N2")
+                                </td>
 
-                <MudTd>
-                    @context.EstadoAdjudicacion
-                </MudTd>
+                                <!-- Estado de Adjudicación -->
+                                <td class="py-3.5 px-4 whitespace-nowrap text-xs font-semibold text-slate-600">
+                                    @(string.IsNullOrWhiteSpace(context.EstadoAdjudicacion) ? "-" : context.EstadoAdjudicacion)
+                                </td>
 
-                <MudTd>
-                    @context.FechaFin.ToLocalTime()
-                    
-                </MudTd>
+                                <!-- Fecha Fin -->
+                                <td class="py-3.5 px-4 text-xs text-slate-500 whitespace-nowrap font-medium">
+                                    @context.FechaFin.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                                </td>
 
-                <MudTd>
-                    <MudButton Size="Size.Small"
-                               OnClick="@(() => Ver(context.Id))">
-                        Ver
-                    </MudButton>
-                </MudTd>
+                                <!-- Botón Ver -->
+                                <td class="py-3.5 px-5 text-center whitespace-nowrap">
+                                    <button type="button"
+                                            class="btn-ver inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white border border-blue-200 transition-all cursor-pointer"
+                                            @onclick="@(() => Ver(context.Id))">
+                                        <span>Ver</span>
+                                        <span class="material-symbols-outlined text-xs">arrow_forward</span>
+                                    </button>
+                                </td>
 
-            </RowTemplate>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
 
-        </MudTable>
+        </div>
     }
 
-</MudContainer>
+</div>
 
 @code {
     private int usuarioId => Sesion.Usuario?.Id ?? 0;
@@ -120,9 +175,7 @@
         catch
         {
             publicaciones = [];
-            Snackbar.Add(
-                "No se pudieron cargar las publicaciones.",
-                Severity.Error);
+            Snackbar.Add("No se pudieron cargar las publicaciones.", Severity.Error);
         }
         finally
         {
@@ -133,11 +186,12 @@
     private void Ver(int id)
         => Navigation.NavigateTo($"/subastas/{id}");
 
-    private Color ColorEstado(string estado) => estado switch
+    private string ObtenerClaseBadge(string estado) => estado?.ToLower() switch
     {
-        "Activa" => Color.Success,
-        "Programada" => Color.Info,
-        "Desierta" => Color.Warning,
-        _ => Color.Default
+        "activa" => "badge-activa",
+        "programada" => "badge-programada",
+        "desierta" => "badge-desierta",
+        "finalizada" => "badge-finalizada",
+        _ => "badge-default"
     };
 }

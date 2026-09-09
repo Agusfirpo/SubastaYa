@@ -1,2 +1,73 @@
-﻿body {
+﻿/* Panel Glassmorphism translúcido */
+.glass-panel-card {
+    background-color: rgba(255, 255, 255, 0.94) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+}
+
+/* Filas de la tabla */
+.pub-table-row:hover {
+    background-color: rgba(248, 250, 252, 0.95);
+}
+
+/* Badges de Estado */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.65rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.badge-activa {
+    background-color: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+}
+
+.badge-programada {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+}
+
+.badge-desierta {
+    background-color: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #fed7aa;
+}
+
+.badge-finalizada {
+    background-color: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.badge-default {
+    background-color: #f8fafc;
+    color: #64748b;
+    border: 1px solid #cbd5e1;
+}
+
+/* Punto pulsante para subastas activas */
+.pulse-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #10b981;
+    display: inline-block;
+    box-shadow: 0 0 6px #10b981;
+}
+
+/* Botón Ver */
+.btn-ver:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px -2px rgba(37, 99, 235, 0.3);
+}
+
+.btn-consultar:hover:not(:disabled) {
+    transform: translateY(-1px);
 }

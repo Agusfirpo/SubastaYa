@@ -153,12 +153,12 @@
 
                         <MudText>
                             Inicio:
-                            @subasta.FechaInicio
+                            @subasta.FechaInicio.ToLocalTime()
                         </MudText>
 
                         <MudText>
                             Finaliza:
-                            @subasta.FechaFin
+                            @subasta.FechaFin.ToLocalTime()
                         </MudText>
 
                     </MudStack>

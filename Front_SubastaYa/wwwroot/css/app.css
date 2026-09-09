@@ -1,5 +1,31 @@
+/* FONDO GLOBAL PARA TODA LA APLICACIÓN */
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-color: #0b1727;
+    background-image: url('../imagenes/pexels-codioful-7130565.jpg');
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Forzar a los contenedores de MudBlazor a ser transparentes */
+.mud-layout,
+.mud-main-content {
+    background: transparent !important;
+    min-height: 100vh;
+}
+
+/* Tarjetas traslúcidas unificadas para todas las vistas */
+.glass-card {
+    background-color: rgba(255, 255, 255, 0.92) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.75) !important;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
 }
 
 h1:focus {

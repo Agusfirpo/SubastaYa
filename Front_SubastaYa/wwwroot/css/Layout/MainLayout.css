@@ -12,12 +12,142 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    cursor: pointer;
 }
 
+.live-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 4px;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, .12);
+    border: 1px solid rgba(255, 255, 255, .3);
+    color: #eef4fa;
+    font-size: .7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+}
+
+.live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: #34d399;
+    box-shadow: 0 0 8px #34d399;
+    display: inline-block;
+    animation: live-pulse 1.6s infinite;
+}
+
+@keyframes live-pulse {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .4;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
 
 /* ============================= */
-/* USUARIO                       */
+/* BARRA SUPERIOR                */
 /* ============================= */
+
+.app-bar {
+    background: #0b1f3a !important;
+    color: white;
+    border-bottom: 3px solid #f97316;
+    height: 64px;
+    min-height: 64px;
+}
+
+.marca {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.live-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 4px;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, .12);
+    border: 1px solid rgba(255, 255, 255, .3);
+    color: #eef4fa;
+    font-size: .7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    white-space: nowrap;
+}
+
+.live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: #34d399;
+    box-shadow: 0 0 8px #34d399;
+    display: inline-block;
+    animation: live-pulse 1.6s infinite;
+}
+
+@keyframes live-pulse {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .4;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+/* ============================= */
+/* NAV HORIZONTAL (anchors simples) */
+/* ============================= */
+
+.nav-horizontal {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    white-space: nowrap;
+}
+
+    .nav-horizontal .nav-item {
+        color: rgba(255, 255, 255, .75);
+        font-weight: 600;
+        font-size: .9rem;
+        text-decoration: none;
+        transition: color .15s ease;
+    }
+
+        .nav-horizontal .nav-item:hover,
+        .nav-horizontal .nav-item.active {
+            color: #ffffff;
+        }
+
+/* ============================= */
+/* CAMPANA Y CUENTA               */
+/* ============================= */
+
+.boton-campana {
+    position: relative;
+    flex-shrink: 0;
+}
 
 .usuario-chip {
     background: rgba(255, 255, 255, .12) !important;
@@ -25,82 +155,41 @@
     border: 1px solid rgba(255, 255, 255, .18);
 }
 
-
-/* ============================= */
-/* MENÚ LATERAL                  */
-/* ============================= */
-
-.menu-lateral {
-    background: #ffffff !important;
-    border-right: 1px solid #e5e7eb;
-}
-
-.logo-menu {
-    height: 90px;
-    padding: 18px;
+.activador-cuenta {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    color: #ffffff;
+    white-space: nowrap;
+    transition: background .15s ease;
 }
 
-.logo-icono {
-    width: 45px;
-    height: 45px;
-    border-radius: 12px;
+    .activador-cuenta:hover {
+        background: rgba(255, 255, 255, .08);
+    }
+
+.avatar-iniciales {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .1);
+    border: 1px solid rgba(255, 255, 255, .3);
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #f97316;
-    color: white;
+    font-size: .7rem;
+    font-weight: 700;
+    color: #93c5fd;
+    flex-shrink: 0;
 }
 
-.logo-titulo {
-    color: #0b1f3a;
-    font-weight: 700 !important;
+.texto-cuenta {
+    font-size: .85rem;
+    font-weight: 500;
 }
-
-
-/* ============================= */
-/* TÍTULOS DEL MENÚ              */
-/* ============================= */
-
-.menu-seccion {
-    display: block;
-    padding: 0 12px 8px 12px;
-    color: #f97316 !important;
-    font-weight: 700 !important;
-    letter-spacing: .5px;
-}
-
-
-/* ============================= */
-/* LINKS                         */
-/* ============================= */
-
-.menu-lateral .mud-nav-link {
-    border-radius: 10px;
-    margin-bottom: 5px;
-    color: #344054;
-}
-
-    .menu-lateral .mud-nav-link:hover {
-        background: #fff7ed;
-        color: #0b1f3a;
-    }
-
-
-    /* LINK ACTIVO */
-
-    .menu-lateral .mud-nav-link.active {
-        background: #fff1e6 !important;
-        color: #f97316 !important;
-        font-weight: 600;
-    }
-
-        .menu-lateral .mud-nav-link.active .mud-icon-root {
-            color: #f97316 !important;
-        }
-
 
 /* ============================= */
 /* CONTENIDO                     */
@@ -111,18 +200,95 @@
     background: #f5f7fa;
 }
 
-.logo-subastaya {
-    width: 100%;
-    min-height: 90px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    cursor: pointer;
-    gap: 4px;
+/* ============================= */
+/* RESPONSIVE                    */
+/* ============================= */
+
+@media (max-width: 900px) {
+    .nav-horizontal {
+        display: none;
+    }
+
+    .live-chip span:not(.live-dot) {
+        display: none;
+    }
+
+    .texto-cuenta {
+        display: none;
+    }
 }
 
-    .logo-subastaya:hover {
-        opacity: .85;
+/* ============================= */
+/* CAMPANA Y CUENTA               */
+/* ============================= */
+
+.boton-campana {
+    position: relative;
+}
+
+.usuario-chip {
+    background: rgba(255, 255, 255, .12) !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, .18);
+}
+
+.activador-cuenta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    color: #ffffff;
+    transition: background .15s ease;
+}
+
+    .activador-cuenta:hover {
+        background: rgba(255, 255, 255, .08);
     }
+
+.avatar-iniciales {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .1);
+    border: 1px solid rgba(255, 255, 255, .3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .7rem;
+    font-weight: 700;
+    color: #93c5fd;
+}
+
+.texto-cuenta {
+    font-size: .85rem;
+    font-weight: 500;
+}
+
+/* ============================= */
+/* CONTENIDO                     */
+/* ============================= */
+
+.contenido-principal {
+    min-height: 100vh;
+    background: #f5f7fa;
+}
+
+/* ============================= */
+/* RESPONSIVE                    */
+/* ============================= */
+
+@media (max-width: 900px) {
+    .nav-horizontal {
+        display: none;
+    }
+
+    .live-chip span:not(.live-dot) {
+        display: none;
+    }
+
+    .texto-cuenta {
+        display: none;
+    }
+}
