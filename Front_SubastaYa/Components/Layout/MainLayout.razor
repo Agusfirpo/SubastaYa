@@ -2,186 +2,151 @@
 @inject NavigationManager Navigation
 @using Front_SubastaYa.Services
 @inject SesionUsuarioService Sesion
-@inject NavigationManager Navigation
+
 <MudThemeProvider Theme="@tema" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<MudLayout>
+<MudLayout Class="layout-wrapper">
 
     @* BARRA SUPERIOR *@
-    <MudAppBar Elevation="0" Class="app-bar">
+    <MudAppBar Elevation="1" Class="app-bar-modern sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex items-center justify-between w-full px-4">
 
-        <MudIconButton Icon="@Icons.Material.Filled.Menu"
-                       Color="Color.Inherit"
-                       OnClick="ToggleMenu" />
+            @* Marca *@
+            <div class="marca-badge" @onclick="@(() => Navigation.NavigateTo("/home"))">
+                <div class="logo-box">
+                    <span class="material-symbols-outlined text-xl text-white">gavel</span>
+                </div>
+                <span class="text-xl font-black text-white tracking-tight ml-2">
+                    Subasta<span class="text-blue-400">Ya</span>
+                </span>
+                <span class="chip-en-vivo ml-2">
+                    <span class="dot-pulso"></span>
+                    En vivo
+                </span>
+            </div>
 
-        <div class="marca">
-            <MudIcon Icon="@Icons.Material.Filled.Gavel"
-                     Size="Size.Large" />
+            @* Navegación Desktop *@
+            <nav class="hidden md:flex items-center gap-7">
+                <a href="/home" class="nav-link-header @(EsActiva("/home") ? "active" : "")">Inicio</a>
+                <a href="/subastas" class="nav-link-header @(EsActiva("/subastas") ? "active" : "")">Explorar</a>
+                <a href="/crear-subasta" class="nav-link-header @(EsActiva("/crear-subasta") ? "active" : "")">Cómo Funciona</a>
+                <a href="/billetera" class="nav-link-header @(EsActiva("/billetera") ? "active" : "")">Billetera</a>
+            </nav>
 
-            <MudText Typo="Typo.h6">
-                SubastaYa
-            </MudText>
+            @* Notificaciones & Menú Usuario *@
+            <div class="flex items-center gap-3">
+                <button class="text-slate-300 hover:text-white p-2 rounded-full hover:bg-slate-800/60 transition">
+                    <span class="material-symbols-outlined text-xl block">notifications</span>
+                </button>
+
+                <div class="h-6 w-px bg-slate-700 mx-1 hidden sm:block"></div>
+
+                @if (sesionCargada)
+                {
+                    @if (Sesion.EstaLogueado)
+                    {
+                        <div class="relative">
+                            @* Botón Activador Mi Cuenta *@
+                            <button type="button"
+                                    class="user-activator-btn flex items-center gap-2 cursor-pointer select-none"
+                                    @onclick="ToggleMenuCuenta">
+                                <div class="user-avatar-badge">
+                                    @Iniciales(Sesion.Usuario?.Nombre ?? "SY")
+                                </div>
+                                <span class="hidden sm:inline text-sm font-semibold text-white">Mi Cuenta</span>
+                                <span class="material-symbols-outlined text-slate-400 text-sm">arrow_drop_down</span>
+                            </button>
+
+                            @if (menuAbierto)
+                            {
+                                @* Backdrop invisible para cerrar al hacer clic afuera *@
+                                <div class="fixed inset-0 z-40" @onclick="() => menuAbierto = false"></div>
+
+                                @* Contenido del menú desplegable Dark Glass *@
+                                <div class="absolute right-0 mt-2.5 w-60 rounded-2xl shadow-2xl z-50 overflow-hidden border border-slate-700/80 bg-slate-900/95 backdrop-blur-xl text-slate-200">
+
+                                    @* Encabezado de usuario *@
+                                    <div class="px-4 py-3 bg-slate-800/40 border-b border-slate-800/80">
+                                        <p class="text-xs text-slate-400 font-medium leading-none">Conectado como</p>
+                                        <p class="text-sm font-bold text-white truncate max-w-[200px] mt-1.5">
+                                            @(Sesion.Usuario?.Nombre ?? "Usuario")
+                                        </p>
+                                    </div>
+
+                                    @* Accesos principales *@
+                                    <div class="py-1">
+                                        <a href="/mis-publicaciones"
+                                           @onclick="() => menuAbierto = false"
+                                           class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-blue-600/20 hover:border-l-2 hover:border-blue-500 transition-all no-underline">
+                                            <span class="material-symbols-outlined text-lg text-blue-400">inventory_2</span>
+                                            <span class="font-medium">Mis publicaciones</span>
+                                        </a>
+
+                                        <a href="/mis-pujas"
+                                           @onclick="() => menuAbierto = false"
+                                           class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-blue-600/20 hover:border-l-2 hover:border-blue-500 transition-all no-underline">
+                                            <span class="material-symbols-outlined text-lg text-blue-400">shopping_bag</span>
+                                            <span class="font-medium">Historial de pujas</span>
+                                        </a>
+                                    </div>
+
+                                    <div class="h-px bg-slate-800 my-0.5"></div>
+
+                                    @* Cerrar sesión *@
+                                    <div class="p-1">
+                                        <button type="button"
+                                                @onclick="CerrarSesion"
+                                                class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-red-400 hover:text-red-300 hover:bg-red-500/15 transition cursor-pointer text-left">
+                                            <span class="material-symbols-outlined text-lg">logout</span>
+                                            <span class="font-semibold">Cerrar sesión</span>
+                                        </button>
+                                    </div>
+
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   Size="Size.Small"
+                                   StartIcon="@Icons.Material.Filled.Login"
+                                   Href="/login"
+                                   Class="rounded-lg">
+                            Ingresar
+                        </MudButton>
+                    }
+                }
+            </div>
+
         </div>
-
-        <MudSpacer />
-
-        @if (sesionCargada)
-        {
-            @if (Sesion.EstaLogueado)
-            {
-                <MudMenu Label="@Sesion.Usuario!.Nombre"
-                         StartIcon="@Icons.Material.Filled.Person"
-                         Color="Color.Inherit">
-
-                    <MudMenuItem Icon="@Icons.Material.Filled.Logout"
-                                 OnClick="CerrarSesion">
-                        Cerrar sesión
-                    </MudMenuItem>
-
-                </MudMenu>
-            }
-            else
-            {
-                <MudButton Variant="Variant.Text"
-                           Color="Color.Inherit"
-                           StartIcon="@Icons.Material.Filled.Login"
-                           Href="/login">
-                    Ingresar
-                </MudButton>
-            }
-        }
-
     </MudAppBar>
 
-
-    @* MENÚ LATERAL *@
-    <MudDrawer @bind-Open="menuAbierto"
-               Variant="DrawerVariant.Responsive"
-               Elevation="0"
-               Class="menu-lateral">
-
-        <div class="logo-menu">
-
-            <div class="logo-subastaya"
-                 @onclick="@(() => Navigation.NavigateTo("/home"))">
-
-                <MudIcon Icon="@Icons.Material.Filled.Gavel"
-                         Size="Size.Large" />
-
-                <MudText Typo="Typo.h6">
-                    SubastaYa
-                </MudText>
-
-            </div>
-
-            <div>
-                <MudText Typo="Typo.h5" Class="logo-titulo">
-                    SubastaYa
-                </MudText>
-
-                <MudText Typo="Typo.caption"
-                         Color="Color.Secondary">
-                    Subastas online
-                </MudText>
-            </div>
-
-        </div>
-
-        <MudDivider />
-
-        <MudNavMenu Class="pa-3">
-
-            <MudText Typo="Typo.caption"
-                     Class="menu-seccion">
-                EXPLORAR
-            </MudText>
-
-            <MudNavLink Href="/subastas"
-                        Match="NavLinkMatch.Prefix"
-                        Icon="@Icons.Material.Filled.Storefront">
-                Subastas
-            </MudNavLink>
-
-            <MudNavLink Href="/crear-subasta"
-                        Icon="@Icons.Material.Filled.AddCircleOutline">
-                Publicar subasta
-            </MudNavLink>
-
-            <MudNavLink Href="/billetera"
-                        Icon="@Icons.Material.Filled.AccountBalanceWallet">
-                Mi billetera
-            </MudNavLink>
-
-            <MudDivider Class="my-4" />
-
-            <MudText Typo="Typo.caption"
-                     Class="menu-seccion">
-                MI ACTIVIDAD
-            </MudText>
-
-            <MudNavLink Href="/mis-publicaciones"
-                        Icon="@Icons.Material.Filled.Inventory2">
-                Mis publicaciones
-            </MudNavLink>
-
-            <MudNavLink Href="/mis-pujas"
-                        Icon="@Icons.Material.Filled.ShoppingBag">
-                Mis compras / pujas
-            </MudNavLink>
-
-        </MudNavMenu>
-
-    </MudDrawer>
-
-
-    @* CONTENIDO *@
-    <MudMainContent Class="contenido-principal">
-
-        <MudContainer MaxWidth="MaxWidth.ExtraLarge"
-                      Class="pa-6">
-
-            @Body
-
-        </MudContainer>
-
+    <MudMainContent Class="p-0 m-0 w-full !bg-transparent">
+        @Body
     </MudMainContent>
 
 </MudLayout>
 
-
 @code {
-    private bool menuAbierto = true;
-
     private readonly MudTheme tema = new()
     {
         PaletteLight = new PaletteLight
         {
-            // AZUL MARINO
-            Primary = "#0B1F3A",
-
-            // NARANJA
-            Secondary = "#F97316",
-
-            Background = "#F5F7FA",
-            Surface = "#FFFFFF",
-
-            AppbarBackground = "#0B1F3A",
-            AppbarText = "#FFFFFF",
-
-            TextPrimary = "#172033",
-            TextSecondary = "#667085"
-        },
-
-        LayoutProperties = new LayoutProperties
-        {
-            DefaultBorderRadius = "12px"
+            Primary = "#2563eb",
+            Secondary = "#f97316",
+            Background = "#00000000",
+            AppbarBackground = "#0b1727",
+            AppbarText = "#ffffff"
         }
     };
 
     private bool sesionCargada;
+    private bool menuAbierto;
 
     protected override async Task OnInitializedAsync()
     {
@@ -189,12 +154,26 @@
         sesionCargada = true;
     }
 
+    private void ToggleMenuCuenta()
+    {
+        menuAbierto = !menuAbierto;
+    }
+
     private async Task CerrarSesion()
     {
+        menuAbierto = false;
         await Sesion.CerrarSesion();
         Navigation.NavigateTo("/login", forceLoad: true);
     }
 
-    private void ToggleMenu()
-        => menuAbierto = !menuAbierto;
+    private bool EsActiva(string ruta)
+        => Navigation.ToBaseRelativePath(Navigation.Uri).TrimEnd('/') == ruta.TrimStart('/').TrimEnd('/');
+
+    private string Iniciales(string nombre)
+    {
+        var partes = nombre.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (partes.Length == 0) return "?";
+        if (partes.Length == 1) return partes[0][..Math.Min(2, partes[0].Length)].ToUpper();
+        return $"{partes[0][0]}{partes[^1][0]}".ToUpper();
+    }
 }

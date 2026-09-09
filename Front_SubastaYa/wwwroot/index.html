@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,6 +8,14 @@
 
     <base href="/" />
 
+    <!-- Google Fonts & Material Icons (Requeridos para la tipografía y los íconos) -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+
+    <!-- CDN de Tailwind CSS (Requerido para procesar las clases de diseño) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- MudBlazor & Estilos Locales -->
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link rel="stylesheet" href="css/app.css" />
@@ -21,7 +28,6 @@
     <link rel="stylesheet" href="css/pages/Home.css" />
     <link rel="stylesheet" href="css/pages/login.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
-    <link rel="stylesheet" href="css/pages/detalle-subasta.css" />
     <link href="Front_SubastaYa.styles.css" rel="stylesheet" />
 </head>
 <body>
@@ -33,14 +39,14 @@
 
         <div class="loading-progress-text"></div>
     </div>
+
     <div id="blazor-error-ui">
         Ocurrió un error inesperado.
         <a href="" class="reload">Recargar</a>
         <a class="dismiss">🗙</a>
     </div>
+
     <script src="_framework/blazor.webassembly.js"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
-
 </body>
-
 </html>

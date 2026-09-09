@@ -1,1 +1,37 @@
-﻿
+﻿/* Botón Principal estilo Tailwind Brand Primary */
+.btn-publicar {
+    width: 100%;
+    background-color: #1956E3;
+    color: #ffffff;
+    font-weight: 700;
+    padding: 0.875rem 1.5rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    box-shadow: 0 4px 6px -1px rgba(25, 86, 227, 0.25);
+    transition: all 150ms ease-in-out;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .btn-publicar:hover:not(:disabled) {
+        background-color: #1347BF;
+    }
+
+    .btn-publicar:active:not(:disabled) {
+        transform: translateY(1px);
+    }
+
+    .btn-publicar:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+/* Tipografía monoespaciada para entradas de montos */
+::deep .font-mono input {
+    font-family: 'Space Grotesk', monospace !important;
+}
