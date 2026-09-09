@@ -12,9 +12,7 @@
 @inject ISnackbar Snackbar
 
 <div class="login-background">
-
     <MudContainer MaxWidth="MaxWidth.Small" Class="login-container">
-
         <MudPaper Class="pa-6 login-card" Elevation="2">
 
             <div class="login-icon-wrapper">
@@ -24,8 +22,6 @@
             <MudText Typo="Typo.h4" Class="mb-1">
                 Iniciar sesión
             </MudText>
-
-            
 
             <MudTextField T="string"
                           Label="Email"
@@ -49,9 +45,6 @@
 
             <div class="login-options-row mb-4">
                 <MudCheckBox T="bool" @bind-Value="recordarme" Label="Recordarme" Dense="true" />
-                <MudLink Class="login-forgot-link" OnClick="@IrAOlvideContraseña">
-                    ¿Olvidé mi contraseña?
-                </MudLink>
             </div>
 
             <MudButton Variant="Variant.Filled"
@@ -59,9 +52,7 @@
                        FullWidth="true"
                        Disabled="@cargando"
                        OnClick="login">
-
                 @(cargando ? "Ingresando..." : "Ingresar")
-
             </MudButton>
 
             <MudButton Variant="Variant.Outlined"
@@ -70,19 +61,11 @@
                        Class="mt-3"
                        StartIcon="@Icons.Material.Filled.Storefront"
                        OnClick="@(() => Navigation.NavigateTo("/subastas"))">
-
                 Ver subastas
-
             </MudButton>
 
-            <MudText Typo="Typo.body2" Class="login-register-text">
-                ¿No tenés cuenta? <MudLink OnClick="@(() => Navigation.NavigateTo("/registro"))">Registrate gratis</MudLink>
-            </MudText>
-
         </MudPaper>
-
     </MudContainer>
-
 </div>
 
 @code {
@@ -92,20 +75,13 @@
     private bool mostrarPassword = false;
     private bool recordarme = false;
 
-    private void IrAOlvideContraseña()
-    {
-        Navigation.NavigateTo("/olvide-password");
-    }
+    private void IrAOlvideContraseña() => Navigation.NavigateTo("/olvide-password");
 
     private async Task login()
     {
-        if (string.IsNullOrWhiteSpace(email) ||
-            string.IsNullOrWhiteSpace(password))
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
         {
-            Snackbar.Add(
-                "Ingresá email y contraseña.",
-                Severity.Warning);
-
+            Snackbar.Add("Ingresá email y contraseña.", Severity.Warning);
             return;
         }
 
@@ -113,38 +89,27 @@
 
         try
         {
-            var response = await Http.PostAsJsonAsync(
-                "api/v1/usuarios/login",
-                new LoginRequest
-                {
-                    Email = email,
-                    Password = password
-                });
+            var response = await Http.PostAsJsonAsync("api/v1/usuarios/login", new LoginRequest
+            {
+                Email = email,
+                Password = password
+            });
 
             if (!response.IsSuccessStatusCode)
             {
-                Snackbar.Add(
-                    "Email o contraseña incorrectos.",
-                    Severity.Error);
-
+                Snackbar.Add("Email o contraseña incorrectos.", Severity.Error);
                 return;
             }
 
-            var usuario = await response.Content
-                .ReadFromJsonAsync<LoginResponse>();
-
-            if (usuario == null)
-                return;
+            var usuario = await response.Content.ReadFromJsonAsync<LoginResponse>();
+            if (usuario == null) return;
 
             await Sesion.IniciarSesion(usuario);
-
-            Navigation.NavigateTo("/home", forceLoad: true);
+            Navigation.NavigateTo("/home", forceLoad: false); // Carga inmediata
         }
         catch
         {
-            Snackbar.Add(
-                "No se pudo conectar con la API.",
-                Severity.Error);
+            Snackbar.Add("No se pudo conectar con la API.", Severity.Error);
         }
         finally
         {

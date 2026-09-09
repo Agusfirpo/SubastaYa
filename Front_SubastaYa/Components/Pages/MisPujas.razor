@@ -117,20 +117,39 @@
     private bool cargando;
     private IList<ParticipacionResponse> participaciones = [];
 
-    protected override async Task OnInitializedAsync() => await Cargar();
+    protected override async Task OnInitializedAsync()
+    {
+        // 1. Restaurar sesión si el usuario presionó F5
+        if (!Sesion.EstaLogueado)
+        {
+            await Sesion.CargarSesion();
+        }
+
+        // 2. Si no hay sesión válida, enviar al login
+        if (!Sesion.EstaLogueado || usuarioId <= 0)
+        {
+            Navigation.NavigateTo("/login");
+            return;
+        }
+
+        // 3. Ejecutar la carga con el ID correcto
+        await Cargar();
+    }
 
     private async Task Cargar()
     {
+        if (usuarioId <= 0) return;
+
         cargando = true;
 
         try
         {
-            participaciones = await Http.GetFromJsonAsync<IList<ParticipacionResponse>>($"api/v1/usuarios/{usuarioId}/pujas") ?? [];
+            participaciones = await Http.GetFromJsonAsync<IList<ParticipacionResponse>>(
+                $"api/v1/usuarios/{usuarioId}/pujas") ?? [];
         }
         catch
         {
             participaciones = [];
-
             Snackbar.Add("No se pudieron cargar las pujas.", Severity.Error);
         }
         finally

@@ -12,7 +12,6 @@
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="py-8">
     <div class="max-w-[820px] mx-auto">
-        <!-- TÍTULO DE LA SECCIÓN -->
         <div class="mb-6">
             <MudText Typo="Typo.h4" Class="font-extrabold text-slate-900 tracking-tight">
                 Publicar subasta
@@ -22,13 +21,11 @@
             </MudText>
         </div>
 
-        <!-- CONTENEDOR PRINCIPAL DEL FORMULARIO -->
         <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-8">
             <EditForm Model="model" OnValidSubmit="Guardar">
                 <DataAnnotationsValidator />
 
                 <MudGrid Spacing="3">
-                    <!-- Categoría Dropdown -->
                     <MudItem xs="12" sm="6" Class="ml-auto">
                         <MudSelect T="int"
                                    Label="Categoría"
@@ -42,7 +39,6 @@
                         </MudSelect>
                     </MudItem>
 
-                    <!-- Título -->
                     <MudItem xs="12">
                         <MudTextField Label="Título"
                                       Variant="Variant.Outlined"
@@ -51,7 +47,6 @@
                                       Class="bg-white rounded-lg" />
                     </MudItem>
 
-                    <!-- Descripción -->
                     <MudItem xs="12">
                         <MudTextField Label="Descripción"
                                       Variant="Variant.Outlined"
@@ -61,7 +56,6 @@
                                       Class="bg-white rounded-lg" />
                     </MudItem>
 
-                    <!-- URL de Imagen -->
                     <MudItem xs="12">
                         <MudTextField Label="URL de imagen"
                                       Variant="Variant.Outlined"
@@ -70,7 +64,6 @@
                                       Class="bg-white rounded-lg" />
                     </MudItem>
 
-                    <!-- Precio Base -->
                     <MudItem xs="12" sm="6">
                         <MudNumericField T="decimal"
                                          Label="Precio base"
@@ -82,7 +75,6 @@
                                          Class="bg-white rounded-lg font-mono" />
                     </MudItem>
 
-                    <!-- Incremento Mínimo -->
                     <MudItem xs="12" sm="6">
                         <MudNumericField T="decimal"
                                          Label="Incremento mínimo"
@@ -94,7 +86,6 @@
                                          Class="bg-white rounded-lg font-mono" />
                     </MudItem>
 
-                    <!-- Fecha Inicio -->
                     <MudItem xs="12" sm="6">
                         <MudDatePicker Label="Fecha inicio"
                                        Variant="Variant.Outlined"
@@ -102,7 +93,6 @@
                                        Class="bg-white rounded-lg" />
                     </MudItem>
 
-                    <!-- Hora Inicio -->
                     <MudItem xs="12" sm="6">
                         <MudTimePicker Label="Hora inicio"
                                        Variant="Variant.Outlined"
@@ -113,7 +103,6 @@
                                        Class="bg-white rounded-lg" />
                     </MudItem>
 
-                    <!-- Fecha Fin -->
                     <MudItem xs="12" sm="6">
                         <MudDatePicker Label="Fecha fin"
                                        Variant="Variant.Outlined"
@@ -121,7 +110,6 @@
                                        Class="bg-white rounded-lg" />
                     </MudItem>
 
-                    <!-- Hora Fin -->
                     <MudItem xs="12" sm="6">
                         <MudTimePicker Label="Hora fin"
                                        Variant="Variant.Outlined"
@@ -132,7 +120,6 @@
                                        Class="bg-white rounded-lg" />
                     </MudItem>
 
-                    <!-- BOTÓN PUBLICAR SUBASTA (AZUL) -->
                     <MudItem xs="12" Class="pt-3">
                         <MudButton ButtonType="ButtonType.Submit"
                                    Variant="Variant.Filled"
@@ -167,7 +154,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await Sesion.CargarSesion();
+        if (!Sesion.EstaLogueado)
+        {
+            await Sesion.CargarSesion();
+        }
 
         if (!Sesion.EstaLogueado)
         {

@@ -6,7 +6,6 @@
 @using Front_SubastaYa.Services
 
 @inject SesionUsuarioService Sesion
-@inject IDialogService DialogService
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject ISnackbar Snackbar
@@ -22,7 +21,7 @@
                     Mercado En Tiempo Real
                 </div>
                 <MudText Typo="Typo.h3" Class="font-extrabold tracking-tight text-slate-900">
-                    Subastas Activas
+                    Catálogo de Subastas
                 </MudText>
                 <MudText Typo="Typo.body1" Class="text-slate-500">
                     Encontrá, seguí y participá en pujas garantizadas en vivo.
@@ -64,7 +63,7 @@
                                      Class="bg-slate-50 rounded-xl" />
                 </MudItem>
 
-                <!-- Estado -->
+                <!-- Estado (Vacío por defecto para mostrar todas) -->
                 <MudItem xs="12" sm="6" md="2">
                     <MudSelect T="string"
                                Label="Estado"
@@ -154,7 +153,7 @@
         </MudPaper>
 
         <!-- RESULTADOS -->
-        @if (cargando)
+        @if (cargando && resultado == null)
         {
             <div class="d-flex justify-center items-center py-16">
                 <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" />
@@ -174,26 +173,41 @@
                     <MudItem xs="12" sm="6" md="4">
                         <article class="subasta-card">
 
-                            <!-- CONTENEDOR DE IMAGEN -->
-                            <div class="imagen-container">
+                            <!-- CONTENEDOR DE IMAGEN ROBUSTO -->
+                            <div class="relative w-full h-48 bg-slate-100/80 overflow-hidden flex items-center justify-center border-b border-slate-100">
                                 @if (!string.IsNullOrWhiteSpace(subasta.UrlImagen))
                                 {
-                                    <img src="@subasta.UrlImagen" alt="@subasta.Titulo" class="subasta-img" />
+                                    <img src="@subasta.UrlImagen"
+                                         alt=""
+                                         class="w-full h-full object-cover"
+                                         loading="lazy"
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+
+                                    <!-- Fallback si la imagen no carga o da error -->
+                                    <div class="hidden w-full h-full flex flex-col items-center justify-center bg-slate-100 text-slate-400 select-none">
+                                        <MudIcon Icon="@Icons.Material.Filled.Image" Size="Size.Large" Class="text-slate-300" />
+                                        <span class="text-[10px] font-semibold text-slate-400 mt-1 uppercase tracking-wider">Sin imagen</span>
+                                    </div>
                                 }
                                 else
                                 {
-                                    <div class="imagen-placeholder">
-                                        <MudIcon Icon="@Icons.Material.Filled.Image" Size="Size.Large" />
+                                    <div class="w-full h-full flex flex-col items-center justify-center bg-slate-100 text-slate-400 select-none">
+                                        <MudIcon Icon="@Icons.Material.Filled.Image" Size="Size.Large" Class="text-slate-300" />
+                                        <span class="text-[10px] font-semibold text-slate-400 mt-1 uppercase tracking-wider">Sin imagen</span>
                                     </div>
                                 }
 
                                 <!-- Badges Superpuestos -->
-                                <div class="badge-estado" style="background-color: @GetEstadoBgColor(subasta.Estado);">
-                                    <span class="badge-ping"></span>
+                                <div class="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold text-white shadow-sm"
+                                     style="background-color: @GetEstadoBgColor(subasta.Estado);">
+                                    @if (subasta.Estado == "Activa")
+                                    {
+                                        <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                                    }
                                     <span>@subasta.Estado</span>
                                 </div>
 
-                                <div class="badge-categoria">
+                                <div class="absolute bottom-3 left-3 px-2.5 py-1 rounded-md text-[11px] font-bold text-slate-700 bg-white/95 backdrop-blur-md border border-white/80 shadow-xs">
                                     @subasta.Categoria
                                 </div>
                             </div>
@@ -267,15 +281,82 @@
     </MudContainer>
 </div>
 
+<!-- MODAL GLASSMORPHISM -->
+@if (mostrarModalAuth)
+{
+    <div class="auth-modal-overlay">
+        <div class="auth-modal-card">
+            <div aria-hidden="true" class="auth-modal-glow"></div>
+
+            <button aria-label="Cerrar modal"
+                    class="auth-modal-close-btn"
+                    type="button"
+                    @onclick="() => mostrarModalAuth = false">
+                <MudIcon Icon="@Icons.Material.Filled.Close" Size="Size.Small" />
+            </button>
+
+            <div class="auth-modal-icon-container">
+                <div class="auth-modal-icon-wrapper">
+                    <div class="auth-modal-icon-box">
+                        <MudIcon Icon="@Icons.Material.Filled.Gavel" Size="Size.Large" />
+                    </div>
+                    <span class="auth-modal-lock-badge">
+                        <MudIcon Icon="@Icons.Material.Filled.Lock" Size="Size.Small" Style="font-size: 11px;" />
+                    </span>
+                </div>
+            </div>
+
+            <div class="auth-modal-text-group">
+                <h3 class="auth-modal-title">
+                    Inicio de sesión requerido
+                </h3>
+                <p class="auth-modal-description">
+                    Para ingresar a una subasta tenés que iniciar sesión.
+                </p>
+                <p class="auth-modal-subtext">
+                    Identificate para realizar ofertas seguras en vivo y administrar tu saldo.
+                </p>
+            </div>
+
+            <div class="auth-modal-actions">
+                <button type="button"
+                        class="auth-btn-secondary"
+                        @onclick="() => mostrarModalAuth = false">
+                    Seguir mirando
+                </button>
+
+                <button type="button"
+                        class="auth-btn-primary"
+                        @onclick='() => Navigation.NavigateTo("/login")'>
+                    <span>Iniciar sesión</span>
+                    <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Size="Size.Small" />
+                </button>
+            </div>
+
+            <div class="auth-modal-footer">
+                <p class="auth-modal-footer-text">
+                    ¿No tenés cuenta aún?
+                    <a class="auth-modal-register-link"
+                       @onclick='() => Navigation.NavigateTo("/registro")'>
+                        Registrate gratis
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     private SubastasPaginadasResponse? resultado;
     private IList<CategoriaResponse> categorias = [];
-
-    // Lista en memoria para que las sugerencias nunca se queden vacías
     private List<string> titulosSugerencias = [];
 
     private bool cargando;
-    private string? estado, orden, busqueda;
+    private bool mostrarModalAuth = false;
+
+    // null por defecto: trae todas las subastas registradas sin importar su estado
+    private string? estado = null;
+    private string? orden, busqueda;
     private int? categoriaId;
     private decimal? precioMinimo, precioMaximo;
 
@@ -284,17 +365,17 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await Sesion.CargarSesion();
-        await CargarCategorias();
-        await CargarSubastas();
+        if (!Sesion.EstaLogueado)
+        {
+            await Sesion.CargarSesion();
+        }
+
+        await Task.WhenAll(CargarCategorias(), CargarSubastas());
     }
 
-    // Se dispara cada vez que seleccionas una opción, la borras o tocas la 'X'
     private async Task OnBusquedaChanged(string? nuevoValor)
     {
         busqueda = nuevoValor;
-
-        // Si se borró el texto o se seleccionó una opción, refresca la grilla automáticamente
         if (string.IsNullOrWhiteSpace(busqueda))
         {
             pagina = 1;
@@ -304,26 +385,23 @@
 
     private async Task<IEnumerable<string>> BuscarSugerencias(string valor, CancellationToken token)
     {
-        // Si no escribió nada, muestra hasta 6 títulos del catálogo global
         if (string.IsNullOrWhiteSpace(valor))
             return titulosSugerencias.Take(6);
 
         var filtro = valor.Trim().ToLowerInvariant();
 
-        // Busca sobre la lista acumulada en memoria
-        var coincidencias = titulosSugerencias
-            .Where(t => t.ToLowerInvariant().Contains(filtro))
-            .Distinct();
-
-        return await Task.FromResult(coincidencias);
+        return await Task.FromResult(
+            titulosSugerencias
+                .Where(t => t.ToLowerInvariant().Contains(filtro))
+                .Distinct()
+        );
     }
 
     private async Task CargarCategorias()
     {
         try
         {
-            categorias = await Http.GetFromJsonAsync<IList<CategoriaResponse>>(
-                "api/v1/categorias") ?? [];
+            categorias = await Http.GetFromJsonAsync<IList<CategoriaResponse>>("api/v1/categorias") ?? [];
         }
         catch
         {
@@ -359,7 +437,6 @@
 
             resultado = await Http.GetFromJsonAsync<SubastasPaginadasResponse>(url);
 
-            // Guardamos los títulos en la caché local de sugerencias
             if (resultado?.Items != null)
             {
                 foreach (var item in resultado.Items.Where(i => !string.IsNullOrEmpty(i.Titulo)))
@@ -408,7 +485,7 @@
         await CargarSubastas();
     }
 
-    private async Task VerSubasta(int id)
+    private void VerSubasta(int id)
     {
         if (Sesion.EstaLogueado)
         {
@@ -416,14 +493,7 @@
             return;
         }
 
-        var dialogResult = await DialogService.ShowMessageBoxAsync(
-            "Inicio de sesión requerido",
-            "Para ingresar a una subasta tenés que iniciar sesión.",
-            yesText: "Iniciar sesión",
-            cancelText: "Seguir mirando");
-
-        if (dialogResult == true)
-            Navigation.NavigateTo("/login");
+        mostrarModalAuth = true;
     }
 
     private static Color ObtenerColorEstado(string estado) => estado switch

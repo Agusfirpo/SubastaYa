@@ -15,7 +15,7 @@
         <div class="max-w-7xl mx-auto flex items-center justify-between w-full px-4">
 
             @* Marca *@
-            <div class="marca-badge" @onclick="@(() => Navigation.NavigateTo("/home"))">
+            <div class="marca-badge cursor-pointer" @onclick="@(() => Navigation.NavigateTo(Sesion.EstaLogueado ? "/home" : "/subastas"))">
                 <div class="logo-box">
                     <span class="material-symbols-outlined text-xl text-white">gavel</span>
                 </div>
@@ -30,10 +30,18 @@
 
             @* Navegación Desktop *@
             <nav class="hidden md:flex items-center gap-7">
-                <a href="/home" class="nav-link-header @(EsActiva("/home") ? "active" : "")">Inicio</a>
+                @if (Sesion.EstaLogueado)
+                {
+                    <a href="/home" class="nav-link-header @(EsActiva("/home") ? "active" : "")">Inicio</a>
+                }
+
                 <a href="/subastas" class="nav-link-header @(EsActiva("/subastas") ? "active" : "")">Explorar</a>
-                <a href="/crear-subasta" class="nav-link-header @(EsActiva("/crear-subasta") ? "active" : "")">Subastar</a>
-                <a href="/billetera" class="nav-link-header @(EsActiva("/billetera") ? "active" : "")">Billetera</a>
+
+                @if (Sesion.EstaLogueado)
+                {
+                    <a href="/crear-subasta" class="nav-link-header @(EsActiva("/crear-subasta") ? "active" : "")">Subastar</a>
+                    <a href="/billetera" class="nav-link-header @(EsActiva("/billetera") ? "active" : "")">Billetera</a>
+                }
             </nav>
 
             @* Notificaciones & Menú Usuario *@
@@ -49,7 +57,6 @@
                     @if (Sesion.EstaLogueado)
                     {
                         <div class="relative">
-                            @* Botón Activador Mi Cuenta *@
                             <button type="button"
                                     class="user-activator-btn flex items-center gap-2 cursor-pointer select-none"
                                     @onclick="ToggleMenuCuenta">
@@ -62,13 +69,9 @@
 
                             @if (menuAbierto)
                             {
-                                @* Backdrop invisible para cerrar al hacer clic afuera *@
                                 <div class="fixed inset-0 z-40" @onclick="() => menuAbierto = false"></div>
 
-                                @* Contenido del menú desplegable Dark Glass *@
                                 <div class="absolute right-0 mt-2.5 w-60 rounded-2xl shadow-2xl z-50 overflow-hidden border border-slate-700/80 bg-slate-900/95 backdrop-blur-xl text-slate-200">
-
-                                    @* Encabezado de usuario *@
                                     <div class="px-4 py-3 bg-slate-800/40 border-b border-slate-800/80">
                                         <p class="text-xs text-slate-400 font-medium leading-none">Conectado como</p>
                                         <p class="text-sm font-bold text-white truncate max-w-[200px] mt-1.5">
@@ -76,7 +79,6 @@
                                         </p>
                                     </div>
 
-                                    @* Accesos principales *@
                                     <div class="py-1">
                                         <a href="/mis-publicaciones"
                                            @onclick="() => menuAbierto = false"
@@ -95,7 +97,6 @@
 
                                     <div class="h-px bg-slate-800 my-0.5"></div>
 
-                                    @* Cerrar sesión *@
                                     <div class="p-1">
                                         <button type="button"
                                                 @onclick="CerrarSesion"
@@ -104,7 +105,6 @@
                                             <span class="font-semibold">Cerrar sesión</span>
                                         </button>
                                     </div>
-
                                 </div>
                             }
                         </div>
@@ -116,7 +116,7 @@
                                    Size="Size.Small"
                                    StartIcon="@Icons.Material.Filled.Login"
                                    Href="/login"
-                                   Class="rounded-lg">
+                                   Class="rounded-lg font-bold">
                             Ingresar
                         </MudButton>
                     }
@@ -150,20 +150,20 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await Sesion.CargarSesion();
+        if (!Sesion.EstaLogueado)
+        {
+            await Sesion.CargarSesion();
+        }
         sesionCargada = true;
     }
 
-    private void ToggleMenuCuenta()
-    {
-        menuAbierto = !menuAbierto;
-    }
+    private void ToggleMenuCuenta() => menuAbierto = !menuAbierto;
 
     private async Task CerrarSesion()
     {
         menuAbierto = false;
         await Sesion.CerrarSesion();
-        Navigation.NavigateTo("/login", forceLoad: true);
+        Navigation.NavigateTo("/login", forceLoad: false);
     }
 
     private bool EsActiva(string ruta)

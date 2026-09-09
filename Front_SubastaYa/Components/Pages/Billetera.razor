@@ -11,7 +11,7 @@
 <PageTitle>SubastaYa - Mi Billetera</PageTitle>
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    @if (cargando)
+    @if (cargando && billetera == null)
     {
         <div class="flex justify-center items-center py-36">
             <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" />
@@ -245,10 +245,10 @@
                                 Monto a ingresar (ARS)
                             </label>
                             <MudNumericField @ref="campoMonto"
-                                             T="decimal"
+                                             T="decimal?"
                                              @bind-Value="monto"
                                              Placeholder="0,00"
-                                             Min="1"
+                                             Min="0"
                                              Format="N2"
                                              Adornment="Adornment.Start"
                                              AdornmentText="$"
@@ -281,7 +281,7 @@
                         <div class="pt-2">
                             <button type="button"
                                     class="w-full flex items-center justify-center px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-extrabold text-sm tracking-wider uppercase shadow-lg shadow-blue-600/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                                    disabled="@depositando"
+                                    disabled="@(depositando || monto.GetValueOrDefault() <= 0)"
                                     @onclick="Depositar">
                                 @if (depositando)
                                 {
@@ -289,7 +289,7 @@
                                 }
                                 else
                                 {
-                                    <span>DEPOSITAR @(monto > 0 ? $"$ {monto:N0}" : "")</span>
+                                    <span>DEPOSITAR @(monto.GetValueOrDefault() > 0 ? $"$ {monto.GetValueOrDefault():N0}" : "")</span>
                                 }
                             </button>
                         </div>
@@ -332,26 +332,47 @@
 </div>
 
 @code {
-    private MudNumericField<decimal>? campoMonto;
+    private MudNumericField<decimal?>? campoMonto;
     private int usuarioId => Sesion.Usuario?.Id ?? 0;
-    private decimal monto;
+    private decimal? monto = null;
     private bool cargando;
     private bool depositando;
     private BilleteraResponse? billetera;
     private IList<TransaccionResponse> transacciones = [];
 
     protected override async Task OnInitializedAsync()
-        => await CargarTodo();
+    {
+        // 1. Si no hay sesión en memoria, restaurarla del almacenamiento local
+        if (!Sesion.EstaLogueado)
+        {
+            await Sesion.CargarSesion();
+        }
+
+        // 2. Si sigue sin estar logueado, enviar al login
+        if (!Sesion.EstaLogueado || usuarioId <= 0)
+        {
+            NavigationManager.NavigateTo("/login");
+            return;
+        }
+
+        // 3. Ya con el usuario cargado y su ID real, pedir la billetera
+        await CargarTodo();
+    }
 
     private async Task CargarTodo()
     {
+        if (usuarioId <= 0) return;
+
         cargando = true;
         try
         {
-            billetera = await Http.GetFromJsonAsync<BilleteraResponse>(
-                $"api/v1/usuarios/{usuarioId}/billetera");
-            transacciones = await Http.GetFromJsonAsync<IList<TransaccionResponse>>(
-                $"api/v1/usuarios/{usuarioId}/billetera/transacciones") ?? [];
+            var tBilletera = Http.GetFromJsonAsync<BilleteraResponse>($"api/v1/usuarios/{usuarioId}/billetera");
+            var tTransacciones = Http.GetFromJsonAsync<IList<TransaccionResponse>>($"api/v1/usuarios/{usuarioId}/billetera/transacciones");
+
+            await Task.WhenAll(tBilletera, tTransacciones);
+
+            billetera = await tBilletera;
+            transacciones = (await tTransacciones) ?? [];
         }
         catch
         {
@@ -367,7 +388,7 @@
 
     private async Task FocusMonto()
     {
-        if (monto == 0) monto = 10000;
+        if (monto.GetValueOrDefault() == 0) monto = 10000;
         if (campoMonto != null)
         {
             await campoMonto.FocusAsync();
@@ -376,7 +397,9 @@
 
     private async Task Depositar()
     {
-        if (monto <= 0)
+        var valorMonto = monto.GetValueOrDefault();
+
+        if (valorMonto <= 0)
         {
             Snackbar.Add("El monto debe ser mayor a cero.", Severity.Warning);
             return;
@@ -387,7 +410,7 @@
         {
             var response = await Http.PostAsJsonAsync(
                 $"api/v1/usuarios/{usuarioId}/billetera/depositos",
-                new AcreditarSaldoRequest { Monto = monto });
+                new AcreditarSaldoRequest { Monto = valorMonto });
 
             if (!response.IsSuccessStatusCode)
             {
@@ -395,7 +418,7 @@
                 return;
             }
 
-            monto = 0;
+            monto = null;
             Snackbar.Add("Saldo acreditado correctamente.", Severity.Success);
             await CargarTodo();
         }
