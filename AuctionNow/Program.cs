@@ -1,86 +1,75 @@
-using Aplicacion.Interfaces.Handlers;
-using Aplicacion.Interfaces.Repositories;
-using Aplicacion.UseCases.Billetera.Handler;
-using Aplicacion.UseCases.Categoria.Handler;
-using Aplicacion.UseCases.Puja.Handler;
-using Aplicacion.UseCases.Subasta.Handler;
-using Aplicacion.UseCases.Transaccion.Handler;
-using Aplicacion.UseCases.Usuario.Handler;
-using Infraestructura.Persistence;
-using Infraestructura.Repositories;
+using Application.Interfaces.Handlers;
+using Application.Interfaces.Repositories;
+using Application.UseCases.Billetera.Handler;
+using Application.UseCases.Categoria.Handler;
+using Application.UseCases.Puja.Handler;
+using Application.UseCases.Subasta.Handler;
+using Application.UseCases.Transaccion.Handler;
+using Application.UseCases.Usuario.Handler;
+using Infrastructure.Persistence;
+using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
-using SubastaYa.Hubs;
-using SubastaYa.Workers;
-using SubastaYa.Middlewares;
+using Api_SubastaYa.Hubs;
+using Api_SubastaYa.Workers;
+using Api_SubastaYa.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//Base de datos
-builder.Services.AddDbContext<AppDbContext>(options =>options.UseSqlServer(
-    builder.Configuration.GetConnectionString(
-            "SubastaYaConnection"
-        )
-    )
+// Base de datos
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SubastaYaConnection"))
 );
 
-//Builders
+// Repositorios y Unit of Work
+builder.Services.AddScoped<IWalletRepository, WalletRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IAuctionRepository, AuctionRepository>();
+builder.Services.AddScoped<IBidRepository, BidRepository>();
+builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+builder.Services.AddScoped<IAuditRepository, AuditRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IAuctionNotifier, AuctionNotifier>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-builder.Services.AddScoped<IBilleteraRepository, BilleteraRepository>();
-builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
-builder.Services.AddScoped<ISubastaRepository, SubastaRepository>();
-builder.Services.AddScoped<IPujaRepository, PujaRepository>();
-builder.Services.AddScoped<ITransaccionRepository, TransaccionRepository>();
-builder.Services.AddScoped<IAuditoriaRepository, AuditoriaRepository>();
-builder.Services.AddScoped<IUnidadTrabajo, UnidadTrabajo>();
-builder.Services.AddScoped<INotificadorSubasta, NotificadorSubasta>();
-builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
-
+// Handlers
 builder.Services.AddScoped<LoginHandler>();
-builder.Services.AddScoped<ObtenerSubastaPorIdHandler>();
-builder.Services.AddScoped<ListarPujasPorSubastaHandler>();
-builder.Services.AddScoped<ListarSubastasHandler>();
-builder.Services.AddScoped<CrearSubastaHandler>();
-builder.Services.AddScoped<ListarCategoriasHandler>();
-builder.Services.AddScoped<ObtenerBilleteraHandler>(); 
-builder.Services.AddScoped<AcreditarSaldoHandler>(); 
-builder.Services.AddScoped<ListarSubastasPorVendedorHandler>();
-builder.Services.AddScoped<FinalizarSubastasHandler>();
-builder.Services.AddScoped<ListarParticipacionesHandler>();
-builder.Services.AddScoped<ListarTransaccionesHandler>();
-builder.Services.AddScoped<RealizarPujaHandler>();
-builder.Services.AddScoped<ProcesarSubastasProgramadasHandler>();
+builder.Services.AddScoped<GetAuctionByIdHandler>();
+builder.Services.AddScoped<GetBidsByAuctionHandler>();
+builder.Services.AddScoped<GetAuctionsHandler>();
+builder.Services.AddScoped<CreateAuctionHandler>();
+builder.Services.AddScoped<GetCategoriesHandler>();
+builder.Services.AddScoped<GetWalletHandler>();
+builder.Services.AddScoped<CreditBalanceHandler>();
+builder.Services.AddScoped<GetAuctionsBySellerHandler>();
+builder.Services.AddScoped<FinishAuctionsHandler>();
+builder.Services.AddScoped<GetParticipationsHandler>();
+builder.Services.AddScoped<GetTransactionsHandler>();
+builder.Services.AddScoped<PlaceBidHandler>();
+builder.Services.AddScoped<ProcessScheduledAuctionsHandler>();
 
-
-builder.Services.AddHostedService<SubastaWorker>();
+builder.Services.AddHostedService<AuctionWorker>();
 builder.Services.AddSignalR();
 
+// CORS configurado para admitir SignalR desde Blazor WebAssembly
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("FrontSubastaYa", policy =>
+    options.AddPolicy("Front_AuctionNow", policy =>
     {
         policy
-            .AllowAnyOrigin()
+            .SetIsOriginAllowed(_ => true)
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
-
-
-var passwordHash = BCrypt.Net.BCrypt.HashPassword("1234");
-Console.WriteLine($"PASSWORD HASH: {passwordHash}");
-
-
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -91,12 +80,15 @@ app.UseHttpsRedirection();
 
 app.UseMiddleware<ExceptionMiddleware>();
 
+// CORS DEBE IR ANTES de Authorization, Controllers y Hubs
+app.UseCors("Front_AuctionNow");
+
 app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseCors("FrontSubastaYa");
-
-app.MapHub<SubastaHub>("/hubs/subastas");
+// Mapeamos ambas rutas para asegurar compatibilidad inmediata
+app.MapHub<AuctionHub>("/hubs/auctionHub");
+app.MapHub<AuctionHub>("/hubs/subastas");
 
 app.Run();

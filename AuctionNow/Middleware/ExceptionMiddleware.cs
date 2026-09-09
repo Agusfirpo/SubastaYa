@@ -1,9 +1,9 @@
-﻿using System.Net;
+using System.Net;
 using System.Text.Json;
-using Aplicacion.Exceptions;
-using Dominio.Exceptions;
+using Application.Exceptions;
+using Domain.Exceptions;
 
-namespace SubastaYa.Middlewares
+namespace Api_SubastaYa.Middlewares
 {
     public class ExceptionMiddleware
     {
@@ -28,11 +28,11 @@ namespace SubastaYa.Middlewares
             {
                 await Responder(context, HttpStatusCode.BadRequest, ex.Message);
             }
-            catch (RecursoNoEncontradoException ex)
+            catch (NotFoundException ex)
             {
                 await Responder(context, HttpStatusCode.NotFound, ex.Message);
             }
-            catch (ConcurrenciaException ex)
+            catch (ConcurrencyException ex)
             {
                 await Responder(context, HttpStatusCode.Conflict, ex.Message);
             }

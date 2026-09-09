@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Infraestructura.Migrations
+namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class ActualizarPasswordUsuarios : Migration

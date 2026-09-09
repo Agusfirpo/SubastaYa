@@ -1,7 +1,7 @@
-﻿@page "/home"
-@using Front_SubastaYa.Services
+@page "/home"
+@using Front_AuctionNow.Services
 @inject NavigationManager Navigation
-@inject SesionUsuarioService Sesion
+@inject UserSessionService Sesion
 
 <div class="subastaya-root pb-16 flex flex-col justify-between">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 w-full flex-grow">
@@ -29,7 +29,7 @@
                 <!-- Columna Derecha: Foto integrada -->
                 <div class="md:col-span-5 h-full w-full relative min-h-[260px] md:min-h-full">
                     <img src="/imagenes/imagen_baner.png"
-                         alt="SubastaYa Banner"
+                         alt="Api_SubastaYa Banner"
                          class="banner-side-img" />
                     <div class="banner-img-fade"></div>
                 </div>
@@ -158,7 +158,7 @@
     <!-- Footer -->
     <footer class="footer-custom py-6 mt-8 text-center">
         <p class="text-sm text-slate-600 font-medium">
-            SubastaYa © 2026 • Plataforma de subastas en tiempo real
+            Api_SubastaYa © 2026 • Plataforma de subastas en tiempo real
         </p>
     </footer>
 </div>

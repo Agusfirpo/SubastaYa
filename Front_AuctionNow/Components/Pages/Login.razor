@@ -1,14 +1,14 @@
-﻿@page "/"
+@page "/"
 @page "/login"
 
 @using System.Net.Http.Json
-@using Aplicacion.DTOs.Request
-@using Aplicacion.DTOs.Response
-@using Front_SubastaYa.Services
+@using Application.DTOs.Request
+@using Application.DTOs.Response
+@using Front_AuctionNow.Services
 @layout LoginLayout
 @inject HttpClient Http
 @inject NavigationManager Navigation
-@inject SesionUsuarioService Sesion
+@inject UserSessionService Sesion
 @inject ISnackbar Snackbar
 
 <div class="login-background">

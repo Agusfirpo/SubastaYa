@@ -1,5 +1,5 @@
-﻿using Dominio.Entities;
-using Dominio.Enums;
+using Domain.Entities;
+using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System;
@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace Infraestructura.Persistence
+namespace Infrastructure.Persistence
 {
     public class AppDbContext : DbContext
     {
@@ -17,18 +17,18 @@ namespace Infraestructura.Persistence
         {
             
         }
-        public DbSet<Usuario> Usuarios { get; set; }
-        public DbSet<Categoria> Categorias { get; set; }
-        public DbSet <Subasta> Subastas { get; set; }
-        public DbSet<Puja> Pujas { get; set; }
-        public DbSet <Billetera> Billeteras { get; set; }
-        public DbSet<AuditoriaLog> AuditoriaLogs {  get; set; }
-        public DbSet< TransaccionLedger> TransaccionLedgers { get; set; }
+        public DbSet<User> Usuarios { get; set; }
+        public DbSet<Category> Categorias { get; set; }
+        public DbSet <Auction> Subastas { get; set; }
+        public DbSet<Bid> Pujas { get; set; }
+        public DbSet <Wallet> Billeteras { get; set; }
+        public DbSet<AuditLog> AuditoriaLogs {  get; set; }
+        public DbSet< LedgerTransaction> TransaccionLedgers { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Usuario>(entity =>
+            modelBuilder.Entity<User>(entity =>
             {
                 entity.ToTable("Usuarios");
                 entity.HasKey(u => u.Id);
@@ -41,7 +41,7 @@ namespace Infraestructura.Persistence
 
             });
 
-            modelBuilder.Entity<Categoria>(entity => 
+            modelBuilder.Entity<Category>(entity => 
             {
                 entity.ToTable("Categorias");
                 entity.HasKey(c => c.Id);
@@ -50,7 +50,7 @@ namespace Infraestructura.Persistence
                 entity.Property(c=>c.UrlIcono).HasMaxLength(500);                                                                         
             });
 
-            modelBuilder.Entity<Subasta>(entity => 
+            modelBuilder.Entity<Auction>(entity => 
             {
                 entity.ToTable("Subastas");
                 entity.HasKey(s => s.Id);
@@ -76,7 +76,7 @@ namespace Infraestructura.Persistence
                 .OnDelete(DeleteBehavior.Restrict);
             });
 
-            modelBuilder.Entity<Puja>(entity =>
+            modelBuilder.Entity<Bid>(entity =>
             {
                 entity.ToTable("Pujas");
                 entity.HasKey(p => p.Id);
@@ -95,7 +95,7 @@ namespace Infraestructura.Persistence
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
-            modelBuilder.Entity<Billetera>(entity =>
+            modelBuilder.Entity<Wallet>(entity =>
             {
 
                 entity.ToTable("Billeteras");
@@ -108,14 +108,14 @@ namespace Infraestructura.Persistence
 
                 entity.HasOne(b => b.Usuario)
                 .WithOne(u => u.Billetera)
-                .HasForeignKey<Billetera>(b => b.UsuarioId)
+                .HasForeignKey<Wallet>(b => b.UsuarioId)
                 .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasIndex(b => b.UsuarioId).IsUnique();
 
             });
 
-            modelBuilder.Entity<AuditoriaLog>(entity =>
+            modelBuilder.Entity<AuditLog>(entity =>
             {
                 entity.ToTable("AuditoriaLogs");
                 entity.HasKey(a => a.Id);
@@ -131,7 +131,7 @@ namespace Infraestructura.Persistence
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
-            modelBuilder.Entity<TransaccionLedger>(entity =>
+            modelBuilder.Entity<LedgerTransaction>(entity =>
             {
                 entity.ToTable("TransaccionesLedger");
                 entity.HasKey(t => t.Id);
@@ -160,8 +160,8 @@ namespace Infraestructura.Persistence
             // 1.Usuarios
             var passwordHash = "$2a$11$Lbbgrr7/PzD8nLmccgEkYuuhMiHckaCIMnKcvUeXWh8jquZ5VlfKy";
 
-            modelBuilder.Entity<Usuario>().HasData(
-                new Usuario
+            modelBuilder.Entity<User>().HasData(
+                new User
                 {
                     Id = 1,
                     Email = "vendedor@test.com",
@@ -169,7 +169,7 @@ namespace Infraestructura.Persistence
                     PasswordHash = passwordHash,
                     FechaRegistro = fechaBase.AddDays(-10)
                 },
-                new Usuario
+                new User
                 {
                     Id = 2,
                     Email = "comprador1@test.com",
@@ -177,7 +177,7 @@ namespace Infraestructura.Persistence
                     PasswordHash = passwordHash,
                     FechaRegistro = fechaBase.AddDays(-5)
                 },
-                new Usuario
+                new User
                 {
                     Id = 3,
                     Email = "comprador2@test.com",
@@ -185,7 +185,7 @@ namespace Infraestructura.Persistence
                     PasswordHash = passwordHash,
                     FechaRegistro = fechaBase.AddDays(-2)
                 },
-                new Usuario
+                new User
                 {
                     Id = 4,
                     Email = "sinfondos@test.com",
@@ -196,24 +196,24 @@ namespace Infraestructura.Persistence
             );
 
             // 2. Billeteras
-            modelBuilder.Entity<Billetera>().HasData(
-                new Billetera { Id = 1, UsuarioId = 1, SaldoTotal = 0m, SaldoRetenido = 0m, Version = 1 },
-                new Billetera { Id = 2, UsuarioId = 2, SaldoTotal = 150000m, SaldoRetenido = 45000m, Version = 1 },
-                new Billetera { Id = 3, UsuarioId = 3, SaldoTotal = 200000m, SaldoRetenido = 0m, Version = 1 },
-                new Billetera { Id = 4, UsuarioId = 4, SaldoTotal = 500m, SaldoRetenido = 0m, Version = 1 }
+            modelBuilder.Entity<Wallet>().HasData(
+                new Wallet { Id = 1, UsuarioId = 1, SaldoTotal = 0m, SaldoRetenido = 0m, Version = 1 },
+                new Wallet { Id = 2, UsuarioId = 2, SaldoTotal = 150000m, SaldoRetenido = 45000m, Version = 1 },
+                new Wallet { Id = 3, UsuarioId = 3, SaldoTotal = 200000m, SaldoRetenido = 0m, Version = 1 },
+                new Wallet { Id = 4, UsuarioId = 4, SaldoTotal = 500m, SaldoRetenido = 0m, Version = 1 }
             );
 
             // 3. Categorías
-            modelBuilder.Entity<Categoria>().HasData(
-                new Categoria { Id = 1, Nombre = "Tecnología", UrlIcono = "tech.png" },
-                new Categoria { Id = 2, Nombre = "Coleccionables", UrlIcono = "col.png" },
-                new Categoria { Id = 3, Nombre = "Indumentaria", UrlIcono = "ropa.png" },
-                new Categoria { Id = 4, Nombre = "Vehículos", UrlIcono = "auto.png" }
+            modelBuilder.Entity<Category>().HasData(
+                new Category { Id = 1, Nombre = "Tecnología", UrlIcono = "tech.png" },
+                new Category { Id = 2, Nombre = "Coleccionables", UrlIcono = "col.png" },
+                new Category { Id = 3, Nombre = "Indumentaria", UrlIcono = "ropa.png" },
+                new Category { Id = 4, Nombre = "Vehículos", UrlIcono = "auto.png" }
             );
 
             // 4. Subastas
-            modelBuilder.Entity<Subasta>().HasData(
-                new Subasta
+            modelBuilder.Entity<Auction>().HasData(
+                new Auction
                 {
                     Id = 1,
                     VendedorId = 1,
@@ -225,11 +225,11 @@ namespace Infraestructura.Persistence
                     IncrementoMinimo = 1000m,
                     FechaInicio = fechaBase.AddHours(-1),
                     FechaFin = fechaBase.AddMinutes(30),
-                    Estado = EstadoSubasta.Activa,
+                    Estado = AuctionStatus.Activa,
                     Version = 1
                 },
 
-                new Subasta
+                new Auction
                 {
                     Id = 2,
                     VendedorId = 1,
@@ -241,11 +241,11 @@ namespace Infraestructura.Persistence
                     IncrementoMinimo = 500m,
                     FechaInicio = fechaBase.AddHours(-2),
                     FechaFin = fechaBase.AddMinutes(1),
-                    Estado = EstadoSubasta.Activa,
+                    Estado = AuctionStatus.Activa,
                     Version = 1
                 },
 
-                new Subasta
+                new Auction
                 {
                     Id = 3,
                     VendedorId = 1,
@@ -257,11 +257,11 @@ namespace Infraestructura.Persistence
                     IncrementoMinimo = 50000m,
                     FechaInicio = fechaBase.AddHours(24),
                     FechaFin = fechaBase.AddHours(48),
-                    Estado = EstadoSubasta.Programada,
+                    Estado = AuctionStatus.Programada,
                     Version = 1
                 },
 
-                new Subasta
+                new Auction
                 {
                     Id = 4,
                     VendedorId = 1,
@@ -273,11 +273,11 @@ namespace Infraestructura.Persistence
                     IncrementoMinimo = 1000m,
                     FechaInicio = fechaBase.AddDays(-3),
                     FechaFin = fechaBase.AddDays(-1),
-                    Estado = EstadoSubasta.Activa,
+                    Estado = AuctionStatus.Activa,
                     Version = 1
                 },
 
-                new Subasta
+                new Auction
                 {
                     Id = 5,
                     VendedorId = 1,
@@ -289,35 +289,35 @@ namespace Infraestructura.Persistence
                     IncrementoMinimo = 2000m,
                     FechaInicio = fechaBase.AddDays(-5),
                     FechaFin = fechaBase.AddDays(-2),
-                    Estado = EstadoSubasta.Activa,
+                    Estado = AuctionStatus.Activa,
                     Version = 1
                 }
             );
 
             // 5. Pujas
-            modelBuilder.Entity<Puja>().HasData(
-                new Puja { Id = 1, SubastaId = 1, CompradorId = 3, Monto = 35000m, FechaPuja = fechaBase.AddMinutes(-40) },
-                new Puja { Id = 2, SubastaId = 1, CompradorId = 2, Monto = 45000m, FechaPuja = fechaBase.AddMinutes(-20) },
-                new Puja { Id = 3, SubastaId = 4, CompradorId = 3, Monto = 25000m, FechaPuja = fechaBase.AddDays(-2) }
+            modelBuilder.Entity<Bid>().HasData(
+                new Bid { Id = 1, SubastaId = 1, CompradorId = 3, Monto = 35000m, FechaPuja = fechaBase.AddMinutes(-40) },
+                new Bid { Id = 2, SubastaId = 1, CompradorId = 2, Monto = 45000m, FechaPuja = fechaBase.AddMinutes(-20) },
+                new Bid { Id = 3, SubastaId = 4, CompradorId = 3, Monto = 25000m, FechaPuja = fechaBase.AddDays(-2) }
             );
 
             // 6. Ledger
-            modelBuilder.Entity<TransaccionLedger>().HasData(
-                new TransaccionLedger
+            modelBuilder.Entity<LedgerTransaction>().HasData(
+                new LedgerTransaction
                 {
                     Id = 1,
                     BilleteraId = 2,
-                    Tipo = TipoTransaccion.Deposito,
+                    Tipo = TransactionType.Deposito,
                     Monto = 150000m,
                     Fecha = fechaBase.AddDays(-4),
                     SubastaId = null
                 },
 
-                new TransaccionLedger
+                new LedgerTransaction
                 {
                     Id = 2,
                     BilleteraId = 2,
-                    Tipo = TipoTransaccion.Retencion,
+                    Tipo = TransactionType.Retencion,
                     Monto = 45000m,
                     Fecha = fechaBase.AddMinutes(-20),
                     SubastaId = 1

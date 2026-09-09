@@ -1,0 +1,560 @@
+@page "/subastas/{Id:int}"
+
+@using System.Net
+@using System.Net.Http.Json
+@using System.Text.Json
+@using Application.DTOs.Request
+@using Application.DTOs.Response
+@using Microsoft.AspNetCore.SignalR.Client
+@using Front_AuctionNow.Components
+@using Front_AuctionNow.Services
+
+@implements IAsyncDisposable
+
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+@inject UserSessionService Sesion
+
+<PageTitle>Api_SubastaYa - @(subasta?.Titulo ?? "Detalle de Subasta")</PageTitle>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Botón Volver -->
+    <div class="mb-6">
+        <button type="button" class="btn-back-link" @onclick="Volver">
+            <span class="material-symbols-outlined text-sm">arrow_back</span>
+            <span>VOLVER A SUBASTAS</span>
+        </button>
+    </div>
+
+    @if (cargando)
+    {
+        <div class="flex flex-col justify-center items-center py-36">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" />
+            <span class="text-xs font-semibold text-slate-500 mt-4 tracking-wide">Cargando subasta...</span>
+        </div>
+    }
+    else if (subasta == null)
+    {
+        <div class="glass-panel-card rounded-2xl p-8 text-center max-w-lg mx-auto shadow-sm">
+            <div class="w-12 h-12 rounded-xl bg-red-50 text-red-600 flex items-center justify-center mx-auto mb-3 border border-red-200">
+                <span class="material-symbols-outlined text-2xl">error</span>
+            </div>
+            <h3 class="text-base font-bold text-slate-900 m-0">No se encontró la subasta</h3>
+            <p class="text-xs text-slate-500 mt-1 mb-4">El lote solicitado no existe o fue dado de baja.</p>
+            <button type="button" class="btn-back-link text-blue-600 font-bold" @onclick="Volver">
+                Regresar al listado
+            </button>
+        </div>
+    }
+    else
+    {
+        <!-- CONTADOR EN TIEMPO REAL -->
+        <div class="glass-panel-card rounded-2xl p-4 sm:p-5 mb-6 shadow-sm">
+            <ContadorSubasta FechaInicio="@subasta.FechaInicio"
+                             FechaFin="@subasta.FechaFin"
+                             Estado="@subasta.Estado"
+                             OnTiempoCumplido="RefrescarSubasta" />
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            <!-- COLUMNA IZQUIERDA: DETALLE DEL LOTE (8 cols) -->
+            <div class="lg:col-span-8 space-y-6">
+
+                <div class="glass-panel-card rounded-2xl p-6 sm:p-8 shadow-sm">
+
+                    <!-- Imagen de la subasta -->
+                    <div class="rounded-2xl overflow-hidden mb-6 product-image-container flex items-center justify-center bg-slate-100/60">
+                        @if (!string.IsNullOrWhiteSpace(subasta.UrlImagen))
+                        {
+                            <img src="@subasta.UrlImagen"
+                                 alt="@subasta.Titulo"
+                                 class="w-full h-full max-h-[460px] object-cover" />
+                        }
+                        else
+                        {
+                            <div class="flex flex-col items-center justify-center py-20 text-slate-400">
+                                <span class="material-symbols-outlined text-6xl">image</span>
+                                <span class="text-xs font-semibold mt-2">Sin imagen disponible</span>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Cabecera de Información -->
+                    <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
+                        <div class="flex-1 min-w-[240px]">
+                            <span class="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-md border border-blue-100 mb-2 inline-block">
+                                @subasta.Categoria
+                            </span>
+                            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight m-0">
+                                @subasta.Titulo
+                            </h1>
+                        </div>
+                        <span class="status-top-badge @(subasta.Estado == "Activa" ? "status-badge-active" : "status-badge-finished")">
+                            @if (subasta.Estado == "Activa")
+                            {
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse mr-1"></span>
+                            }
+                            @subasta.Estado
+                        </span>
+                    </div>
+
+                    <!-- Descripción -->
+                    <p class="text-slate-600 text-sm sm:text-base leading-relaxed mb-6 mt-4">
+                        @subasta.Descripcion
+                    </p>
+
+                    <div class="h-px bg-slate-200/80 my-6"></div>
+
+                    <!-- MÉTRICAS FINANCIERAS (Grid 2x2) -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-slate-50/80 border border-slate-200/70 mb-6">
+                        <div>
+                            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Precio base</span>
+                            <span class="text-base sm:text-lg font-bold font-mono text-slate-800 mt-0.5 block">
+                                $ @subasta.PrecioBase.ToString("N2")
+                            </span>
+                        </div>
+
+                        <div>
+                            <span class="text-[11px] font-bold text-blue-600 uppercase tracking-wider block">Puja actual</span>
+                            <span class="text-lg sm:text-2xl font-black font-mono text-blue-600 mt-0.5 block">
+                                $ @subasta.PujaActual.ToString("N2")
+                            </span>
+                        </div>
+
+                        <div>
+                            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Incremento mín.</span>
+                            <span class="text-base sm:text-lg font-bold font-mono text-slate-800 mt-0.5 block">
+                                $ @subasta.IncrementoMinimo.ToString("N2")
+                            </span>
+                        </div>
+
+                        <div>
+                            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Pujas</span>
+                            <span class="text-base sm:text-lg font-bold font-mono text-slate-800 mt-0.5 block">
+                                @subasta.CantidadPujas
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Datos Operativos del Lote -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-600 pt-2">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-slate-400 text-base">person</span>
+                            <span>Vendedor: <strong class="text-slate-900">@subasta.Vendedor</strong></span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-slate-400 text-base">event</span>
+                            <span>Inicio: @subasta.FechaInicio.ToLocalTime().ToString("dd/MM/yy HH:mm")</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-slate-400 text-base">schedule</span>
+                            <span>Finaliza: @subasta.FechaFin.ToLocalTime().ToString("dd/MM/yy HH:mm")</span>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- COLUMNA DERECHA: PANEL DE OFERTA (4 cols) -->
+            <div class="lg:col-span-4 space-y-6">
+
+                <div class="glass-panel-card rounded-2xl p-6 shadow-sm relative overflow-hidden">
+                    <div class="flex items-center justify-between mb-5">
+                        <h2 class="text-base font-bold text-slate-900 m-0">Realizar puja</h2>
+                        <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 flex items-center justify-center border border-blue-500/20">
+                            <span class="material-symbols-outlined text-lg">gavel</span>
+                        </div>
+                    </div>
+
+                    @if (Participo())
+                    {
+                        <div class="p-3.5 rounded-xl mb-4 border @(EsLider() ? "bg-emerald-50 border-emerald-200 text-emerald-800" : "bg-amber-50 border-amber-200 text-amber-800") flex items-center gap-2.5">
+                            <span class="material-symbols-outlined text-lg">
+                                @(EsLider() ? "verified" : "warning")
+                            </span>
+                            <span class="text-xs font-bold">
+                                @(EsLider() ? "Estás liderando esta subasta" : "Tu oferta fue superada")
+                            </span>
+                        </div>
+                    }
+
+                    @if (subasta.Estado == "Activa")
+                    {
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">
+                                    Tu oferta (ARS)
+                                </label>
+                                <MudNumericField T="decimal"
+                                                 @bind-Value="montoPuja"
+                                                 Variant="Variant.Outlined"
+                                                 Margin="Margin.Dense"
+                                                 Format="N2"
+                                                 Min="0"
+                                                 Adornment="Adornment.Start"
+                                                 AdornmentText="$"
+                                                 Class="monto-numeric-field bg-white/90 rounded-xl" />
+                            </div>
+
+                            <div class="p-3 rounded-xl bg-blue-50/70 border border-blue-100 flex items-center justify-between text-xs">
+                                <span class="text-slate-600 font-medium">Puja mínima requerida:</span>
+                                <span class="font-bold font-mono text-blue-700">$ @CalcularPujaMinima().ToString("N2")</span>
+                            </div>
+
+                            <button type="button"
+                                    class="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-extrabold text-sm tracking-wider uppercase shadow-lg shadow-blue-600/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+                                    disabled="@enviandoPuja"
+                                    @onclick="RealizarPuja">
+                                @if (enviandoPuja)
+                                {
+                                    <MudProgressCircular Indeterminate="true" Size="Size.Small" Color="Color.Surface" />
+                                    <span>Enviando oferta...</span>
+                                }
+                                else
+                                {
+                                    <span>OFERTAR $ @montoPuja.ToString("N0")</span>
+                                }
+                            </button>
+
+                            <div class="flex items-center justify-center space-x-1.5 pt-1 text-[11px] text-slate-500">
+                                <span class="material-symbols-outlined text-xs text-emerald-600">lock</span>
+                                <span>Garantía retenida automáticamente con 1-click</span>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="auction-inactive-alert p-4 rounded-xl text-center">
+                            <span class="material-symbols-outlined text-blue-600 text-2xl mb-1 block">info</span>
+                            <p class="text-xs font-semibold text-slate-700 m-0">
+                                @(subasta.Estado == "Programada"
+                                                        ? "La subasta todavía no comenzó."
+                                                        : "Esta subasta ya no se encuentra activa.")
+                    </p>
+                </div>
+                                }
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- HISTORIAL DE PUJAS (Ancho Completo) -->
+        <div class="glass-panel-card rounded-2xl overflow-hidden shadow-sm mt-8">
+            <div class="p-5 border-b border-slate-200/80 flex items-center justify-between">
+                <div>
+                    <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">Historial de pujas</h2>
+                    <p class="text-xs text-slate-500 mt-0.5 m-0">Ofertas recibidas en tiempo real</p>
+                </div>
+                <span class="text-xs font-bold text-slate-600 bg-white/90 px-3 py-1 rounded-full border border-slate-200 shadow-xs">
+                    @pujas.Count ofertas
+                </span>
+            </div>
+
+            @if (cargandoPujas)
+            {
+                <div class="py-12 flex justify-center">
+                    <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Medium" />
+                </div>
+            }
+            else if (pujas.Count == 0)
+            {
+                <div class="auction-empty-history-alert p-8 text-center">
+                    <span class="material-symbols-outlined text-blue-500 text-3xl mb-1">history_toggle_off</span>
+                    <p class="text-xs font-bold text-slate-700 m-0">Esta subasta todavía no recibió pujas.</p>
+                    <span class="text-[11px] text-slate-500">Sé el primero en realizar una oferta.</span>
+                </div>
+            }
+            else
+            {
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-slate-200/70 text-left text-sm">
+                        <thead>
+                            <tr class="bg-slate-50/90 text-slate-500 text-[11px] font-bold uppercase tracking-wider">
+                                <th class="py-3.5 px-5" scope="col">Usuario</th>
+                                <th class="py-3.5 px-5" scope="col">Monto</th>
+                                <th class="py-3.5 px-5" scope="col">Fecha y Hora</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200/60 text-slate-700">
+                            @foreach (var p in pujas)
+                            {
+                                <tr class="hover:bg-white/80 transition-colors">
+                                    <td class="py-3.5 px-5 font-medium text-slate-900 flex items-center gap-2">
+                                        <div class="w-7 h-7 rounded-full bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center">
+                                            @p.Usuario.Substring(0, Math.Min(2, p.Usuario.Length))
+                                        </div>
+                                        <span>@p.Usuario</span>
+                                    </td>
+                                    <td class="py-3.5 px-5 font-mono font-bold text-blue-600 text-sm">
+                                        $ @p.Monto.ToString("N2")
+                                    </td>
+                                    <td class="py-3.5 px-5 text-xs text-slate-500 whitespace-nowrap">
+                                        @p.FechaPuja
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    }
+
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private HubConnection? hubConnection;
+    private AuctionDetailResponse? subasta;
+    private IList<BidResponse> pujas = [];
+
+    private bool cargando = true;
+    private bool cargandoPujas = true;
+    private bool enviandoPuja;
+
+    private int compradorId => Sesion.Usuario?.Id ?? 0;
+    private decimal montoPuja;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!Sesion.EstaLogueado)
+            await Sesion.CargarSesion();
+
+        if (!Sesion.EstaLogueado)
+        {
+            Navigation.NavigateTo("/login");
+            return;
+        }
+
+        await CargarSubasta();
+
+        if (subasta == null)
+            return;
+
+        await CargarPujas();
+        montoPuja = CalcularPujaMinima();
+
+        await ConectarSignalR();
+    }
+
+    private async Task CargarSubasta()
+    {
+        cargando = true;
+
+        try
+        {
+            subasta = await Http
+                .GetFromJsonAsync<AuctionDetailResponse>(
+                    $"api/v1/subastas/{Id}");
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        {
+            subasta = null;
+        }
+        catch
+        {
+            subasta = null;
+            Snackbar.Add("No se pudo cargar la subasta.", Severity.Error);
+        }
+        finally
+        {
+            cargando = false;
+        }
+    }
+
+    private async Task CargarPujas()
+    {
+        cargandoPujas = true;
+
+        try
+        {
+            pujas = await Http
+                .GetFromJsonAsync<IList<BidResponse>>(
+                    $"api/v1/subastas/{Id}/pujas") ?? [];
+        }
+        catch
+        {
+            pujas = [];
+            Snackbar.Add("No se pudo cargar el historial.", Severity.Error);
+        }
+        finally
+        {
+            cargandoPujas = false;
+        }
+    }
+
+    private async Task RefrescarSubasta()
+    {
+        await Task.Delay(1500);
+
+        await CargarSubasta();
+
+        if (subasta == null)
+            return;
+
+        await CargarPujas();
+        montoPuja = CalcularPujaMinima();
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task ConectarSignalR()
+    {
+        if (hubConnection != null)
+            return;
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(new Uri(Http.BaseAddress!, "hubs/subastas"))
+            .WithAutomaticReconnect()
+            .Build();
+
+        hubConnection.On<JsonElement>(
+            "NuevaPuja",
+            async evento =>
+            {
+                var extendida = evento.TryGetProperty("tiempoExtendido", out var valor) && valor.GetBoolean();
+
+                await CargarSubasta();
+                await CargarPujas();
+
+                if (subasta != null)
+                    montoPuja = CalcularPujaMinima();
+
+                if (extendida)
+                {
+                    Snackbar.Add(
+                        "La subasta fue extendida 2 minutos por anti-sniping.",
+                        Severity.Warning);
+                }
+
+                await InvokeAsync(StateHasChanged);
+            });
+
+        await hubConnection.StartAsync();
+
+        await hubConnection.InvokeAsync("UnirseASubasta", Id);
+    }
+
+    private decimal CalcularPujaMinima() =>
+        subasta == null
+            ? 0
+            : subasta.CantidadPujas == 0
+                ? subasta.PrecioBase
+                : subasta.PujaActual + subasta.IncrementoMinimo;
+
+    private bool Participo() =>
+        pujas.Any(p => p.Usuario == $"Usuario***{compradorId}");
+
+    private bool EsLider() =>
+        pujas.OrderByDescending(p => p.Monto)
+             .FirstOrDefault()?.Usuario == $"Usuario***{compradorId}";
+
+    private async Task RealizarPuja()
+    {
+        if (subasta == null)
+            return;
+
+        if (subasta.Estado != "Activa")
+        {
+            Snackbar.Add("La subasta ya no está activa.", Severity.Warning);
+            return;
+        }
+
+        var minimo = CalcularPujaMinima();
+
+        if (compradorId <= 0)
+        {
+            Snackbar.Add("Comprador inválido.", Severity.Warning);
+            return;
+        }
+
+        if (montoPuja < minimo)
+        {
+            Snackbar.Add($"La puja mínima es $ {minimo:N2}.", Severity.Warning);
+            return;
+        }
+
+        enviandoPuja = true;
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync(
+                $"api/v1/subastas/{Id}/pujas",
+                new PlaceBidRequest
+                {
+                    CompradorId = compradorId,
+                    Monto = montoPuja
+                });
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var mensaje = await ObtenerMensajeError(response);
+
+                Snackbar.Add(
+                    mensaje,
+                    response.StatusCode == HttpStatusCode.Conflict
+                        ? Severity.Warning
+                        : Severity.Error);
+
+                return;
+            }
+
+            Snackbar.Add("Puja realizada correctamente.", Severity.Success);
+
+            await CargarSubasta();
+            await CargarPujas();
+
+            montoPuja = CalcularPujaMinima();
+        }
+        catch
+        {
+            Snackbar.Add("Ocurrió un error al realizar la puja.", Severity.Error);
+        }
+        finally
+        {
+            enviandoPuja = false;
+        }
+    }
+
+    private async Task<string> ObtenerMensajeError(HttpResponseMessage response)
+    {
+        try
+        {
+            var error = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+            if (!string.IsNullOrWhiteSpace(error?.Mensaje))
+                return error.Mensaje;
+        }
+        catch
+        {
+        }
+
+        return "No se pudo realizar la puja.";
+    }
+
+    private void Volver() => Navigation.NavigateTo("/subastas");
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection == null)
+            return;
+
+        if (hubConnection.State == HubConnectionState.Connected)
+        {
+            await hubConnection.InvokeAsync("SalirDeSubasta", Id);
+        }
+
+        await hubConnection.DisposeAsync();
+    }
+
+    private class ErrorResponse
+    {
+        public string Mensaje { get; set; } = "";
+    }
+}

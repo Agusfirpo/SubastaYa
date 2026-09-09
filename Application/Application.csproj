@@ -7,12 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="UseCases\Auditoria\Handler\" />
-    <Folder Include="UseCases\Auditoria\Command\" />
-    <Folder Include="UseCases\Auditoria\Queries\" />
-    <Folder Include="UseCases\Categoria\Command\" />
-    <Folder Include="UseCases\Transaccion\Command\" />
-    <Folder Include="UseCases\Usuario\Queries\" />
+    <Folder Include="UseCases\Audit\Handler\" />
+    <Folder Include="UseCases\Audit\Command\" />
+    <Folder Include="UseCases\Audit\Queries\" />
+    <Folder Include="UseCases\Category\Commands\" />
+    <Folder Include="UseCases\Transaction\Commands\" />
+    <Folder Include="UseCases\User\Queries\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Dominio\Dominio.csproj" />
+    <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
 
 </Project>
