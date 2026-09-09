@@ -1,8 +1,236 @@
-﻿.imagen-placeholder {
-    height: 180px;
+﻿/* Fondo Global de la Sección */
+.subastas-background {
+    min-height: 100vh;
+    width: 100%;
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+}
+
+/* Header & Chips */
+.header-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    background-color: #dbeafe;
+    color: #1d4ed8;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.pulse-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background-color: #10b981;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.stats-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 9999px;
+    background-color: #ffffff;
+    border: 1px solid #a7f3d0;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.active-dot {
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 9999px;
+    background-color: #10b981;
+    box-shadow: 0 0 0 4px #d1fae5;
+}
+
+/* Tarjeta de Subasta */
+.subasta-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border-radius: 1rem;
+    background-color: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+    .subasta-card:hover {
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        transform: translateY(-0.25rem);
+    }
+
+/* Imagen y Badges */
+.imagen-container {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    overflow: hidden;
+    background-color: #f1f5f9;
+}
+
+.subasta-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.subasta-card:hover .subasta-img {
+    transform: scale(1.05);
+}
+
+.imagen-placeholder {
+    height: 100%;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #eef1f5;
-    color: #98a2b3;
+    background-color: #f1f5f9;
+    color: #94a3b8;
+}
+
+.badge-estado {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.badge-ping {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background-color: #ffffff;
+    animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.badge-categoria {
+    position: absolute;
+    bottom: 0.75rem;
+    left: 0.75rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: 0.375rem;
+    background-color: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(8px);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Detalles de Tarjeta */
+.pujas-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: #2563eb;
+    font-weight: 700;
+    background-color: #eff6ff;
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+}
+
+.card-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+    transition: color 150ms ease;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.subasta-card:hover .card-title {
+    color: #2563eb;
+}
+
+.precios-container {
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    background-color: #f8fafc;
+    border: 1px solid #f1f5f9;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+/* Animaciones */
+@keyframes pulse {
+    50% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes ping {
+    75%, 100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+/* ==========================================
+   COLOR AZUL EN INPUTS DE MUDBLAZOR
+   ========================================== */
+
+/* 1. Etiquetas (Buscar Lote, Estado, Categoría, etc.) */
+::deep .mud-input-label-outlined,
+::deep .mud-input-label-animated {
+    color: #003fb8 !important;
+    font-weight: 600 !important;
+}
+
+/* 2. Texto tipeado o seleccionado */
+::deep input.mud-input-slot,
+::deep .mud-select .mud-input-slot {
+    color: #003fb8 !important;
+    font-weight: 600 !important;
+}
+
+/* 3. Placeholder (Título, marca o palabra clave...) */
+::deep .mud-input-slot::placeholder {
+    color: #1956e3 !important;
+    opacity: 0.7 !important;
+}
+
+/* 4. Íconos (Lupa, Flechas desplegables, Símbolo $) */
+::deep .mud-icon-root,
+::deep .mud-input-adornment .mud-icon-root,
+::deep .mud-select-icon {
+    color: #003fb8 !important;
+}
+
+/* 5. Bordes del Input en estado normal y hover */
+::deep .mud-input-outlined-border {
+    border-color: #003fb8 !important;
+}
+
+::deep .mud-input-control:hover .mud-input-outlined-border {
+    border-color: #00201d !important;
+}
+
+/* 6. Botón de Limpiar */
+::deep .mud-button-outlined-default {
+    color: #003fb8 !important;
+    border-color: #003fb8 !important;
+    font-weight: 700 !important;
 }

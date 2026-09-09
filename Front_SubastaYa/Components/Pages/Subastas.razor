@@ -11,231 +11,259 @@
 @inject NavigationManager Navigation
 @inject ISnackbar Snackbar
 
-<MudContainer MaxWidth="MaxWidth.Large" Class="mt-6">
+<!--
+  Usamos el operador relativo tilde (~) para que Blazor resuelva la ruta
+  exacta desde la carpeta wwwroot sin importar en qué subruta estés.
+-->
+<div class="subastas-background" style="background-image: url('imagenes/pexels-codioful-7130565.jpg');">
+    <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-6">
 
-    <MudText Typo="Typo.h4">Subastas</MudText>
-    <MudText Typo="Typo.body1" Color="Color.Secondary" Class="mb-4">
-        Encontrá y participá en subastas
-    </MudText>
+        <!-- CABECERA DE LA PÁGINA -->
+        <div class="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <div class="header-chip">
+                    <span class="pulse-dot"></span>
+                    Mercado En Tiempo Real
+                </div>
+                <MudText Typo="Typo.h3" Class="font-extrabold tracking-tight text-slate-900">
+                    Subastas Activas
+                </MudText>
+                <MudText Typo="Typo.body1" Class="text-slate-500">
+                    Encontrá, seguí y participá en pujas garantizadas en vivo.
+                </MudText>
+            </div>
 
-    @* FILTROS *@
-    <MudPaper Class="pa-4 mb-6" Elevation="1">
-        <MudGrid>
-
-            <MudItem xs="12" md="4">
-                <MudTextField T="string"
-                              Label="Buscar"
-                              Placeholder="Título de la subasta..."
-                              Variant="Variant.Outlined"
-                              Adornment="Adornment.End"
-                              AdornmentIcon="@Icons.Material.Filled.Search"
-                              @bind-Value="busqueda" />
-            </MudItem>
-
-            <MudItem xs="12" sm="6" md="2">
-                <MudSelect T="string"
-                           Label="Estado"
-                           Variant="Variant.Outlined"
-                           @bind-Value="estado"
-                           Clearable="true">
-                    <MudSelectItem Value="@("Activa")">Activa</MudSelectItem>
-                    <MudSelectItem Value="@("Programada")">Programada</MudSelectItem>
-                    <MudSelectItem Value="@("Finalizada")">Finalizada</MudSelectItem>
-                    <MudSelectItem Value="@("Desierta")">Desierta</MudSelectItem>
-                </MudSelect>
-            </MudItem>
-
-            <MudItem xs="12" sm="6" md="3">
-                <MudSelect T="int?"
-                           Label="Categoría"
-                           Variant="Variant.Outlined"
-                           @bind-Value="categoriaId"
-                           Clearable="true">
-
-                    @foreach (var categoria in categorias)
-                    {
-                        <MudSelectItem T="int?" Value="@((int?)categoria.Id)">
-                            @categoria.Nombre
-                        </MudSelectItem>
-                    }
-
-                </MudSelect>
-            </MudItem>
-
-            <MudItem xs="12" sm="6" md="3">
-                <MudSelect T="string"
-                           Label="Ordenar"
-                           Variant="Variant.Outlined"
-                           @bind-Value="orden"
-                           Clearable="true">
-                    <MudSelectItem Value="@("tiempo")">Menor tiempo</MudSelectItem>
-                    <MudSelectItem Value="@("puja")">Mayor puja</MudSelectItem>
-                </MudSelect>
-            </MudItem>
-
-            <MudItem xs="12" sm="6" md="3">
-                <MudNumericField T="decimal?"
-                                 Label="Precio mínimo"
-                                 Variant="Variant.Outlined"
-                                 @bind-Value="precioMinimo" />
-            </MudItem>
-
-            <MudItem xs="12" sm="6" md="3">
-                <MudNumericField T="decimal?"
-                                 Label="Precio máximo"
-                                 Variant="Variant.Outlined"
-                                 @bind-Value="precioMaximo" />
-            </MudItem>
-
-        </MudGrid>
-
-        <MudStack Row="true" Spacing="2" Class="mt-4">
-            <MudButton Variant="Variant.Filled"
-                       Color="Color.Primary"
-                       OnClick="AplicarFiltros">
-                Aplicar filtros
-            </MudButton>
-
-            <MudButton Variant="Variant.Outlined"
-                       OnClick="LimpiarFiltros">
-                Limpiar
-            </MudButton>
-        </MudStack>
-    </MudPaper>
-
-
-    @* RESULTADOS *@
-    @if (cargando)
-    {
-        <div class="d-flex justify-center mt-8">
-            <MudProgressCircular Indeterminate="true"
-                                 Color="Color.Primary" />
-        </div>
-    }
-    else if (resultado == null || resultado.Items.Count == 0)
-    {
-        <MudAlert Severity="Severity.Info">
-            No se encontraron subastas.
-        </MudAlert>
-    }
-    else
-    {
-        <MudGrid>
-
-            @foreach (var subasta in resultado.Items)
+            @if (resultado != null)
             {
-                <MudItem xs="12" sm="6" md="4">
-
-                    <MudCard Class="subasta-card">
-
-                        @* IMAGEN *@
-                        @if (!string.IsNullOrWhiteSpace(subasta.UrlImagen))
-                        {
-                            <MudCardMedia Image="@subasta.UrlImagen"
-                                          Height="180" />
-                        }
-                        else
-                        {
-                            <div class="imagen-placeholder">
-                                <MudIcon Icon="@Icons.Material.Filled.Image"
-                                         Size="Size.Large" />
-                            </div>
-                        }
-
-                        <MudCardContent>
-
-                            <MudStack Spacing="2">
-
-                                <MudText Typo="Typo.h6">
-                                    @subasta.Titulo
-                                </MudText>
-
-                                <div>
-                                    <MudChip T="string"
-                                             Size="Size.Small"
-                                             Color="@ObtenerColorEstado(subasta.Estado)">
-                                        @subasta.Estado
-                                    </MudChip>
-                                </div>
-
-                                <MudText Typo="Typo.body2"
-                                         Color="Color.Secondary">
-                                    @subasta.Categoria
-                                </MudText>
-
-                                <MudDivider />
-
-                                <MudGrid>
-                                    <MudItem xs="6">
-                                        <MudText Typo="Typo.caption">
-                                            Precio base
-                                        </MudText>
-
-                                        <MudText Typo="Typo.body1">
-                                            $ @subasta.PrecioBase.ToString("N2")
-                                        </MudText>
-                                    </MudItem>
-
-                                    <MudItem xs="6">
-                                        <MudText Typo="Typo.caption">
-                                            Puja actual
-                                        </MudText>
-
-                                        <MudText Typo="Typo.h6"
-                                                 Color="Color.Primary">
-                                            $ @subasta.PujaActual.ToString("N2")
-                                        </MudText>
-                                    </MudItem>
-                                </MudGrid>
-
-                                <MudText Typo="Typo.body2">
-                                    @subasta.CantidadPujas
-                                    @(subasta.CantidadPujas == 1 ? "puja" : "pujas")
-                                </MudText>
-
-
-                                @* CONTADOR CON SEMÁFORO *@
-                                <ContadorSubasta FechaInicio="@subasta.FechaInicio"
-                                                 FechaFin="@subasta.FechaFin"
-                                                 Estado="@subasta.Estado"
-                                                 OnTiempoCumplido="RefrescarEstado" />
-
-                            </MudStack>
-
-                        </MudCardContent>
-
-                        <MudCardActions>
-                            <MudButton Variant="Variant.Filled"
-                                       Color="Color.Primary"
-                                       OnClick="@(() => VerSubasta(subasta.Id))">
-                                Ver subasta
-                            </MudButton>
-                        </MudCardActions>
-
-                    </MudCard>
-
-                </MudItem>
+                <div class="flex items-center gap-2">
+                    <div class="stats-badge">
+                        <span class="active-dot"></span>
+                        <span class="text-xs text-slate-600 font-medium">
+                            
+                        </span>
+                    </div>
+                </div>
             }
+        </div>
 
-        </MudGrid>
+        <!-- PANEL DE FILTROS -->
+        <MudPaper Class="pa-4 mb-6 rounded-2xl bg-white/90 backdrop-blur-md shadow-sm border border-slate-200/80" Elevation="0">
+            <MudGrid Spacing="2">
 
+                <!-- Buscar -->
+                <MudItem xs="12" md="4">
+                    <MudTextField T="string"
+                                  Label="Buscar lote"
+                                  Placeholder="Título, marca o palabra clave..."
+                                  Variant="Variant.Outlined"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Search"
+                                  @bind-Value="busqueda"
+                                  Class="bg-slate-50 rounded-xl" />
+                </MudItem>
 
-        @* PAGINACIÓN *@
-        @if (resultado.TotalPaginas > 1)
+                <!-- Estado -->
+                <MudItem xs="12" sm="6" md="2">
+                    <MudSelect T="string"
+                               Label="Estado"
+                               Variant="Variant.Outlined"
+                               @bind-Value="estado"
+                               Clearable="true"
+                               Class="bg-slate-50 rounded-xl">
+                        <MudSelectItem Value="@("Activa")">Activa</MudSelectItem>
+                        <MudSelectItem Value="@("Programada")">Programada</MudSelectItem>
+                        <MudSelectItem Value="@("Finalizada")">Finalizada</MudSelectItem>
+                        <MudSelectItem Value="@("Desierta")">Desierta</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+
+                <!-- Categoría -->
+                <MudItem xs="12" sm="6" md="3">
+                    <MudSelect T="int?"
+                               Label="Categoría"
+                               Variant="Variant.Outlined"
+                               @bind-Value="categoriaId"
+                               Clearable="true"
+                               Class="bg-slate-50 rounded-xl">
+                        @foreach (var categoria in categorias)
+                        {
+                            <MudSelectItem T="int?" Value="@((int?)categoria.Id)">
+                                @categoria.Nombre
+                            </MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+
+                <!-- Ordenar -->
+                <MudItem xs="12" sm="6" md="3">
+                    <MudSelect T="string"
+                               Label="Ordenar por"
+                               Variant="Variant.Outlined"
+                               @bind-Value="orden"
+                               Clearable="true"
+                               Class="bg-slate-50 rounded-xl">
+                        <MudSelectItem Value="@("tiempo")">Menor tiempo restante</MudSelectItem>
+                        <MudSelectItem Value="@("puja")">Mayor puja actual</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+
+                <!-- Precio Mínimo -->
+                <MudItem xs="12" sm="6" md="3">
+                    <MudNumericField T="decimal?"
+                                     Label="Precio mínimo"
+                                     Variant="Variant.Outlined"
+                                     Adornment="Adornment.Start"
+                                     AdornmentText="$"
+                                     @bind-Value="precioMinimo"
+                                     Class="bg-slate-50 rounded-xl" />
+                </MudItem>
+
+                <!-- Precio Máximo -->
+                <MudItem xs="12" sm="6" md="3">
+                    <MudNumericField T="decimal?"
+                                     Label="Precio máximo"
+                                     Variant="Variant.Outlined"
+                                     Adornment="Adornment.Start"
+                                     AdornmentText="$"
+                                     @bind-Value="precioMaximo"
+                                     Class="bg-slate-50 rounded-xl" />
+                </MudItem>
+
+                <!-- Botones de Acción -->
+                <MudItem xs="12" Class="d-flex justify-end gap-2 pt-2">
+                    <MudButton Variant="Variant.Outlined"
+                               Color="Color.Default"
+                               StartIcon="@Icons.Material.Filled.RestartAlt"
+                               OnClick="LimpiarFiltros"
+                               Class="rounded-xl px-4">
+                        Limpiar
+                    </MudButton>
+
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.Tune"
+                               OnClick="AplicarFiltros"
+                               Class="rounded-xl px-6 font-bold shadow-md">
+                        Aplicar filtros
+                    </MudButton>
+                </MudItem>
+
+            </MudGrid>
+        </MudPaper>
+
+        <!-- RESULTADOS -->
+        @if (cargando)
         {
-            <div class="d-flex justify-center mt-6 mb-6">
-                <MudPagination Count="@resultado.TotalPaginas"
-                               Selected="@pagina"
-                               SelectedChanged="CambiarPagina"
-                               ShowFirstButton="true"
-                               ShowLastButton="true"
-                               Color="Color.Primary" />
+            <div class="d-flex justify-center items-center py-16">
+                <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" />
             </div>
         }
-    }
+        else if (resultado == null || resultado.Items.Count == 0)
+        {
+            <MudAlert Severity="Severity.Info" Class="rounded-xl border border-blue-200">
+                No se encontraron subastas con los filtros seleccionados.
+            </MudAlert>
+        }
+        else
+        {
+            <MudGrid Spacing="3">
+                @foreach (var subasta in resultado.Items)
+                {
+                    <MudItem xs="12" sm="6" md="4">
+                        <article class="subasta-card">
 
-</MudContainer>
+                            <!-- CONTENEDOR DE IMAGEN -->
+                            <div class="imagen-container">
+                                @if (!string.IsNullOrWhiteSpace(subasta.UrlImagen))
+                                {
+                                    <img src="@subasta.UrlImagen" alt="@subasta.Titulo" class="subasta-img" />
+                                }
+                                else
+                                {
+                                    <div class="imagen-placeholder">
+                                        <MudIcon Icon="@Icons.Material.Filled.Image" Size="Size.Large" />
+                                    </div>
+                                }
 
+                                <!-- Badges Superpuestos -->
+                                <div class="badge-estado" style="background-color: @GetEstadoBgColor(subasta.Estado);">
+                                    <span class="badge-ping"></span>
+                                    <span>@subasta.Estado</span>
+                                </div>
+
+                                <div class="badge-categoria">
+                                    @subasta.Categoria
+                                </div>
+                            </div>
+
+                            <!-- CONTENIDO DE LA TARJETA -->
+                            <div class="p-5 flex flex-col flex-1 justify-between gap-4">
+                                <div class="space-y-2">
+                                    <div class="flex items-center justify-between text-xs text-slate-500">
+                                        <span class="font-bold text-slate-700">Lote #@subasta.Id</span>
+                                        <span class="pujas-badge">
+                                            <MudIcon Icon="@Icons.Material.Filled.Gavel" Size="Size.Small" />
+                                            @subasta.CantidadPujas @(subasta.CantidadPujas == 1 ? "puja" : "pujas")
+                                        </span>
+                                    </div>
+
+                                    <h3 class="card-title">
+                                        @subasta.Titulo
+                                    </h3>
+                                </div>
+
+                                <!-- PRECIOS -->
+                                <div class="precios-container">
+                                    <div class="flex justify-between items-center text-xs text-slate-500">
+                                        <span>Precio base:</span>
+                                        <span class="line-through font-semibold">$ @subasta.PrecioBase.ToString("N2")</span>
+                                    </div>
+                                    <div class="flex justify-between items-baseline">
+                                        <span class="text-xs font-bold text-blue-600">Puja actual:</span>
+                                        <span class="text-lg font-black text-blue-700">$ @subasta.PujaActual.ToString("N2")</span>
+                                    </div>
+                                </div>
+
+                                <!-- CONTADOR CON SEMÁFORO -->
+                                <div class="pt-1">
+                                    <ContadorSubasta FechaInicio="@subasta.FechaInicio"
+                                                     FechaFin="@subasta.FechaFin"
+                                                     Estado="@subasta.Estado"
+                                                     OnTiempoCumplido="RefrescarEstado" />
+                                </div>
+
+                                <!-- BOTÓN ACCIÓN -->
+                                <MudButton Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           FullWidth="true"
+                                           EndIcon="@Icons.Material.Filled.ArrowForward"
+                                           OnClick="@(() => VerSubasta(subasta.Id))"
+                                           Class="rounded-xl py-2.5 font-bold shadow-md">
+                                    Ver subasta
+                                </MudButton>
+                            </div>
+
+                        </article>
+                    </MudItem>
+                }
+            </MudGrid>
+
+            <!-- PAGINACIÓN -->
+            @if (resultado.TotalPaginas > 1)
+            {
+                <div class="d-flex justify-center mt-8 mb-6">
+                    <MudPagination Count="@resultado.TotalPaginas"
+                                   Selected="@pagina"
+                                   SelectedChanged="CambiarPagina"
+                                   ShowFirstButton="true"
+                                   ShowLastButton="true"
+                                   Color="Color.Primary"
+                                   Class="rounded-xl bg-white p-2 shadow-sm border border-slate-200" />
+                </div>
+            }
+        }
+    </MudContainer>
+</div>
 
 @code {
 
@@ -375,5 +403,13 @@
         "Programada" => Color.Info,
         "Desierta" => Color.Warning,
         _ => Color.Default
+    };
+
+    private static string GetEstadoBgColor(string estado) => estado switch
+    {
+        "Activa" => "#059669",
+        "Programada" => "#2563eb",
+        "Desierta" => "#d97706",
+        _ => "#64748b"
     };
 }

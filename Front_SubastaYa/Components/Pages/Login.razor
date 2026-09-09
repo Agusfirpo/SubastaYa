@@ -11,58 +11,91 @@
 @inject SesionUsuarioService Sesion
 @inject ISnackbar Snackbar
 
-<MudContainer MaxWidth="MaxWidth.Small" Class="mt-8">
+<div class="login-background">
 
-    <MudPaper Class="pa-6" Elevation="2">
+    <MudContainer MaxWidth="MaxWidth.Small" Class="login-container">
 
-        <MudText Typo="Typo.h4" Class="mb-1">
-            Iniciar sesión
-        </MudText>
+        <MudPaper Class="pa-6 login-card" Elevation="2">
 
-        <MudText Color="Color.Secondary" Class="mb-5">
-            Ingresá a tu cuenta de SubastaYa
-        </MudText>
+            <div class="login-icon-wrapper">
+                <MudIcon Icon="@Icons.Material.Filled.Gavel" Color="Color.Primary" Size="Size.Medium" />
+            </div>
 
-        <MudTextField T="string"
-                      Label="Email"
-                      Variant="Variant.Outlined"
-                      @bind-Value="email"
-                      Class="mb-3" />
+            <MudText Typo="Typo.h4" Class="mb-1">
+                Iniciar sesión
+            </MudText>
 
-        <MudTextField T="string"
-                      Label="Contraseña"
-                      InputType="InputType.Password"
-                      Variant="Variant.Outlined"
-                      @bind-Value="password"
-                      Class="mb-4" />
+            
 
-        <MudButton Variant="Variant.Filled"
-                   Color="Color.Primary"
-                   FullWidth="true"
-                   Disabled="@cargando"
-                   OnClick="login">
+            <MudTextField T="string"
+                          Label="Email"
+                          Placeholder="nombre@ejemplo.com"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Email"
+                          Variant="Variant.Outlined"
+                          @bind-Value="email"
+                          Class="mb-3" />
 
-            @(cargando ? "Ingresando..." : "Ingresar")
+            <MudTextField T="string"
+                          Label="Contraseña"
+                          Placeholder="********"
+                          InputType="@(mostrarPassword ? InputType.Text : InputType.Password)"
+                          Adornment="Adornment.End"
+                          AdornmentIcon="@(mostrarPassword ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility)"
+                          OnAdornmentClick="@(() => mostrarPassword = !mostrarPassword)"
+                          Variant="Variant.Outlined"
+                          @bind-Value="password"
+                          Class="mb-2" />
 
-        </MudButton>
-        <MudButton Variant="Variant.Outlined"
-                   Color="Color.Primary"
-                   FullWidth="true"
-                   Class="mt-3"
-                   StartIcon="@Icons.Material.Filled.Storefront"
-                   OnClick="@(() => Navigation.NavigateTo("/subastas"))">
+            <div class="login-options-row mb-4">
+                <MudCheckBox T="bool" @bind-Value="recordarme" Label="Recordarme" Dense="true" />
+                <MudLink Class="login-forgot-link" OnClick="@IrAOlvideContraseña">
+                    ¿Olvidé mi contraseña?
+                </MudLink>
+            </div>
 
-            Ver subastas
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       FullWidth="true"
+                       Disabled="@cargando"
+                       OnClick="login">
 
-        </MudButton>
-    </MudPaper>
+                @(cargando ? "Ingresando..." : "Ingresar")
 
-</MudContainer>
+            </MudButton>
+
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Primary"
+                       FullWidth="true"
+                       Class="mt-3"
+                       StartIcon="@Icons.Material.Filled.Storefront"
+                       OnClick="@(() => Navigation.NavigateTo("/subastas"))">
+
+                Ver subastas
+
+            </MudButton>
+
+            <MudText Typo="Typo.body2" Class="login-register-text">
+                ¿No tenés cuenta? <MudLink OnClick="@(() => Navigation.NavigateTo("/registro"))">Registrate gratis</MudLink>
+            </MudText>
+
+        </MudPaper>
+
+    </MudContainer>
+
+</div>
 
 @code {
     private string email = "";
     private string password = "";
     private bool cargando;
+    private bool mostrarPassword = false;
+    private bool recordarme = false;
+
+    private void IrAOlvideContraseña()
+    {
+        Navigation.NavigateTo("/olvide-password");
+    }
 
     private async Task login()
     {

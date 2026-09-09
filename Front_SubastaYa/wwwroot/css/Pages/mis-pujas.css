@@ -1,2 +1,33 @@
-﻿body {
+﻿/* Botón "Consultar" */
+.btn-consultar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #1956E3;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.625rem 1.5rem;
+    border-radius: 0.375rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-family: 'Space Grotesk', sans-serif;
+    transition: all 150ms ease-in-out;
+    border: none;
+    cursor: pointer;
+}
+
+    .btn-consultar:hover {
+        background-color: #1344B5;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-consultar:active {
+        transform: scale(0.99);
+    }
+
+/* Tipografía monoespaciada para valores numéricos */
+.font-mono {
+    font-family: 'Space Grotesk', sans-serif;
 }
