@@ -10,7 +10,7 @@ namespace Domain.Enums
     {
         Deposito = 1,
         Retencion = 2,
-        Liberacao = 3,
+        Liberacion = 3,
         Pago = 4,
         Cobro= 5
     }
