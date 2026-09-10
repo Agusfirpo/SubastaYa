@@ -1,29 +1,17 @@
 ﻿@implements IAsyncDisposable
 
-@if (Estado == "Finalizada" || Estado == "Desierta")
+@if (!EsFinalizada)
 {
-    <MudChip T="string"
-             Size="Size.Small"
-             Color="Color.Default"
-             Icon="@Icons.Material.Filled.Schedule">
-        Finalizada
-    </MudChip>
-}
-else
-{
-    <div class="contador-container">
+    <div class="flex items-center justify-between w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200/80 my-1">
+        <span class="text-xs font-semibold text-slate-500 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-sm text-slate-400">timer</span>
+            @(string.Equals(Estado, "Programada", StringComparison.OrdinalIgnoreCase) ? "Comienza en:" : "Tiempo restante:")
+        </span>
 
-        <MudText Typo="Typo.caption">
-            @(Estado == "Programada" ? "Comienza en" : "Tiempo restante")
-        </MudText>
-
-        <MudChip T="string"
-                 Size="Size.Small"
-                 Color="@ColorContador()"
-                 Icon="@Icons.Material.Filled.Circle">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold font-mono tracking-wider @ObtenerClaseBadge()">
+            <span class="w-2 h-2 rounded-full @ObtenerColorPunto()"></span>
             @TextoTiempo()
-        </MudChip>
-
+        </span>
     </div>
 }
 
@@ -37,12 +25,14 @@ else
     private CancellationTokenSource? cts;
     private bool notificado;
 
+    private bool EsFinalizada =>
+        string.Equals(Estado, "Finalizada", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(Estado, "Desierta", StringComparison.OrdinalIgnoreCase);
+
     protected override void OnInitialized()
     {
         ActualizarTiempo();
-
         cts = new CancellationTokenSource();
-
         _ = EjecutarTemporizador(cts.Token);
     }
 
@@ -62,7 +52,7 @@ else
             {
                 ActualizarTiempo();
 
-                if (tiempoRestante <= TimeSpan.Zero && !notificado)
+                if (tiempoRestante <= TimeSpan.Zero && !notificado && !EsFinalizada)
                 {
                     notificado = true;
 
@@ -80,15 +70,25 @@ else
 
     private void ActualizarTiempo()
     {
-        var objetivo = Estado == "Programada"
-            ? FechaInicio.ToLocalTime()
-            : FechaFin.ToLocalTime();
+        if (EsFinalizada)
+        {
+            tiempoRestante = TimeSpan.Zero;
+            return;
+        }
 
-        var restante = objetivo - DateTime.Now;
+        var fechaReferencia = string.Equals(Estado, "Programada", StringComparison.OrdinalIgnoreCase)
+            ? FechaInicio
+            : FechaFin;
 
-        tiempoRestante = restante > TimeSpan.Zero
-            ? restante
-            : TimeSpan.Zero;
+        // Normalizamos la fecha a hora local del navegador para comparar correctamente
+        var fechaLocal = fechaReferencia.Kind == DateTimeKind.Utc
+            ? fechaReferencia.ToLocalTime()
+            : (fechaReferencia.Kind == DateTimeKind.Unspecified
+                ? DateTime.SpecifyKind(fechaReferencia, DateTimeKind.Utc).ToLocalTime()
+                : fechaReferencia);
+
+        var restante = fechaLocal - DateTime.Now;
+        tiempoRestante = restante > TimeSpan.Zero ? restante : TimeSpan.Zero;
     }
 
     private string TextoTiempo()
@@ -96,30 +96,47 @@ else
         if (tiempoRestante <= TimeSpan.Zero)
             return "00:00:00";
 
-        return $"{(int)tiempoRestante.TotalHours:00}:" +
-               $"{tiempoRestante.Minutes:00}:" +
-               $"{tiempoRestante.Seconds:00}";
+        var horas = (int)tiempoRestante.TotalHours;
+        return $"{horas:00}:{tiempoRestante.Minutes:00}:{tiempoRestante.Seconds:00}";
     }
 
-    private Color ColorContador()
+    // Semáforo: Fondo y texto según urgencia
+    private string ObtenerClaseBadge()
     {
-        if (Estado == "Programada")
-            return Color.Info;
+        if (string.Equals(Estado, "Programada", StringComparison.OrdinalIgnoreCase))
+            return "bg-blue-50 text-blue-700 border border-blue-200";
 
-        if (tiempoRestante <= TimeSpan.FromSeconds(30))
-            return Color.Error;
+        // Rojo: menos de 1 minuto
+        if (tiempoRestante <= TimeSpan.FromMinutes(1))
+            return "bg-red-50 text-red-700 border border-red-200 animate-pulse";
+
+        // Amarillo: menos de 5 minutos
+        if (tiempoRestante <= TimeSpan.FromMinutes(5))
+            return "bg-amber-50 text-amber-700 border border-amber-200";
+
+        // Verde: tiempo de sobra
+        return "bg-emerald-50 text-emerald-700 border border-emerald-200";
+    }
+
+    // Semáforo: Color del punto indicador
+    private string ObtenerColorPunto()
+    {
+        if (string.Equals(Estado, "Programada", StringComparison.OrdinalIgnoreCase))
+            return "bg-blue-500";
 
         if (tiempoRestante <= TimeSpan.FromMinutes(1))
-            return Color.Warning;
+            return "bg-red-500 animate-ping";
 
-        return Color.Success;
+        if (tiempoRestante <= TimeSpan.FromMinutes(5))
+            return "bg-amber-500";
+
+        return "bg-emerald-500 animate-pulse";
     }
 
     public ValueTask DisposeAsync()
     {
         cts?.Cancel();
         cts?.Dispose();
-
         return ValueTask.CompletedTask;
     }
 }

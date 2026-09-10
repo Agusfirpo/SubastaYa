@@ -242,10 +242,10 @@
 
                                 <!-- CONTADOR CON SEMÁFORO -->
                                 <div class="pt-1">
-                                    <ContadorSubasta FechaInicio="@subasta.FechaInicio"
-                                                     FechaFin="@subasta.FechaFin"
-                                                     Estado="@subasta.Estado"
-                                                     OnTiempoCumplido="RefrescarEstado" />
+                                    <AuctionTimer FechaInicio="@subasta.FechaInicio"
+                                                  FechaFin="@subasta.FechaFin"
+                                                  Estado="@subasta.Estado"
+                                                  OnTiempoCumplido="RefrescarEstado" />
                                 </div>
 
                                 <!-- BOTÓN ACCIÓN -->
@@ -331,16 +331,6 @@
                     <span>Iniciar sesión</span>
                     <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Size="Size.Small" />
                 </button>
-            </div>
-
-            <div class="auth-modal-footer">
-                <p class="auth-modal-footer-text">
-                    ¿No tenés cuenta aún?
-                    <a class="auth-modal-register-link"
-                       @onclick='() => Navigation.NavigateTo("/registro")'>
-                        Registrate gratis
-                    </a>
-                </p>
             </div>
         </div>
     </div>

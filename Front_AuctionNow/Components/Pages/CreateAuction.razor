@@ -4,7 +4,6 @@
 @using Application.DTOs.Request
 @using Application.DTOs.Response
 @using Front_AuctionNow.Services
-
 @inject UserSessionService Sesion
 @inject HttpClient Http
 @inject NavigationManager Navigation
@@ -12,6 +11,7 @@
 
 <MudContainer MaxWidth="MaxWidth.Large" Class="py-8">
     <div class="max-w-[820px] mx-auto">
+        <!-- TÍTULO DE LA SECCIÓN -->
         <div class="mb-6">
             <MudText Typo="Typo.h4" Class="font-extrabold text-slate-900 tracking-tight">
                 Publicar subasta
@@ -21,139 +21,150 @@
             </MudText>
         </div>
 
+        <!-- CONTENEDOR PRINCIPAL DEL FORMULARIO -->
         <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-8">
-            <EditForm Model="model" OnValidSubmit="Guardar">
-                <DataAnnotationsValidator />
+            <MudGrid Spacing="3">
 
-                <MudGrid Spacing="3">
-                    <MudItem xs="12" sm="6" Class="ml-auto">
-                        <MudSelect T="int"
-                                   Label="Categoría"
+                <!-- Espaciador / Categoría Dropdown -->
+                <MudItem xs="12" sm="6" Class="ml-auto">
+                    <MudSelect T="int"
+                               Label="Categoría"
+                               Variant="Variant.Outlined"
+                               @bind-Value="categoriaId"
+                               Class="bg-white rounded-lg">
+                        @foreach (var categoria in categorias)
+                        {
+                            <MudSelectItem Value="@categoria.Id">
+                                @categoria.Nombre
+                            </MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+
+                <!-- Título -->
+                <MudItem xs="12">
+                    <MudTextField Label="Título"
+                                  Variant="Variant.Outlined"
+                                  @bind-Value="titulo"
+                                  Class="bg-white rounded-lg" />
+                </MudItem>
+
+                <!-- Descripción -->
+                <MudItem xs="12">
+                    <MudTextField Label="Descripción"
+                                  Variant="Variant.Outlined"
+                                  Lines="4"
+                                  @bind-Value="descripcion"
+                                  Class="bg-white rounded-lg" />
+                </MudItem>
+
+                <!-- URL de Imagen -->
+                <MudItem xs="12">
+                    <MudTextField Label="URL de imagen"
+                                  Variant="Variant.Outlined"
+                                  @bind-Value="urlImagen"
+                                  Class="bg-white rounded-lg" />
+                </MudItem>
+
+                <!-- Precio Base -->
+                <MudItem xs="12" sm="6">
+                    <MudNumericField T="decimal"
+                                     Label="Precio base"
+                                     Variant="Variant.Outlined"
+                                     Adornment="Adornment.Start"
+                                     AdornmentText="$"
+                                     Min="0"
+                                     @bind-Value="precioBase"
+                                     Class="bg-white rounded-lg font-mono" />
+                </MudItem>
+
+                <!-- Incremento Mínimo -->
+                <MudItem xs="12" sm="6">
+                    <MudNumericField T="decimal"
+                                     Label="Incremento mínimo"
+                                     Variant="Variant.Outlined"
+                                     Adornment="Adornment.Start"
+                                     AdornmentText="$"
+                                     Min="0"
+                                     @bind-Value="incrementoMinimo"
+                                     Class="bg-white rounded-lg font-mono" />
+                </MudItem>
+
+                <!-- Fecha Inicio -->
+                <MudItem xs="12" sm="6">
+                    <MudDatePicker Label="Fecha inicio"
                                    Variant="Variant.Outlined"
-                                   @bind-Value="model.CategoriaId"
-                                   Class="bg-white rounded-lg">
-                            @foreach (var cat in categorias)
-                            {
-                                <MudSelectItem Value="@cat.Id">@cat.Nombre</MudSelectItem>
-                            }
-                        </MudSelect>
-                    </MudItem>
+                                   @bind-Date="fechaInicio"
+                                   Class="bg-white rounded-lg" />
+                </MudItem>
 
-                    <MudItem xs="12">
-                        <MudTextField Label="Título"
-                                      Variant="Variant.Outlined"
-                                      @bind-Value="model.Titulo"
-                                      For="@(() => model.Titulo)"
-                                      Class="bg-white rounded-lg" />
-                    </MudItem>
+                <!-- Hora Inicio -->
+                <MudItem xs="12" sm="6">
+                    <MudTimePicker Label="Hora inicio"
+                                   Variant="Variant.Outlined"
+                                   PickerVariant="PickerVariant.Dialog"
+                                   DisableToolbar="false"
+                                   TimeEditMode="TimeEditMode.Normal"
+                                   @bind-Time="horaInicio"
+                                   Class="bg-white rounded-lg" />
+                </MudItem>
 
-                    <MudItem xs="12">
-                        <MudTextField Label="Descripción"
-                                      Variant="Variant.Outlined"
-                                      Lines="4"
-                                      @bind-Value="model.Descripcion"
-                                      For="@(() => model.Descripcion)"
-                                      Class="bg-white rounded-lg" />
-                    </MudItem>
+                <!-- Fecha Fin -->
+                <MudItem xs="12" sm="6">
+                    <MudDatePicker Label="Fecha fin"
+                                   Variant="Variant.Outlined"
+                                   @bind-Date="fechaFin"
+                                   Class="bg-white rounded-lg" />
+                </MudItem>
 
-                    <MudItem xs="12">
-                        <MudTextField Label="URL de imagen"
-                                      Variant="Variant.Outlined"
-                                      @bind-Value="model.UrlImagen"
-                                      For="@(() => model.UrlImagen)"
-                                      Class="bg-white rounded-lg" />
-                    </MudItem>
+                <!-- Hora Fin -->
+                <MudItem xs="12" sm="6">
+                    <MudTimePicker Label="Hora fin"
+                                   Variant="Variant.Outlined"
+                                   PickerVariant="PickerVariant.Dialog"
+                                   DisableToolbar="false"
+                                   TimeEditMode="TimeEditMode.Normal"
+                                   @bind-Time="horaFin"
+                                   Class="bg-white rounded-lg" />
+                </MudItem>
 
-                    <MudItem xs="12" sm="6">
-                        <MudNumericField T="decimal"
-                                         Label="Precio base"
-                                         Variant="Variant.Outlined"
-                                         Adornment="Adornment.Start"
-                                         AdornmentText="$"
-                                         @bind-Value="model.PrecioBase"
-                                         For="@(() => model.PrecioBase)"
-                                         Class="bg-white rounded-lg font-mono" />
-                    </MudItem>
+                <!-- Botón Publicar Subasta -->
+                <MudItem xs="12" Class="pt-3">
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               FullWidth="true"
+                               Disabled="@guardando"
+                               OnClick="Crear"
+                               Class="py-3 font-bold text-base rounded-lg shadow-md uppercase tracking-wide">
+                        @if (guardando)
+                        {
+                            <MudProgressCircular Indeterminate="true" Size="Size.Small" Class="mr-2" />
+                        }
+                        @(guardando ? "Publicando..." : "Publicar subasta")
+                    </MudButton>
+                </MudItem>
 
-                    <MudItem xs="12" sm="6">
-                        <MudNumericField T="decimal"
-                                         Label="Incremento mínimo"
-                                         Variant="Variant.Outlined"
-                                         Adornment="Adornment.Start"
-                                         AdornmentText="$"
-                                         @bind-Value="model.IncrementoMinimo"
-                                         For="@(() => model.IncrementoMinimo)"
-                                         Class="bg-white rounded-lg font-mono" />
-                    </MudItem>
-
-                    <MudItem xs="12" sm="6">
-                        <MudDatePicker Label="Fecha inicio"
-                                       Variant="Variant.Outlined"
-                                       @bind-Date="fechaInicio"
-                                       Class="bg-white rounded-lg" />
-                    </MudItem>
-
-                    <MudItem xs="12" sm="6">
-                        <MudTimePicker Label="Hora inicio"
-                                       Variant="Variant.Outlined"
-                                       PickerVariant="PickerVariant.Dialog"
-                                       DisableToolbar="false"
-                                       TimeEditMode="TimeEditMode.Normal"
-                                       @bind-Time="horaInicio"
-                                       Class="bg-white rounded-lg" />
-                    </MudItem>
-
-                    <MudItem xs="12" sm="6">
-                        <MudDatePicker Label="Fecha fin"
-                                       Variant="Variant.Outlined"
-                                       @bind-Date="fechaFin"
-                                       Class="bg-white rounded-lg" />
-                    </MudItem>
-
-                    <MudItem xs="12" sm="6">
-                        <MudTimePicker Label="Hora fin"
-                                       Variant="Variant.Outlined"
-                                       PickerVariant="PickerVariant.Dialog"
-                                       DisableToolbar="false"
-                                       TimeEditMode="TimeEditMode.Normal"
-                                       @bind-Time="horaFin"
-                                       Class="bg-white rounded-lg" />
-                    </MudItem>
-
-                    <MudItem xs="12" Class="pt-3">
-                        <MudButton ButtonType="ButtonType.Submit"
-                                   Variant="Variant.Filled"
-                                   Color="Color.Primary"
-                                   FullWidth="true"
-                                   Disabled="@guardando"
-                                   Class="py-3 font-bold text-base rounded-lg shadow-md uppercase tracking-wide">
-                            @if (guardando)
-                            {
-                                <MudProgressCircular Indeterminate="true" Size="Size.Small" Class="mr-2" />
-                            }
-                            PUBLICAR SUBASTA
-                        </MudButton>
-                    </MudItem>
-                </MudGrid>
-            </EditForm>
+            </MudGrid>
         </div>
     </div>
 </MudContainer>
 
 @code {
-    private CreateAuctionRequest model = new();
     private IList<CategoryResponse> categorias = [];
 
-    private DateTime? fechaInicio = DateTime.Today;
-    private TimeSpan? horaInicio = DateTime.Now.TimeOfDay;
-
-    private DateTime? fechaFin = DateTime.Today.AddDays(1);
-    private TimeSpan? horaFin = DateTime.Now.TimeOfDay;
-
+    private int categoriaId = 1;
+    private string titulo = "", descripcion = "", urlImagen = "";
+    private decimal precioBase, incrementoMinimo;
     private bool guardando;
+
+    private DateTime? fechaInicio = DateTime.Today;
+    private DateTime? fechaFin = DateTime.Today.AddDays(1);
+    private TimeSpan? horaInicio = DateTime.Now.TimeOfDay;
+    private TimeSpan? horaFin = DateTime.Now.TimeOfDay;
 
     protected override async Task OnInitializedAsync()
     {
+        // 1. Restaurar sesión si se recarga con F5
         if (!Sesion.EstaLogueado)
         {
             await Sesion.CargarSesion();
@@ -165,17 +176,13 @@
             return;
         }
 
-        await CargarCategorias();
-    }
-
-    private async Task CargarCategorias()
-    {
+        // 2. Cargar categorías
         try
         {
             categorias = await Http.GetFromJsonAsync<IList<CategoryResponse>>("api/v1/categorias") ?? [];
             if (categorias.Any())
             {
-                model.CategoriaId = categorias.First().Id;
+                categoriaId = categorias.First().Id;
             }
         }
         catch
@@ -184,20 +191,23 @@
         }
     }
 
-    private async Task Guardar()
+    private async Task Crear()
     {
-        if (!fechaInicio.HasValue || !horaInicio.HasValue || !fechaFin.HasValue || !horaFin.HasValue)
+        if (string.IsNullOrWhiteSpace(titulo) ||
+            precioBase <= 0 || incrementoMinimo <= 0 ||
+            fechaInicio == null || fechaFin == null ||
+            horaInicio == null || horaFin == null)
         {
-            Snackbar.Add("Ingresá las fechas y horas correctamente.", Severity.Warning);
+            Snackbar.Add("Revisá los datos ingresados.", Severity.Warning);
             return;
         }
 
-        model.FechaInicio = fechaInicio.Value.Date + horaInicio.Value;
-        model.FechaFin = fechaFin.Value.Date + horaFin.Value;
+        var inicio = fechaInicio.Value.Date + horaInicio.Value;
+        var fin = fechaFin.Value.Date + horaFin.Value;
 
-        if (model.FechaFin <= model.FechaInicio)
+        if (fin <= inicio)
         {
-            Snackbar.Add("La fecha de fin debe ser mayor a la de inicio.", Severity.Warning);
+            Snackbar.Add("La fecha de fin debe ser posterior al inicio.", Severity.Warning);
             return;
         }
 
@@ -205,25 +215,66 @@
 
         try
         {
-            var response = await Http.PostAsJsonAsync("api/v1/subastas", model);
+            if (Sesion.Usuario == null)
+            {
+                Snackbar.Add("Tenés que iniciar sesión.", Severity.Warning);
+                Navigation.NavigateTo("/login");
+                return;
+            }
 
-            if (response.IsSuccessStatusCode)
+            var request = new CreateAuctionRequest
             {
-                Snackbar.Add("Subasta creada con éxito.", Severity.Success);
-                Navigation.NavigateTo("/subastas");
-            }
-            else
+                VendedorId = Sesion.Usuario.Id,
+                CategoriaId = categoriaId,
+                Titulo = titulo,
+                Descripcion = descripcion,
+                UrlImagen = urlImagen,
+                PrecioBase = precioBase,
+                IncrementoMinimo = incrementoMinimo,
+                FechaInicio = inicio.ToUniversalTime(),
+                FechaFin = fin.ToUniversalTime()
+            };
+
+            var response = await Http.PostAsJsonAsync("api/v1/subastas", request);
+
+            if (!response.IsSuccessStatusCode)
             {
-                Snackbar.Add("No se pudo crear la subasta.", Severity.Error);
+                Snackbar.Add(await LeerError(response), Severity.Error);
+                return;
             }
+
+            var creada = await response.Content.ReadFromJsonAsync<CreateAuctionResponse>();
+
+            Snackbar.Add("Subasta publicada correctamente.", Severity.Success);
+
+            Navigation.NavigateTo(
+                creada == null ? "/subastas" : $"/subastas/{creada.Id}");
         }
         catch
         {
-            Snackbar.Add("Ocurrió un error al guardar.", Severity.Error);
+            Snackbar.Add("No se pudo crear la subasta.", Severity.Error);
         }
         finally
         {
             guardando = false;
         }
+    }
+
+    private async Task<string> LeerError(HttpResponseMessage response)
+    {
+        try
+        {
+            var error = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+            return error?.Mensaje ?? "No se pudo crear la subasta.";
+        }
+        catch
+        {
+            return "No se pudo crear la subasta.";
+        }
+    }
+
+    private class ErrorResponse
+    {
+        public string Mensaje { get; set; } = "";
     }
 }
