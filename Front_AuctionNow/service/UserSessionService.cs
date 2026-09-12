@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Application.DTOs.Response;
+using Front_AuctionNow.Models.Responses;
 using Microsoft.JSInterop;
 
 namespace Front_AuctionNow.Services;

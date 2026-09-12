@@ -15,7 +15,7 @@ using Api_SubastaYa.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Controllers + Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -25,7 +25,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SubastaYaConnection"))
 );
 
-// Repositorios y Unit of Work
+// Repositorios + Unit of Work
 builder.Services.AddScoped<IWalletRepository, WalletRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IAuctionRepository, AuctionRepository>();
@@ -52,16 +52,19 @@ builder.Services.AddScoped<GetTransactionsHandler>();
 builder.Services.AddScoped<PlaceBidHandler>();
 builder.Services.AddScoped<ProcessScheduledAuctionsHandler>();
 
+// Worker
 builder.Services.AddHostedService<AuctionWorker>();
+
+// SignalR
 builder.Services.AddSignalR();
 
-// CORS configurado para admitir SignalR desde Blazor WebAssembly
+// CORS flexible para desarrollo en localhost
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("Front_AuctionNow", policy =>
+    options.AddPolicy("Frontend", policy =>
     {
         policy
-            .SetIsOriginAllowed(_ => true)
+            .SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -70,6 +73,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Swagger
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -78,16 +82,18 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// 1. Enrutamiento
+app.UseRouting();
+
+// 2. CORS (debe ir inmediatamente después de UseRouting)
+app.UseCors("Frontend");
+
+// 3. Manejo de excepciones y seguridad
 app.UseMiddleware<ExceptionMiddleware>();
-
-// CORS DEBE IR ANTES de Authorization, Controllers y Hubs
-app.UseCors("Front_AuctionNow");
-
 app.UseAuthorization();
 
+// 4. Endpoints y Hubs
 app.MapControllers();
-
-// Mapeamos ambas rutas para asegurar compatibilidad inmediata
 app.MapHub<AuctionHub>("/hubs/auctionHub");
 app.MapHub<AuctionHub>("/hubs/subastas");
 
