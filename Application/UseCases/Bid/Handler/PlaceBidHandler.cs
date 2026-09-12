@@ -134,7 +134,7 @@ namespace Application.UseCases.Puja.Handler
                                 new LedgerTransaction
                                 {
                                     BilleteraId = billeteraAnterior.Id,
-                                    Tipo = TransactionType.Liberacao,
+                                    Tipo = TransactionType.Liberacion,
                                     Monto = pujaAnterior.Monto,
                                     Fecha = ahora,
                                     SubastaId = subasta.Id
