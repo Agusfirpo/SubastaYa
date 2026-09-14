@@ -54,7 +54,8 @@ namespace Application.UseCases.Puja.Handler
                 if (subasta == null)
                     throw new NotFoundException("La subasta no existe.");
 
-                  
+                if (subasta.VendedorId == command.CompradorId)
+                    throw new ValidationException("No podés pujar en una subasta creada por vos.");
 
                 if (subasta.Estado != AuctionStatus.Activa)
                     throw new ValidationException("La subasta no está activa.");
@@ -67,7 +68,13 @@ namespace Application.UseCases.Puja.Handler
 
                 //PUJA ACTUAL
                 var pujaAnterior =await _pujaRepository.ObtenerMayorPorSubastaIdAsync(command.SubastaId);
-
+               
+                if (pujaAnterior != null &&
+                pujaAnterior.CompradorId == command.CompradorId)
+                {
+                   throw new ValidationException("Debés esperar a que otro usuario realice una puja antes de volver a ofertar.");
+                
+                }
                 decimal montoMinimo;
 
                 if (pujaAnterior == null)

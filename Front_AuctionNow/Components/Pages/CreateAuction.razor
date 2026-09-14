@@ -1,8 +1,8 @@
 @page "/crear-subasta"
 
 @using System.Net.Http.Json
-@using Application.DTOs.Request
-@using Application.DTOs.Response
+@using Front_AuctionNow.Models.Requests
+@using Front_AuctionNow.Models.Responses
 @using Front_AuctionNow.Services
 @inject UserSessionService Sesion
 @inject HttpClient Http
@@ -273,8 +273,5 @@
         }
     }
 
-    private class ErrorResponse
-    {
-        public string Mensaje { get; set; } = "";
-    }
+    
 }
