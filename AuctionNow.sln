@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.37531.7 d17.14
+VisualStudioVersion = 17.14.37531.7
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionNow", "AuctionNow\AuctionNow.csproj", "{D683C31A-92D8-4320-9784-5F149D0120F7}"
 EndProject
@@ -12,6 +12,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{7B1C44B3-AF22-4A46-A83B-C5D9E8EFACE5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Front_AuctionNow", "Front_AuctionNow\Front_AuctionNow.csproj", "{07F84415-8FDB-44A4-BF65-43102A510359}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend_AuctionNow", "Backend_AuctionNow", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend_AuctionNow", "Frontend_AuctionNow", "{67207007-9B5D-4C49-80C9-1B83946269E9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,6 +46,13 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D683C31A-92D8-4320-9784-5F149D0120F7} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{B0C37CBF-8A18-43F3-B489-C3BB71D1B576} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{77842284-465D-4825-8882-CA78EC2E0D82} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{7B1C44B3-AF22-4A46-A83B-C5D9E8EFACE5} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{07F84415-8FDB-44A4-BF65-43102A510359} = {67207007-9B5D-4C49-80C9-1B83946269E9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {079A674B-570D-4E15-9EC8-E03BA9508EF6}

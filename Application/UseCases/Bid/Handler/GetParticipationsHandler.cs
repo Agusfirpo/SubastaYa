@@ -19,14 +19,12 @@ namespace Application.UseCases.Puja.Handler
         {
             _pujaRepository = pujaRepository;
         }
-        public async Task<IList<ParticipationResponse>> Handle(GetParticipationsQuery query)
-        {
-            var pujas =await _pujaRepository.ObtenerPorCompradorIdAsync(query.CompradorId);
-            var participaciones = pujas.GroupBy(p => p.SubastaId);
-            var resultado = new List<ParticipationResponse>();
 
-            return pujas
-                .GroupBy(p => p.SubastaId)
+        public async Task<IList<ParticipationResponse>> Handle(GetParticipationsQuery query, CancellationToken cancellationToken)
+        {
+            var pujas =await _pujaRepository.ObtenerPorCompradorIdAsync(query.CompradorId,cancellationToken);
+
+            return pujas.GroupBy(p => p.SubastaId)
                 .Select(grupo =>
                 {
                     var ultimaPujaUsuario = grupo
