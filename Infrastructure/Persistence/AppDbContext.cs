@@ -63,7 +63,8 @@ namespace Infrastructure.Persistence
                 entity.Property(s => s.FechaInicio).IsRequired();
                 entity.Property(s => s.FechaFin).IsRequired();
                 entity.Property(s => s.Estado).HasConversion<string>().HasMaxLength(20).IsRequired();
-                entity.Property(s => s.Version).IsConcurrencyToken();
+                modelBuilder.Entity<Auction>(entity =>{entity.Property(e => e.RowVersion).IsRowVersion();
+                });
 
                 entity.HasOne(s => s.Vendedor)
                 .WithMany(c => c.Subastas)
@@ -104,7 +105,10 @@ namespace Infrastructure.Persistence
                 entity.Property(b => b.SaldoTotal).HasPrecision(18, 2).IsRequired();
                 entity.Property(b => b.SaldoRetenido).HasPrecision(18, 2).IsRequired();
                 entity.Ignore(b=> b.SaldoDisponible);
-                entity.Property(b => b.Version).IsConcurrencyToken();
+                modelBuilder.Entity<Wallet>(entity =>{entity.Property(e => e.RowVersion).IsRowVersion();
+
+                });
+
 
                 entity.HasOne(b => b.Usuario)
                 .WithOne(u => u.Billetera)
@@ -197,10 +201,10 @@ namespace Infrastructure.Persistence
 
             // 2. Billeteras
             modelBuilder.Entity<Wallet>().HasData(
-                new Wallet { Id = 1, UsuarioId = 1, SaldoTotal = 0m, SaldoRetenido = 0m, Version = 1 },
-                new Wallet { Id = 2, UsuarioId = 2, SaldoTotal = 150000m, SaldoRetenido = 45000m, Version = 1 },
-                new Wallet { Id = 3, UsuarioId = 3, SaldoTotal = 200000m, SaldoRetenido = 0m, Version = 1 },
-                new Wallet { Id = 4, UsuarioId = 4, SaldoTotal = 500m, SaldoRetenido = 0m, Version = 1 }
+                new Wallet { Id = 1, UsuarioId = 1, SaldoTotal = 0m, SaldoRetenido = 0m,},
+                new Wallet { Id = 2, UsuarioId = 2, SaldoTotal = 150000m, SaldoRetenido = 45000m,},
+                new Wallet { Id = 3, UsuarioId = 3, SaldoTotal = 200000m, SaldoRetenido = 0m,},
+                new Wallet { Id = 4, UsuarioId = 4, SaldoTotal = 500m, SaldoRetenido = 0m,}
             );
 
             // 3. Categorías
@@ -226,7 +230,6 @@ namespace Infrastructure.Persistence
                     FechaInicio = fechaBase.AddHours(-1),
                     FechaFin = fechaBase.AddMinutes(30),
                     Estado = AuctionStatus.Activa,
-                    Version = 1
                 },
 
                 new Auction
@@ -242,7 +245,6 @@ namespace Infrastructure.Persistence
                     FechaInicio = fechaBase.AddHours(-2),
                     FechaFin = fechaBase.AddMinutes(1),
                     Estado = AuctionStatus.Activa,
-                    Version = 1
                 },
 
                 new Auction
@@ -258,7 +260,6 @@ namespace Infrastructure.Persistence
                     FechaInicio = fechaBase.AddHours(24),
                     FechaFin = fechaBase.AddHours(48),
                     Estado = AuctionStatus.Programada,
-                    Version = 1
                 },
 
                 new Auction
@@ -274,7 +275,6 @@ namespace Infrastructure.Persistence
                     FechaInicio = fechaBase.AddDays(-3),
                     FechaFin = fechaBase.AddDays(-1),
                     Estado = AuctionStatus.Activa,
-                    Version = 1
                 },
 
                 new Auction
@@ -290,7 +290,6 @@ namespace Infrastructure.Persistence
                     FechaInicio = fechaBase.AddDays(-5),
                     FechaFin = fechaBase.AddDays(-2),
                     Estado = AuctionStatus.Activa,
-                    Version = 1
                 }
             );
 

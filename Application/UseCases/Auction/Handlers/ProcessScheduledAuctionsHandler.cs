@@ -26,7 +26,6 @@ namespace Application.UseCases.Subasta.Handler
                 foreach (var subasta in subastas)
                 {
                     subasta.Estado = AuctionStatus.Activa;
-                    subasta.Version++;
 
                     await _auditoriaRepository.AgregarAsync(
                         new AuditLog

@@ -20,7 +20,7 @@ namespace Domain.Entities
         public DateTime FechaInicio { get; set; }    
         public DateTime FechaFin {  get; set; }
         public AuctionStatus Estado {  get; set; }
-        public int Version { get; set; }
+        public byte[] RowVersion { get; set; } = [];
         public User Vendedor {  get; set; }
         public Category Categoria { get; set; }    
         public  IList<Bid>  Pujas { get; set; }= new List<Bid>();

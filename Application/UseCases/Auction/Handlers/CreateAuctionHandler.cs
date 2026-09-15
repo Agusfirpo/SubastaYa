@@ -16,8 +16,7 @@ namespace Application.UseCases.Subasta.Handler
     {
         private readonly IAuctionRepository _subastaRepository;
         private readonly IUnitOfWork _unidadTrabajo;
-        public CreateAuctionHandler(
-            IAuctionRepository subastaRepository , IUnitOfWork unidadTrabajo)
+        public CreateAuctionHandler(IAuctionRepository subastaRepository, IUnitOfWork unidadTrabajo)
         {
             _subastaRepository = subastaRepository;
             _unidadTrabajo = unidadTrabajo;
@@ -50,7 +49,6 @@ namespace Application.UseCases.Subasta.Handler
                 FechaInicio = command.FechaInicio,
                 FechaFin = command.FechaFin,
                 Estado = estado,
-                Version = 0
             };
 
             await _unidadTrabajo.EjecutarEnTransaccionAsync(async () =>
@@ -65,11 +63,6 @@ namespace Application.UseCases.Subasta.Handler
                 Titulo = subasta.Titulo,
                 Estado = subasta.Estado.ToString()
             };
-        }
-
-
-        
-
-
+        }     
     }
 }

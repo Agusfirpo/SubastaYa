@@ -23,14 +23,7 @@ namespace Application.UseCases.Puja.Handler
         private readonly IAuditRepository _auditoriaRepository;
         private readonly IUnitOfWork _unidadTrabajo;
         private readonly IAuctionNotifier _notificadorSubasta;
-        public PlaceBidHandler(
-            IAuctionRepository subastaRepository,
-            IBidRepository pujaRepository,
-            IWalletRepository billeteraRepository,
-            ITransactionRepository transaccionRepository,
-            IAuditRepository auditoriaRepository,
-            IUnitOfWork unidadTrabajo,
-            IAuctionNotifier notificadorSubasta)
+        public PlaceBidHandler(IAuctionRepository subastaRepository,IBidRepository pujaRepository, IWalletRepository billeteraRepository,ITransactionRepository transaccionRepository,IAuditRepository auditoriaRepository,IUnitOfWork unidadTrabajo,IAuctionNotifier notificadorSubasta)
         {
             _subastaRepository = subastaRepository;
             _pujaRepository = pujaRepository;
@@ -94,30 +87,7 @@ namespace Application.UseCases.Puja.Handler
 
                 if (billeteraNueva == null)
                     throw new NotFoundException("El comprador no posee billetera.");
-
-                // SI EL MISMO LÍDER VUELVE A OFERTAR
-                if (pujaAnterior != null && pujaAnterior.CompradorId == command.CompradorId)
-                {
-                    var diferencia = command.Monto - pujaAnterior.Monto;
-
-                    if (billeteraNueva.SaldoDisponible < diferencia)
-                    {
-                        throw new ValidationException("Saldo insuficiente.");
-                    }
-
-                    billeteraNueva.SaldoRetenido += diferencia;
-                    billeteraNueva.Version++;
-
-                    await _transaccionRepository.AgregarAsync(
-                        new LedgerTransaction
-                        {
-                            BilleteraId = billeteraNueva.Id,
-                            Tipo = TransactionType.Retencion,
-                            Monto = diferencia,
-                            Fecha = ahora,
-                            SubastaId = subasta.Id
-                        });
-                }
+             
                 else
                 {
                     // NUEVO LÍDER
@@ -135,7 +105,6 @@ namespace Application.UseCases.Puja.Handler
                         {
                             billeteraAnterior.SaldoRetenido -= pujaAnterior.Monto;
 
-                            billeteraAnterior.Version++;
 
                             await _transaccionRepository.AgregarAsync(
                                 new LedgerTransaction
@@ -152,7 +121,6 @@ namespace Application.UseCases.Puja.Handler
                     // Retener al nuevo líder
                     billeteraNueva.SaldoRetenido += command.Monto;
 
-                    billeteraNueva.Version++;
 
                     await _transaccionRepository.AgregarAsync(
                         new LedgerTransaction
@@ -164,7 +132,6 @@ namespace Application.UseCases.Puja.Handler
                             SubastaId = subasta.Id
                         });
                 }
-
                 // REGISTRAR PUJA
                 await _pujaRepository.AgregarAsync(
                     new Domain.Entities.Bid
@@ -181,7 +148,6 @@ namespace Application.UseCases.Puja.Handler
 
                 if (tiempoRestante <= TimeSpan.FromSeconds(60))
                 {
-
                     subasta.FechaFin = subasta.FechaFin.AddMinutes(2);
                     tiempoExtendido = true;
 
@@ -196,9 +162,15 @@ namespace Application.UseCases.Puja.Handler
                             Fecha = ahora
                         });
                 }
+                else
+                {
+                    // Forzar un cambio mínimo (ej. sumar 1 tick) para que EF Core detecte 
+                    // la modificación en la subasta y active el RowVersion (Optimistic Locking) 
+                    // en todas las pujas concurrentes.
+                    subasta.FechaFin = subasta.FechaFin.AddTicks(1);
+                }
 
                 // Cada puja modifica la versión de la subasta.
-                subasta.Version++;
                 resultado = new PlaceBidResponse
                 {
                     SubastaId = subasta.Id,

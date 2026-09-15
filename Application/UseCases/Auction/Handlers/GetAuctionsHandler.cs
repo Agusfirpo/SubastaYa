@@ -1,5 +1,5 @@
 using Application.DTOs.Response;
-using Application.Helpers;
+using Application.Mappers;
 using Application.Interfaces.Repositories;
 using Application.UseCases.Subasta.Queries;
 using System;
@@ -14,8 +14,7 @@ namespace Application.UseCases.Subasta.Handler
     public class GetAuctionsHandler
     {
         private readonly IAuctionRepository _subastaRepository;
-        public GetAuctionsHandler(
-            IAuctionRepository subastaRepository)
+        public GetAuctionsHandler(IAuctionRepository subastaRepository)
         {
             _subastaRepository = subastaRepository;
         }

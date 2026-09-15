@@ -7,6 +7,7 @@ using Application.DTOs.Response;
 using Application.Interfaces.Repositories;
 using Application.UseCases.Subasta.Queries;
 using Domain.Enums;
+using Application.Mappers;
 
 namespace Application.UseCases.Subasta.Handler
 {
@@ -22,52 +23,9 @@ namespace Application.UseCases.Subasta.Handler
         public async Task<IList<ListingResponse>> Handle(
             GetAuctionsBySellerQuery query)
         {
-            var subastas = await _subastaRepository
-                .ObtenerPorVendedorIdAsync(query.VendedorId);
+            var subastas =await _subastaRepository.ObtenerPorVendedorIdAsync(query.VendedorId);
 
-            return subastas.Select(s =>
-            {
-                var tienePujas = s.Pujas.Any();
-
-                var precioActual = tienePujas
-                    ? s.Pujas.Max(p => p.Monto)
-                    : s.PrecioBase;
-
-                var recaudacion =s.Estado == AuctionStatus.Finalizada && tienePujas ? precioActual : 0;
-
-                var adjudicacion = s.Estado switch
-                {
-                    AuctionStatus.Finalizada when tienePujas
-                        => "Adjudicada",
-
-                    AuctionStatus.Desierta
-                        => "Sin adjudicar",
-
-                    AuctionStatus.Activa
-                        => "En curso",
-
-                    AuctionStatus.Programada
-                        => "Pendiente",
-
-                    _ => "Pendiente"
-                };
-
-                return new ListingResponse
-                {
-                    Id = s.Id,
-                    Titulo = s.Titulo,
-                    Categoria = s.Categoria.Nombre,
-                    Estado = s.Estado.ToString(),
-
-                    CantidadPujas = s.Pujas.Count,
-                    PrecioActual = precioActual,
-
-                    Recaudacion = recaudacion,
-                    EstadoAdjudicacion = adjudicacion,
-
-                    FechaFin = s.FechaFin
-                };
-            }).ToList();
+            return subastas.Select(AuctionMapper.ToPublicacionResponse).ToList();
         }
     }
 }

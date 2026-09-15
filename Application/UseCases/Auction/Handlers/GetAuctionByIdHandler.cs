@@ -1,7 +1,6 @@
 using Application.DTOs.Response;
-using Application.Helpers;
-using Application.Interfaces.Repositories;
 using Application.Mappers;
+using Application.Interfaces.Repositories;
 using Application.UseCases.Subasta.Queries;
 using System;
 using System.Collections.Generic;
@@ -24,8 +23,6 @@ namespace Application.UseCases.Subasta.Handler
 
             if (subasta == null)
                 return null;
-
-            var pujaActual = subasta.Pujas.Any() ? subasta.Pujas.Max(p => p.Monto) : subasta.PrecioBase;
 
             return AuctionMapper.ToDetalleResponse(subasta);
         }
