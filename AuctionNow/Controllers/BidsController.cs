@@ -20,25 +20,25 @@ namespace Api_SubastaYa.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IList<BidResponse>>> ObtenerPorSubasta(int subastaId)
+        public async Task<ActionResult<IList<BidResponse>>> ObtenerPorSubasta(int subastaId ,CancellationToken cancellationToken)
         {
             var resultado = await _listar.Handle(new GetBidsByAuctionQuery
                 {
                     SubastaId = subastaId
-                });
+                } ,cancellationToken);
 
             return Ok(resultado);
         }
 
         [HttpPost]
-        public async Task<ActionResult<PlaceBidResponse>> Realizar(int subastaId,PlaceBidRequest request)
+        public async Task<ActionResult<PlaceBidResponse>> Realizar(int subastaId,PlaceBidRequest request ,CancellationToken cancellationToken)
         {
             var resultado = await _realizar.Handle(new PlaceBidCommand
                 {
                     SubastaId = subastaId,
                     CompradorId = request.CompradorId,
                     Monto = request.Monto
-                });
+                } ,cancellationToken);
 
             return Created($"/api/v1/subastas/{subastaId}/pujas",resultado);
         }

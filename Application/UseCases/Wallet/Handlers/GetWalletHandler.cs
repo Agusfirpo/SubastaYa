@@ -13,9 +13,9 @@ namespace Application.UseCases.Billetera.Handler
             _billeteraRepository = billeteraRepository;
         }
 
-        public async Task<WalletResponse> Handle(GetWalletQuery query)
+        public async Task<WalletResponse> Handle(GetWalletQuery query , CancellationToken cancellationToken)
         {
-            var billetera = await _billeteraRepository.ObtenerPorUsuarioAsync(query.UsuarioId);
+            var billetera = await _billeteraRepository.ObtenerPorUsuarioAsync(query.UsuarioId , cancellationToken);
 
             if (billetera == null)
                 throw new NotFoundException("No se encontró la billetera del usuario.");

@@ -22,7 +22,7 @@ namespace Application.UseCases.Subasta.Handler
             _subastaRepository = subastaRepository;
             _unidadTrabajo = unidadTrabajo;
         }
-        public async Task<CreateAuctionResponse> Handle(CrearSubastaCommand command)
+        public async Task<CreateAuctionResponse> Handle(CrearSubastaCommand command , CancellationToken cancellationToken)
         {
             if (command.PrecioBase <= 0)
                 throw new ValidationException("El precio base debe ser mayor a cero.");
@@ -55,8 +55,8 @@ namespace Application.UseCases.Subasta.Handler
 
             await _unidadTrabajo.EjecutarEnTransaccionAsync(async () =>
             {
-                await _subastaRepository.AgregarAsync(subasta);
-            });
+                await _subastaRepository.AgregarAsync(subasta ,cancellationToken);
+            },cancellationToken);
 
 
             return new CreateAuctionResponse

@@ -33,13 +33,13 @@ namespace Api_SubastaYa.Workers
                         new ProcessScheduledAuctionsCommand
                         {
                             FechaActual = ahora
-                        });
+                        },stoppingToken );
 
                     await finalizar.Handle(
                         new FinishAuctionsCommand
                         {
                             FechaActual = ahora
-                        });
+                        } ,stoppingToken);
                 }
                 catch (Exception ex)
                 {

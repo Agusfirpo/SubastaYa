@@ -5,11 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace Application.Interfaces.Repositories
 {
     public interface IWalletRepository
     {
-        Task<Wallet?> ObtenerPorUsuarioAsync(int usuarioId);
-
+        Task<Wallet?> ObtenerPorUsuarioAsync(
+            int usuarioId,
+            CancellationToken cancellationToken);
     }
 }

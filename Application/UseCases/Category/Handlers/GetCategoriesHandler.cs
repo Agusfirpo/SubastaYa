@@ -19,9 +19,9 @@ namespace Application.UseCases.Categoria.Handler
             _categoriasRepository = categoriasRepository;
         }
 
-        public async Task<IList<CategoryResponse>> Handle(GetCategoriesQuery query)
+        public async Task<IList<CategoryResponse>> Handle(GetCategoriesQuery query , CancellationToken cancellationToken)
         {
-            var categorias = await _categoriasRepository.ObtenerTodasAsync();
+            var categorias = await _categoriasRepository.ObtenerTodasAsync(cancellationToken);
 
             return categorias.Select(CategoryMapper.ToResponse).ToList();
         }

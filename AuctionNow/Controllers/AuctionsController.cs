@@ -24,53 +24,60 @@ namespace Api_SubastaYa.Controllers
 
         [HttpGet]
         public async Task<ActionResult<PagedAuctionsResponse>> ObtenerTodas(
-            [FromQuery] string? estado,
-            [FromQuery] string? busqueda,
-            [FromQuery] int? categoriaId,
-            [FromQuery] decimal? precioMinimo,
-            [FromQuery] decimal? precioMaximo,
-            [FromQuery] string? orden,
-            [FromQuery] int pagina = 1,
-            [FromQuery] int tamanioPagina = 10)
+        [FromQuery] string? estado,
+        [FromQuery] string? busqueda,
+        [FromQuery] int? categoriaId,
+        [FromQuery] decimal? precioMinimo,
+        [FromQuery] decimal? precioMaximo,
+        [FromQuery] string? orden,
+        [FromQuery] int pagina = 1,
+        [FromQuery] int tamanioPagina = 10,
+    CancellationToken cancellationToken = default)
         {
             var resultado = await _listar.Handle(new GetAuctionsQuery
-                {
-                    Estado = estado,
-                    Busqueda = busqueda,
-                    CategoriaId = categoriaId,
-                    PrecioMinimo = precioMinimo,
-                    PrecioMaximo = precioMaximo,
-                    Orden = orden,
-                    Pagina = pagina,
-                    TamanioPagina = tamanioPagina
-                });
+            {
+                Estado = estado,
+                Busqueda = busqueda,
+                CategoriaId = categoriaId,
+                PrecioMinimo = precioMinimo,
+                PrecioMaximo = precioMaximo,
+                Orden = orden,
+                Pagina = pagina,
+                TamanioPagina = tamanioPagina
+            }, cancellationToken);
 
             return Ok(resultado);
         }
 
         [HttpPost]
-        public async Task<ActionResult<CreateAuctionResponse>> Crear(CreateAuctionRequest request)
+        public async Task<ActionResult<CreateAuctionResponse>> Crear(
+        CreateAuctionRequest request,
+        CancellationToken cancellationToken)
         {
             var resultado = await _crear.Handle(new CrearSubastaCommand
-                {
-                    VendedorId = request.VendedorId,
-                    CategoriaId = request.CategoriaId,
-                    Titulo = request.Titulo,
-                    Descripcion = request.Descripcion,
-                    UrlImagen = request.UrlImagen,
-                    PrecioBase = request.PrecioBase,
-                    IncrementoMinimo = request.IncrementoMinimo,
-                    FechaInicio = request.FechaInicio,
-                    FechaFin = request.FechaFin
-                });
+            {
+                VendedorId = request.VendedorId,
+                CategoriaId = request.CategoriaId,
+                Titulo = request.Titulo,
+                Descripcion = request.Descripcion,
+                UrlImagen = request.UrlImagen,
+                PrecioBase = request.PrecioBase,
+                IncrementoMinimo = request.IncrementoMinimo,
+                FechaInicio = request.FechaInicio,
+                FechaFin = request.FechaFin
+            }, cancellationToken);
 
-            return Created($"/api/v1/subastas/{resultado.Id}",resultado);
+            return Created($"/api/v1/subastas/{resultado.Id}", resultado);
         }
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<AuctionDetailResponse>> ObtenerPorId(int id)
+        public async Task<ActionResult<AuctionDetailResponse>> ObtenerPorId(
+       int id,
+       CancellationToken cancellationToken)
         {
-            var resultado = await _obtener.Handle(new GetAuctionByIdQuery { Id = id });
+            var resultado = await _obtener.Handle(
+                new GetAuctionByIdQuery { Id = id },
+                cancellationToken);
 
             return Ok(resultado);
         }

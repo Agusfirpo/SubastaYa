@@ -17,11 +17,11 @@ namespace Application.UseCases.Subasta.Handler
             _auditoriaRepository = auditoriaRepository;
         }
 
-        public async Task Handle(ProcessScheduledAuctionsCommand command)
+        public async Task Handle(ProcessScheduledAuctionsCommand command , CancellationToken cancellationToken)
         {
             await _unidadTrabajo.EjecutarEnTransaccionAsync(async () =>
             {
-                var subastas = await _subastaRepository.ObtenerProgramadasParaProcesarAsync(command.FechaActual);
+                var subastas = await _subastaRepository.ObtenerProgramadasParaProcesarAsync(command.FechaActual ,cancellationToken);
 
                 foreach (var subasta in subastas)
                 {
@@ -38,9 +38,9 @@ namespace Application.UseCases.Subasta.Handler
                             DetalleJson =
                                 "{\"estadoAnterior\":\"Programada\",\"estadoNuevo\":\"Activa\"}",
                             Fecha = command.FechaActual
-                        });
+                        } ,cancellationToken);
                 }
-            });
+            } ,cancellationToken);
         }
     }
 }

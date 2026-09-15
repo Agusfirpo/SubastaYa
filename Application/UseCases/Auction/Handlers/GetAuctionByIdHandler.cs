@@ -18,14 +18,16 @@ namespace Application.UseCases.Subasta.Handler
         {
             _subastaRepository = subastaRepository;
         }
-        public async Task<AuctionDetailResponse?> Handle(GetAuctionByIdQuery query)
+        public async Task<AuctionDetailResponse?> Handle(
+         GetAuctionByIdQuery query,
+        CancellationToken cancellationToken)
         {
-            var subasta = await _subastaRepository.ObtenerPorIdAsync(query.Id);
+            var subasta = await _subastaRepository.ObtenerPorIdAsync(
+                query.Id,
+                cancellationToken);
 
             if (subasta == null)
                 return null;
-
-            var pujaActual = subasta.Pujas.Any() ? subasta.Pujas.Max(p => p.Monto) : subasta.PrecioBase;
 
             return AuctionMapper.ToDetalleResponse(subasta);
         }

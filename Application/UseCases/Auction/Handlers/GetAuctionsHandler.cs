@@ -19,7 +19,7 @@ namespace Application.UseCases.Subasta.Handler
         {
             _subastaRepository = subastaRepository;
         }
-        public async Task<PagedAuctionsResponse> Handle(GetAuctionsQuery query)
+        public async Task<PagedAuctionsResponse> Handle(GetAuctionsQuery query ,CancellationToken cancellationToken)
         {
             if (query.Pagina <= 0)
             {
@@ -40,7 +40,8 @@ namespace Application.UseCases.Subasta.Handler
                     query.Orden,
                     query.Pagina,
                     query.TamanioPagina,
-                    query.Busqueda
+                    query.Busqueda,
+                    cancellationToken
                     );
 
             var items = resultado.Items.Select(AuctionMapper.ToResponse).ToList();

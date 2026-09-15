@@ -16,11 +16,11 @@ namespace Api_SubastaYa.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IList<CategoryResponse>>> ObtenerTodas()
+        public async Task<ActionResult<IList<CategoryResponse>>> ObtenerTodas ( CancellationToken cancellationToken)
         {
             var query = new GetCategoriesQuery();
 
-            var resultado = await _listarCategoriasHandler.Handle(query);
+            var resultado = await _listarCategoriasHandler.Handle(query ,cancellationToken);
 
             return Ok(resultado);
         }

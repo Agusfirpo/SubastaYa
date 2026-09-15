@@ -5,9 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Domain.Entities;
 
+
 namespace Application.Interfaces.Repositories;
 
 public interface IUserRepository
 {
-    Task<User?> ObtenerPorEmailAsync(string email);
+    Task<User?> ObtenerPorEmailAsync(
+        string email,
+        CancellationToken cancellationToken);
 }

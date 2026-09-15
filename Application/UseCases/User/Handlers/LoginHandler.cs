@@ -16,10 +16,10 @@ public class LoginHandler
     public LoginHandler(IUserRepository usuarioRepository)
         => _usuarioRepository = usuarioRepository;
 
-    public async Task<LoginResponse?> Handle(LoginCommand command)
+    public async Task<LoginResponse?> Handle(LoginCommand command , CancellationToken cancellationToken)
     {
         var usuario = await _usuarioRepository
-            .ObtenerPorEmailAsync(command.Email);
+            .ObtenerPorEmailAsync(command.Email , cancellationToken);
 
         if (usuario == null ||
             !BCrypt.Net.BCrypt.Verify(command.Password, usuario.PasswordHash))

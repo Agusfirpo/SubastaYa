@@ -13,22 +13,28 @@ namespace Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task EjecutarEnTransaccionAsync(Func<Task> action)
+        public async Task EjecutarEnTransaccionAsync(
+            Func<Task> action,
+            CancellationToken cancellationToken)
         {
             await using var transaction =
-                await _context.Database.BeginTransactionAsync();
+                await _context.Database.BeginTransactionAsync(
+                    cancellationToken);
 
             try
             {
                 await action();
 
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(
+                    cancellationToken);
 
-                await transaction.CommitAsync();
+                await transaction.CommitAsync(
+                    cancellationToken);
             }
             catch (DbUpdateConcurrencyException)
             {
-                await transaction.RollbackAsync();
+                await transaction.RollbackAsync(
+                    CancellationToken.None);
 
                 _context.ChangeTracker.Clear();
 
@@ -36,7 +42,8 @@ namespace Infrastructure.Repositories
             }
             catch
             {
-                await transaction.RollbackAsync();
+                await transaction.RollbackAsync(
+                    CancellationToken.None);
 
                 throw;
             }

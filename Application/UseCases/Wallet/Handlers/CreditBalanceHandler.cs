@@ -22,7 +22,7 @@ namespace Application.UseCases.Billetera.Handler
             _unidadTrabajo = unidadTrabajo;
         }
 
-        public async Task<WalletResponse> Handle(CreditBalanceCommand command)
+        public async Task<WalletResponse> Handle(CreditBalanceCommand command , CancellationToken cancellationToken)
         {
             if (command.Monto <= 0)
                 throw new ValidationException("El monto a acreditar debe ser mayor a cero.");
@@ -31,7 +31,7 @@ namespace Application.UseCases.Billetera.Handler
 
             await _unidadTrabajo.EjecutarEnTransaccionAsync(async () =>
             {
-                var billetera = await _billeteraRepository.ObtenerPorUsuarioAsync(command.UsuarioId);
+                var billetera = await _billeteraRepository.ObtenerPorUsuarioAsync(command.UsuarioId , cancellationToken);
 
                 if (billetera == null)
                     throw new NotFoundException("No se encontró la billetera del usuario.");
@@ -48,7 +48,7 @@ namespace Application.UseCases.Billetera.Handler
                         Monto = command.Monto,
                         Fecha = ahora,
                         SubastaId = null
-                    });
+                    } , cancellationToken);
 
                 await _auditoriaRepository.AgregarAsync(new AuditLog
                     {
@@ -59,7 +59,7 @@ namespace Application.UseCases.Billetera.Handler
                         DetalleJson =
                             $"{{\"monto\":{command.Monto}}}",
                         Fecha = ahora
-                    });
+                    } , cancellationToken);
 
                 resultado = new WalletResponse
                 {
@@ -69,7 +69,7 @@ namespace Application.UseCases.Billetera.Handler
                     SaldoRetenido = billetera.SaldoRetenido,
                     SaldoDisponible = billetera.SaldoDisponible
                 };
-            });
+            }, cancellationToken);
 
             return resultado!;
         }

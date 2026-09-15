@@ -19,9 +19,9 @@ namespace Application.UseCases.Puja.Handler
         {
             _pujaRepository = pujaRepository;
         }
-        public async Task<IList<ParticipationResponse>> Handle(GetParticipationsQuery query)
+        public async Task<IList<ParticipationResponse>> Handle(GetParticipationsQuery query , CancellationToken cancellationToken)
         {
-            var pujas =await _pujaRepository.ObtenerPorCompradorIdAsync(query.CompradorId);
+            var pujas =await _pujaRepository.ObtenerPorCompradorIdAsync(query.CompradorId , cancellationToken);
             var participaciones = pujas.GroupBy(p => p.SubastaId);
             var resultado = new List<ParticipationResponse>();
 

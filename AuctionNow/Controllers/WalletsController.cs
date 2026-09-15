@@ -25,31 +25,31 @@ namespace Api_SubastaYa.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<WalletResponse>> Get(int usuarioId)
+        public async Task<ActionResult<WalletResponse>> Get(int usuarioId ,CancellationToken cancellationToken)
         {
-            var resultado = await _obtener.Handle(new GetWalletQuery { UsuarioId = usuarioId });
+            var resultado = await _obtener.Handle(new GetWalletQuery { UsuarioId = usuarioId } ,cancellationToken);
             return Ok(resultado);
         }
 
         [HttpPost("depositos")]
-        public async Task<ActionResult<WalletResponse>> AcreditarSaldo(int usuarioId,CreditBalanceRequest request)
+        public async Task<ActionResult<WalletResponse>> AcreditarSaldo(int usuarioId,CreditBalanceRequest request ,CancellationToken cancellationToken)
         {
             var resultado = await _acreditar.Handle(new CreditBalanceCommand
                 {
                     UsuarioId = usuarioId,
                     Monto = request.Monto
-                });
+                } ,cancellationToken);
 
             return Ok(resultado);
         }
 
         [HttpGet("transacciones")]
-        public async Task<ActionResult<IList<TransactionResponse>>> ObtenerTransacciones(int usuarioId)
+        public async Task<ActionResult<IList<TransactionResponse>>> ObtenerTransacciones(int usuarioId ,CancellationToken cancellationToken)
         {
             var resultado = await _transacciones.Handle(new GetTransactionsQuery
                 {
                     UsuarioId = usuarioId
-                });
+                } ,cancellationToken);
 
             return Ok(resultado);
         }

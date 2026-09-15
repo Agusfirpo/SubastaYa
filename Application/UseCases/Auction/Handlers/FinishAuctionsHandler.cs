@@ -30,17 +30,17 @@ namespace Application.UseCases.Subasta.Handler
         }
 
         public async Task Handle(
-            FinishAuctionsCommand command)
+            FinishAuctionsCommand command , CancellationToken cancellationToken)
         {
-            var subastas = await _subastaRepository.ObtenerVencidasParaActualizarAsync(command.FechaActual);
+            var subastas = await _subastaRepository.ObtenerVencidasParaActualizarAsync(command.FechaActual ,cancellationToken );
 
             foreach (var subasta in subastas)
             {
-                await FinalizarSubasta(subasta,command.FechaActual);
+                await FinalizarSubasta(subasta,command.FechaActual ,cancellationToken);
             }
         }
 
-        private async Task FinalizarSubasta(Domain.Entities.Auction subasta,DateTime fechaActual)
+        private async Task FinalizarSubasta(Domain.Entities.Auction subasta,DateTime fechaActual ,CancellationToken cancellationToken)
         {
             await _unidadTrabajo.EjecutarEnTransaccionAsync(async () =>
             {
@@ -60,7 +60,7 @@ namespace Application.UseCases.Subasta.Handler
                             DetalleJson =
                                 "{\"motivo\":\"Subasta finalizada sin pujas\"}",
                             Fecha = fechaActual
-                        });
+                        } ,cancellationToken);
 
                     return;
                 }
@@ -72,11 +72,11 @@ namespace Application.UseCases.Subasta.Handler
 
                 var billeteraComprador =
                     await _billeteraRepository.ObtenerPorUsuarioAsync(
-                        pujaGanadora.CompradorId);
+                        pujaGanadora.CompradorId ,cancellationToken);
 
                 var billeteraVendedor =
                     await _billeteraRepository.ObtenerPorUsuarioAsync(
-                        subasta.VendedorId);
+                        subasta.VendedorId ,cancellationToken);
 
                 if (billeteraComprador == null ||
                     billeteraVendedor == null)
@@ -103,7 +103,7 @@ namespace Application.UseCases.Subasta.Handler
                         Monto = pujaGanadora.Monto,
                         Fecha = fechaActual,
                         SubastaId = subasta.Id
-                    });
+                    } ,cancellationToken);
 
                 // LEDGER VENDEDOR
                 await _transaccionRepository.AgregarAsync(
@@ -114,7 +114,7 @@ namespace Application.UseCases.Subasta.Handler
                         Monto = pujaGanadora.Monto,
                         Fecha = fechaActual,
                         SubastaId = subasta.Id
-                    });
+                    }, cancellationToken);
 
                 // FINALIZAR SUBASTA
                 subasta.Estado = AuctionStatus.Finalizada;
@@ -131,8 +131,8 @@ namespace Application.UseCases.Subasta.Handler
                         DetalleJson =
                             $"{{\"ganadorId\":{pujaGanadora.CompradorId},\"monto\":{pujaGanadora.Monto}}}",
                         Fecha = fechaActual
-                    });
-            });
+                    },cancellationToken);
+            } ,cancellationToken);
         }
     }
 }

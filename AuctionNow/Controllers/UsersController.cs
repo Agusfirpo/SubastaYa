@@ -26,35 +26,35 @@ namespace Api_SubastaYa.Controllers
         }
 
         [HttpGet("{usuarioId:int}/subastas")]
-        public async Task<ActionResult<IList<ListingResponse>>> ObtenerPublicaciones(int usuarioId)
+        public async Task<ActionResult<IList<ListingResponse>>> ObtenerPublicaciones(int usuarioId ,CancellationToken cancellationToken)
         {
             var resultado = await _publicaciones.Handle(new GetAuctionsBySellerQuery
             {
                 VendedorId = usuarioId
-            });
+            } ,cancellationToken);
 
             return Ok(resultado);
         }
 
         [HttpGet("{usuarioId:int}/pujas")]
-        public async Task<ActionResult<IList<ParticipationResponse>>> ObtenerParticipaciones(int usuarioId)
+        public async Task<ActionResult<IList<ParticipationResponse>>> ObtenerParticipaciones(int usuarioId ,CancellationToken cancellationToken)
         {
             var resultado = await _participaciones.Handle(new GetParticipationsQuery
             {
                 CompradorId = usuarioId
-            });
+            }, cancellationToken);
 
             return Ok(resultado);
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<LoginResponse>> Login(LoginRequest request)
+        public async Task<ActionResult<LoginResponse>> Login(LoginRequest request ,CancellationToken cancellationToken)
         {
             var resultado = await _login.Handle(new LoginCommand
             {
                 Email = request.Email,
                 Password = request.Password
-            });
+            }, cancellationToken);
 
             return resultado == null
                 ? Unauthorized(new

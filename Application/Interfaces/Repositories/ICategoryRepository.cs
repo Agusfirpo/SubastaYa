@@ -5,11 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace Application.Interfaces.Repositories
 {
     public interface ICategoryRepository
     {
-        Task<IList<Category>> ObtenerTodasAsync();
-
+        Task<IList<Category>> ObtenerTodasAsync(
+            CancellationToken cancellationToken);
     }
 }

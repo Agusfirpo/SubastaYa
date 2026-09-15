@@ -20,10 +20,10 @@ namespace Application.UseCases.Subasta.Handler
         }
 
         public async Task<IList<ListingResponse>> Handle(
-            GetAuctionsBySellerQuery query)
+            GetAuctionsBySellerQuery query , CancellationToken cancellationToken)
         {
             var subastas = await _subastaRepository
-                .ObtenerPorVendedorIdAsync(query.VendedorId);
+                .ObtenerPorVendedorIdAsync(query.VendedorId,cancellationToken);
 
             return subastas.Select(s =>
             {

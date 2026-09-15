@@ -5,11 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace Application.Interfaces.Repositories
 {
     public interface IAuditRepository
     {
-        Task AgregarAsync(AuditLog auditoria);
-
+        Task AgregarAsync(
+            AuditLog auditoria,
+            CancellationToken cancellationToken);
     }
 }

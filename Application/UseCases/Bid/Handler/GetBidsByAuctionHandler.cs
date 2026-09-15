@@ -18,9 +18,9 @@ namespace Application.UseCases.Puja.Handler
         {
             _pujaRepository = pujaRepository;
         }
-        public async Task<IList<BidResponse>> Handle(GetBidsByAuctionQuery query)
+        public async Task<IList<BidResponse>> Handle(GetBidsByAuctionQuery query , CancellationToken cancellationToken)
         {
-            var pujas = await _pujaRepository.ObtenerPorSubastaIdAsync(query.SubastaId);
+            var pujas = await _pujaRepository.ObtenerPorSubastaIdAsync(query.SubastaId , cancellationToken);
 
             return pujas.Select(BidMapper.ToResponse).ToList();
         }

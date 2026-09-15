@@ -8,8 +8,8 @@ namespace Application.Interfaces.Repositories
 {
     public interface IUnitOfWork
     {
-        Task EjecutarEnTransaccionAsync(Func<Task> accion);
-
-        
+        Task EjecutarEnTransaccionAsync(
+            Func<Task> accion,
+            CancellationToken cancellationToken);
     }
 }

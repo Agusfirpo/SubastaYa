@@ -20,14 +20,14 @@ namespace Application.UseCases.Transaccion.Handler
             _transaccionRepository = transaccionRepository;
         }
 
-        public async Task<IList<TransactionResponse>?> Handle(GetTransactionsQuery query)
+        public async Task<IList<TransactionResponse>?> Handle(GetTransactionsQuery query ,CancellationToken cancellationToken)
         {
-            var billetera = await _billeteraRepository.ObtenerPorUsuarioAsync(query.UsuarioId);
+            var billetera = await _billeteraRepository.ObtenerPorUsuarioAsync(query.UsuarioId ,cancellationToken);
 
             if (billetera == null)
                 return null;
 
-            var transacciones = await _transaccionRepository.ObtenerPorBilleteraIdAsync(billetera.Id);
+            var transacciones = await _transaccionRepository.ObtenerPorBilleteraIdAsync(billetera.Id ,cancellationToken);
 
             return transacciones.Select(TransactionMapper.ToResponse).ToList();
         }

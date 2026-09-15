@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Application.Interfaces.Repositories;
 using Domain.Entities;
 using Infrastructure.Persistence;
@@ -17,8 +12,12 @@ public class UserRepository : IUserRepository
     public UserRepository(AppDbContext context)
         => _context = context;
 
-    public async Task<User?> ObtenerPorEmailAsync(string email) =>
+    public async Task<User?> ObtenerPorEmailAsync(
+        string email,
+        CancellationToken cancellationToken) =>
         await _context.Usuarios
             .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Email == email);
+            .FirstOrDefaultAsync(
+                u => u.Email == email,
+                cancellationToken);
 }

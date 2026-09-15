@@ -41,7 +41,7 @@ namespace Application.UseCases.Puja.Handler
             _notificadorSubasta = notificadorSubasta;
         }
         public async Task<PlaceBidResponse> Handle(
-            PlaceBidCommand command)
+            PlaceBidCommand command , CancellationToken cancellationToken)
         {
             PlaceBidResponse? resultado = null;
 
@@ -50,7 +50,7 @@ namespace Application.UseCases.Puja.Handler
                 var ahora = DateTime.UtcNow;
                 // SUBASTA             
                 var subasta =
-                    await _subastaRepository.ObtenerPorIdParaActualizarAsync(command.SubastaId);
+                    await _subastaRepository.ObtenerPorIdParaActualizarAsync(command.SubastaId ,cancellationToken);
                 if (subasta == null)
                     throw new NotFoundException("La subasta no existe.");
 
@@ -67,7 +67,7 @@ namespace Application.UseCases.Puja.Handler
                     throw new ValidationException("La subasta ya finalizó.");
 
                 //PUJA ACTUAL
-                var pujaAnterior =await _pujaRepository.ObtenerMayorPorSubastaIdAsync(command.SubastaId);
+                var pujaAnterior =await _pujaRepository.ObtenerMayorPorSubastaIdAsync(command.SubastaId ,cancellationToken);
                
                 if (pujaAnterior != null &&
                 pujaAnterior.CompradorId == command.CompradorId)
@@ -90,7 +90,7 @@ namespace Application.UseCases.Puja.Handler
                     throw new ValidationException($"La puja mínima es ${montoMinimo:N2}.");
 
                 // BILLETERA NUEVO POSTOR
-                var billeteraNueva =await _billeteraRepository.ObtenerPorUsuarioAsync(command.CompradorId);
+                var billeteraNueva =await _billeteraRepository.ObtenerPorUsuarioAsync(command.CompradorId ,cancellationToken);
 
                 if (billeteraNueva == null)
                     throw new NotFoundException("El comprador no posee billetera.");
@@ -116,7 +116,7 @@ namespace Application.UseCases.Puja.Handler
                             Monto = diferencia,
                             Fecha = ahora,
                             SubastaId = subasta.Id
-                        });
+                        } ,cancellationToken);
                 }
                 else
                 {
@@ -129,7 +129,7 @@ namespace Application.UseCases.Puja.Handler
                     // Liberar líder anterior
                     if (pujaAnterior != null)
                     {
-                        var billeteraAnterior = await _billeteraRepository.ObtenerPorUsuarioAsync(pujaAnterior.CompradorId);
+                        var billeteraAnterior = await _billeteraRepository.ObtenerPorUsuarioAsync(pujaAnterior.CompradorId ,cancellationToken);
 
                         if (billeteraAnterior != null)
                         {
@@ -145,7 +145,7 @@ namespace Application.UseCases.Puja.Handler
                                     Monto = pujaAnterior.Monto,
                                     Fecha = ahora,
                                     SubastaId = subasta.Id
-                                });
+                                } ,cancellationToken);
                         }
                     }
 
@@ -162,7 +162,7 @@ namespace Application.UseCases.Puja.Handler
                             Monto = command.Monto,
                             Fecha = ahora,
                             SubastaId = subasta.Id
-                        });
+                        }, cancellationToken);
                 }
 
                 // REGISTRAR PUJA
@@ -173,7 +173,7 @@ namespace Application.UseCases.Puja.Handler
                         CompradorId = command.CompradorId,
                         Monto = command.Monto,
                         FechaPuja = ahora
-                    });
+                    } ,cancellationToken);
 
                 // ANTI-SNIPING
                 var tiempoExtendido = false;
@@ -194,7 +194,7 @@ namespace Application.UseCases.Puja.Handler
                             UsuarioId = command.CompradorId,
                             DetalleJson = $"{{\"nuevaFechaFin\":\"{subasta.FechaFin:O}\"}}",
                             Fecha = ahora
-                        });
+                        } ,cancellationToken);
                 }
 
                 // Cada puja modifica la versión de la subasta.
@@ -207,7 +207,7 @@ namespace Application.UseCases.Puja.Handler
                     FechaFin = subasta.FechaFin,
                     TiempoExtendido = tiempoExtendido
                 };
-            });
+            } ,cancellationToken);
 
             await _notificadorSubasta.NotificarNuevaPuja(
                 resultado!.SubastaId,
