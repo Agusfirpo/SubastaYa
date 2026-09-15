@@ -12,8 +12,8 @@ namespace Domain.Entities
         public int UsuarioId { get; set; }
         public decimal SaldoTotal { get; set; }
         public decimal SaldoRetenido { get; set; }
-        public decimal SaldoDisponible => SaldoTotal - SaldoRetenido; 
-        public int Version { get; set; }
+        public decimal SaldoDisponible => SaldoTotal - SaldoRetenido;
+        public byte[] RowVersion { get; set; } = [];
         public User Usuario { get; set; } = null;
         public IList<LedgerTransaction> Transacciones { get; set; } = new List<LedgerTransaction>();
     }

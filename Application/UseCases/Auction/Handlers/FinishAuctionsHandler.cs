@@ -15,12 +15,7 @@ namespace Application.UseCases.Subasta.Handler
         private readonly IAuditRepository _auditoriaRepository;
         private readonly IUnitOfWork _unidadTrabajo;
 
-        public FinishAuctionsHandler(
-            IAuctionRepository subastaRepository,
-            IWalletRepository billeteraRepository,
-            ITransactionRepository transaccionRepository,
-            IAuditRepository auditoriaRepository,
-            IUnitOfWork unidadTrabajo)
+        public FinishAuctionsHandler(IAuctionRepository subastaRepository,IWalletRepository billeteraRepository,ITransactionRepository transaccionRepository,IAuditRepository auditoriaRepository,IUnitOfWork unidadTrabajo)
         {
             _subastaRepository = subastaRepository;
             _billeteraRepository = billeteraRepository;
@@ -48,7 +43,6 @@ namespace Application.UseCases.Subasta.Handler
                 if (!subasta.Pujas.Any())
                 {
                     subasta.Estado = AuctionStatus.Desierta;
-                    subasta.Version++;
 
                     await _auditoriaRepository.AgregarAsync(
                         new AuditLog
@@ -80,19 +74,15 @@ namespace Application.UseCases.Subasta.Handler
 
                 if (billeteraComprador == null ||
                     billeteraVendedor == null)
-                {
-                    throw new NotFoundException(
-                        "No se encontraron las billeteras necesarias para liquidar la subasta.");
+                {                
                     throw new NotFoundException("No se encontraron las billeteras necesarias para liquidar la subasta.");
                 }
 
                 // LIQUIDACIÓN
                 billeteraComprador.SaldoRetenido -= pujaGanadora.Monto;
-                billeteraComprador.SaldoTotal -= pujaGanadora.Monto;
-                billeteraComprador.Version++;
+                billeteraComprador.SaldoTotal -= pujaGanadora.Monto;            
 
                 billeteraVendedor.SaldoTotal += pujaGanadora.Monto;
-                billeteraVendedor.Version++;
 
                 // LEDGER COMPRADOR
                 await _transaccionRepository.AgregarAsync(
@@ -118,7 +108,6 @@ namespace Application.UseCases.Subasta.Handler
 
                 // FINALIZAR SUBASTA
                 subasta.Estado = AuctionStatus.Finalizada;
-                subasta.Version++;
 
                 // AUDITORÍA
                 await _auditoriaRepository.AgregarAsync(
