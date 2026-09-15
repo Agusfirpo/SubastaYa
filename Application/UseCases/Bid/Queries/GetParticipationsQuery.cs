@@ -9,5 +9,6 @@ namespace Application.UseCases.Puja.Queries
     public class GetParticipationsQuery
     {
         public int CompradorId { get; set; }
+
     }
 }

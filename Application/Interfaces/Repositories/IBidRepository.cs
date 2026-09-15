@@ -10,20 +10,13 @@ namespace Application.Interfaces.Repositories
 {
     public interface IBidRepository
     {
-        Task<IList<Bid>> ObtenerPorSubastaIdAsync(
-            int subastaId,
-            CancellationToken cancellationToken);
+        Task<IList<Bid>> ObtenerPorSubastaIdAsync(int subastaId,CancellationToken cancellationToken);
 
-        Task<Bid?> ObtenerMayorPorSubastaIdAsync(
-            int subastaId,
-            CancellationToken cancellationToken);
+        Task<Bid?> ObtenerMayorPorSubastaIdAsync(int subastaId,CancellationToken cancellationToken);
 
-        Task AgregarAsync(
-            Bid puja,
-            CancellationToken cancellationToken);
+        Task AgregarAsync(Bid puja,CancellationToken cancellationToken);
 
-        Task<IList<Bid>> ObtenerPorCompradorIdAsync(
-            int compradorId,
-            CancellationToken cancellationToken);
+        Task<IList<Bid>> ObtenerPorCompradorIdAsync(int compradorId,CancellationToken cancellationToken);
+
     }
 }

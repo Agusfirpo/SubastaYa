@@ -14,18 +14,12 @@ namespace Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task AgregarAsync(
-            LedgerTransaction transaccion,
-            CancellationToken cancellationToken)
+        public async Task AgregarAsync(LedgerTransaction transaccion, CancellationToken cancellationToken)
         {
-            await _context.TransaccionLedgers.AddAsync(
-                transaccion,
-                cancellationToken);
+            await _context.TransaccionLedgers.AddAsync(transaccion, cancellationToken);
         }
 
-        public async Task<IList<LedgerTransaction>> ObtenerPorBilleteraIdAsync(
-            int billeteraId,
-            CancellationToken cancellationToken)
+        public async Task<IList<LedgerTransaction>> ObtenerPorBilleteraIdAsync(int billeteraId, CancellationToken cancellationToken)
         {
             return await _context.TransaccionLedgers
                 .AsNoTracking()

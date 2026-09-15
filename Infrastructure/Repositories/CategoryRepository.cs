@@ -13,12 +13,9 @@ namespace Infrastructure.Repositories
         {
             _context = context;
         }
-
-        public async Task<IList<Category>> ObtenerTodasAsync(
-            CancellationToken cancellationToken)
+        public async Task<IList<Category>> ObtenerTodasAsync(CancellationToken cancellationToken)
         {
-            return await _context.Categorias
-                .ToArrayAsync(cancellationToken);
+            return await _context.Categorias.ToArrayAsync(cancellationToken);
         }
     }
 }

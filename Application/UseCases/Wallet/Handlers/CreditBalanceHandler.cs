@@ -1,5 +1,6 @@
 using Application.DTOs.Response;
 using Application.Interfaces.Repositories;
+using Application.Mappers;
 using Application.UseCases.Billetera.Command;
 using Domain.Entities;
 using Domain.Enums;
@@ -22,54 +23,56 @@ namespace Application.UseCases.Billetera.Handler
             _unidadTrabajo = unidadTrabajo;
         }
 
-        public async Task<WalletResponse> Handle(CreditBalanceCommand command , CancellationToken cancellationToken)
+        public async Task<WalletResponse> Handle(CreditBalanceCommand command,CancellationToken cancellationToken)
         {
             if (command.Monto <= 0)
+            {
                 throw new ValidationException("El monto a acreditar debe ser mayor a cero.");
+            }
 
             WalletResponse? resultado = null;
 
-            await _unidadTrabajo.EjecutarEnTransaccionAsync(async () =>
-            {
-                var billetera = await _billeteraRepository.ObtenerPorUsuarioAsync(command.UsuarioId , cancellationToken);
-
-                if (billetera == null)
-                    throw new NotFoundException("No se encontró la billetera del usuario.");
-
-                billetera.SaldoTotal += command.Monto;
-                billetera.Version++;
-
-                var ahora = DateTime.UtcNow;
-
-                await _transaccionRepository.AgregarAsync(new LedgerTransaction
-                    {
-                        BilleteraId = billetera.Id,
-                        Tipo = TransactionType.Deposito,
-                        Monto = command.Monto,
-                        Fecha = ahora,
-                        SubastaId = null
-                    } , cancellationToken);
-
-                await _auditoriaRepository.AgregarAsync(new AuditLog
-                    {
-                        Entidad = "Billetera",
-                        EntidadId = billetera.Id,
-                        Accion = "ACREDITACION_SALDO",
-                        UsuarioId = command.UsuarioId,
-                        DetalleJson =
-                            $"{{\"monto\":{command.Monto}}}",
-                        Fecha = ahora
-                    } , cancellationToken);
-
-                resultado = new WalletResponse
+            await _unidadTrabajo.EjecutarEnTransaccionAsync(
+                async () =>
                 {
-                    Id = billetera.Id,
-                    UsuarioId = billetera.UsuarioId,
-                    SaldoTotal = billetera.SaldoTotal,
-                    SaldoRetenido = billetera.SaldoRetenido,
-                    SaldoDisponible = billetera.SaldoDisponible
-                };
-            }, cancellationToken);
+                    var billetera = await _billeteraRepository.ObtenerPorUsuarioAsync(command.UsuarioId, cancellationToken);
+
+                    if (billetera == null)
+                    {
+                        throw new NotFoundException("No se encontró la billetera del usuario.");
+                    }
+
+                    billetera.SaldoTotal += command.Monto;
+
+                    var ahora = DateTime.UtcNow;
+
+                    await _transaccionRepository.AgregarAsync(
+                        new LedgerTransaction
+                        {
+                            BilleteraId = billetera.Id,
+                            Tipo = TransactionType.Deposito,
+                            Monto = command.Monto,
+                            Fecha = ahora,
+                            SubastaId = null
+                        },
+                        cancellationToken);
+
+                    await _auditoriaRepository.AgregarAsync(
+                        new AuditLog
+                        {
+                            Entidad = "Billetera",
+                            EntidadId = billetera.Id,
+                            Accion = "ACREDITACION_SALDO",
+                            UsuarioId = command.UsuarioId,
+                            DetalleJson =
+                                $"{{\"monto\":{command.Monto}}}",
+                            Fecha = ahora
+                        },
+                        cancellationToken);
+
+                    resultado = WalletMapper.ToResponse(billetera);
+                },
+                cancellationToken);
 
             return resultado!;
         }

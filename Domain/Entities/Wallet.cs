@@ -16,5 +16,6 @@ namespace Domain.Entities
         public byte[] RowVersion { get; set; } = [];
         public User Usuario { get; set; } = null;
         public IList<LedgerTransaction> Transacciones { get; set; } = new List<LedgerTransaction>();
+
     }
 }

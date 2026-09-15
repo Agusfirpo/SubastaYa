@@ -18,6 +18,5 @@ namespace Domain.Entities
         public IList<Bid> Pujas { get; set; }= new List<Bid>();
         public IList <AuditLog> AuditoriaLogs { get; set; }= new List<AuditLog>();
 
-
     }
 }

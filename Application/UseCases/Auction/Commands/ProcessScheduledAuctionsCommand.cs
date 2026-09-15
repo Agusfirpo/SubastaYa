@@ -9,5 +9,6 @@ namespace Application.UseCases.Subasta.Command
     public class ProcessScheduledAuctionsCommand
     {
         public DateTime FechaActual { get; set; }
+
     }
 }

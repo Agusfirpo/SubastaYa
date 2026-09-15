@@ -23,14 +23,8 @@ namespace Application.UseCases.Puja.Handler
         private readonly IAuditRepository _auditoriaRepository;
         private readonly IUnitOfWork _unidadTrabajo;
         private readonly IAuctionNotifier _notificadorSubasta;
-        public PlaceBidHandler(
-            IAuctionRepository subastaRepository,
-            IBidRepository pujaRepository,
-            IWalletRepository billeteraRepository,
-            ITransactionRepository transaccionRepository,
-            IAuditRepository auditoriaRepository,
-            IUnitOfWork unidadTrabajo,
-            IAuctionNotifier notificadorSubasta)
+
+        public PlaceBidHandler(IAuctionRepository subastaRepository,IBidRepository pujaRepository,IWalletRepository billeteraRepository,ITransactionRepository transaccionRepository,IAuditRepository auditoriaRepository,IUnitOfWork unidadTrabajo,IAuctionNotifier notificadorSubasta)
         {
             _subastaRepository = subastaRepository;
             _pujaRepository = pujaRepository;
@@ -40,102 +34,83 @@ namespace Application.UseCases.Puja.Handler
             _unidadTrabajo = unidadTrabajo;
             _notificadorSubasta = notificadorSubasta;
         }
-        public async Task<PlaceBidResponse> Handle(
-            PlaceBidCommand command , CancellationToken cancellationToken)
+
+        public async Task<PlaceBidResponse> Handle(PlaceBidCommand command,CancellationToken cancellationToken)
         {
             PlaceBidResponse? resultado = null;
 
-            await _unidadTrabajo.EjecutarEnTransaccionAsync(async () =>
-            {
-                var ahora = DateTime.UtcNow;
-                // SUBASTA             
-                var subasta =
-                    await _subastaRepository.ObtenerPorIdParaActualizarAsync(command.SubastaId ,cancellationToken);
-                if (subasta == null)
-                    throw new NotFoundException("La subasta no existe.");
-
-                if (subasta.VendedorId == command.CompradorId)
-                    throw new ValidationException("No podés pujar en una subasta creada por vos.");
-
-                if (subasta.Estado != AuctionStatus.Activa)
-                    throw new ValidationException("La subasta no está activa.");
-
-                if (ahora < subasta.FechaInicio)
-                    throw new ValidationException("La subasta todavía no comenzó.");
-
-                if (ahora >= subasta.FechaFin)
-                    throw new ValidationException("La subasta ya finalizó.");
-
-                //PUJA ACTUAL
-                var pujaAnterior =await _pujaRepository.ObtenerMayorPorSubastaIdAsync(command.SubastaId ,cancellationToken);
-               
-                if (pujaAnterior != null &&
-                pujaAnterior.CompradorId == command.CompradorId)
+            await _unidadTrabajo.EjecutarEnTransaccionAsync(
+                async () =>
                 {
-                   throw new ValidationException("Debés esperar a que otro usuario realice una puja antes de volver a ofertar.");
-                
-                }
-                decimal montoMinimo;
+                    var ahora = DateTime.UtcNow;
 
-                if (pujaAnterior == null)
-                {
-                    montoMinimo = subasta.PrecioBase;
-                }
-                else
-                {
-                    montoMinimo =pujaAnterior.Monto + subasta.IncrementoMinimo;
-                }
+                    // SUBASTA
+                    var subasta = await _subastaRepository.ObtenerPorIdParaActualizarAsync(command.SubastaId,cancellationToken);
 
-                if (command.Monto < montoMinimo)
-                    throw new ValidationException($"La puja mínima es ${montoMinimo:N2}.");
+                    if (subasta == null)
+                        throw new NotFoundException("La subasta no existe.");
 
-                // BILLETERA NUEVO POSTOR
-                var billeteraNueva =await _billeteraRepository.ObtenerPorUsuarioAsync(command.CompradorId ,cancellationToken);
-
-                if (billeteraNueva == null)
-                    throw new NotFoundException("El comprador no posee billetera.");
-
-                // SI EL MISMO LÍDER VUELVE A OFERTAR
-                if (pujaAnterior != null && pujaAnterior.CompradorId == command.CompradorId)
-                {
-                    var diferencia = command.Monto - pujaAnterior.Monto;
-
-                    if (billeteraNueva.SaldoDisponible < diferencia)
+                    if (subasta.VendedorId == command.CompradorId)
                     {
-                        throw new ValidationException("Saldo insuficiente.");
+                        throw new ValidationException("No podés pujar en una subasta creada por vos.");
                     }
 
-                    billeteraNueva.SaldoRetenido += diferencia;
-                    billeteraNueva.Version++;
+                    if (subasta.Estado != AuctionStatus.Activa)
+                    {
+                        throw new ValidationException("La subasta no está activa.");
+                    }
 
-                    await _transaccionRepository.AgregarAsync(
-                        new LedgerTransaction
-                        {
-                            BilleteraId = billeteraNueva.Id,
-                            Tipo = TransactionType.Retencion,
-                            Monto = diferencia,
-                            Fecha = ahora,
-                            SubastaId = subasta.Id
-                        } ,cancellationToken);
-                }
-                else
-                {
-                    // NUEVO LÍDER
+                    if (ahora < subasta.FechaInicio)
+                    {
+                        throw new ValidationException("La subasta todavía no comenzó.");
+                    }
+
+                    if (ahora >= subasta.FechaFin)
+                    {
+                        throw new ValidationException("La subasta ya finalizó.");
+                    }
+
+                    // PUJA ACTUAL
+                    var pujaAnterior =await _pujaRepository.ObtenerMayorPorSubastaIdAsync(command.SubastaId,cancellationToken);
+
+                    // El líder actual no puede volver a ofertar
+                    if (pujaAnterior != null &&pujaAnterior.CompradorId == command.CompradorId)
+                    {
+                        throw new ValidationException("Debés esperar a que otro usuario realice una puja antes de volver a ofertar.");
+                    }
+
+                    // MONTO MÍNIMO
+                    var montoMinimo = pujaAnterior == null
+                            ? subasta.PrecioBase
+                            : pujaAnterior.Monto +
+                              subasta.IncrementoMinimo;
+
+                    if (command.Monto < montoMinimo)
+                    {
+                        throw new ValidationException($"La puja mínima es ${montoMinimo:N2}.");
+                    }
+
+                    // BILLETERA DEL NUEVO POSTOR
+                    var billeteraNueva =await _billeteraRepository.ObtenerPorUsuarioAsync(command.CompradorId,cancellationToken);
+
+                    if (billeteraNueva == null)
+                    {
+                        throw new NotFoundException("El comprador no posee billetera.");
+                    }
+
                     if (billeteraNueva.SaldoDisponible < command.Monto)
                     {
                         throw new ValidationException("Saldo insuficiente.");
                     }
 
-                    // Liberar líder anterior
+                    // LIBERAR SALDO DEL LÍDER ANTERIOR
                     if (pujaAnterior != null)
                     {
-                        var billeteraAnterior = await _billeteraRepository.ObtenerPorUsuarioAsync(pujaAnterior.CompradorId ,cancellationToken);
+                        var billeteraAnterior = await _billeteraRepository.ObtenerPorUsuarioAsync(pujaAnterior.CompradorId,cancellationToken);
 
                         if (billeteraAnterior != null)
                         {
                             billeteraAnterior.SaldoRetenido -= pujaAnterior.Monto;
-
-                            billeteraAnterior.Version++;
 
                             await _transaccionRepository.AgregarAsync(
                                 new LedgerTransaction
@@ -145,14 +120,13 @@ namespace Application.UseCases.Puja.Handler
                                     Monto = pujaAnterior.Monto,
                                     Fecha = ahora,
                                     SubastaId = subasta.Id
-                                } ,cancellationToken);
+                                },
+                                cancellationToken);
                         }
                     }
 
-                    // Retener al nuevo líder
+                    // RETENER SALDO DEL NUEVO LÍDER
                     billeteraNueva.SaldoRetenido += command.Monto;
-
-                    billeteraNueva.Version++;
 
                     await _transaccionRepository.AgregarAsync(
                         new LedgerTransaction
@@ -162,61 +136,69 @@ namespace Application.UseCases.Puja.Handler
                             Monto = command.Monto,
                             Fecha = ahora,
                             SubastaId = subasta.Id
-                        }, cancellationToken);
-                }
+                        },
+                        cancellationToken);
 
-                // REGISTRAR PUJA
-                await _pujaRepository.AgregarAsync(
-                    new Domain.Entities.Bid
+                    // REGISTRAR PUJA
+                    await _pujaRepository.AgregarAsync(
+                        new Bid
+                        {
+                            SubastaId = subasta.Id,
+                            CompradorId = command.CompradorId,
+                            Monto = command.Monto,
+                            FechaPuja = ahora
+                        },
+                        cancellationToken);
+
+                    // ANTI-SNIPING
+                    var tiempoExtendido = false;
+                    var tiempoRestante = subasta.FechaFin - ahora;
+
+                    if (tiempoRestante <=
+                        TimeSpan.FromSeconds(60))
+                    {
+                        subasta.FechaFin = subasta.FechaFin.AddMinutes(2);
+
+                        tiempoExtendido = true;
+
+                        await _auditoriaRepository.AgregarAsync(
+                            new AuditLog
+                            {
+                                Entidad = "Subasta",
+                                EntidadId = subasta.Id,
+                                Accion = "EXTENSION_ANTI_SNIPING",
+                                UsuarioId = command.CompradorId,
+                                DetalleJson =
+                                    $"{{\"nuevaFechaFin\":\"{subasta.FechaFin:O}\"}}",
+                                Fecha = ahora
+                            },
+                            cancellationToken);
+                    }
+
+                    // NO se incrementa Version manualmente.
+                    // RowVersion es manejado automáticamente
+                    // por SQL Server / Entity Framework Core.
+
+                    resultado = new PlaceBidResponse
                     {
                         SubastaId = subasta.Id,
-                        CompradorId = command.CompradorId,
                         Monto = command.Monto,
-                        FechaPuja = ahora
-                    } ,cancellationToken);
-
-                // ANTI-SNIPING
-                var tiempoExtendido = false;
-                var tiempoRestante = subasta.FechaFin - ahora;
-
-                if (tiempoRestante <= TimeSpan.FromSeconds(60))
-                {
-
-                    subasta.FechaFin = subasta.FechaFin.AddMinutes(2);
-                    tiempoExtendido = true;
-
-                    await _auditoriaRepository.AgregarAsync(
-                        new AuditLog
-                        {
-                            Entidad = "Subasta",
-                            EntidadId = subasta.Id,
-                            Accion = "EXTENSION_ANTI_SNIPING",
-                            UsuarioId = command.CompradorId,
-                            DetalleJson = $"{{\"nuevaFechaFin\":\"{subasta.FechaFin:O}\"}}",
-                            Fecha = ahora
-                        } ,cancellationToken);
-                }
-
-                // Cada puja modifica la versión de la subasta.
-                subasta.Version++;
-                resultado = new PlaceBidResponse
-                {
-                    SubastaId = subasta.Id,
-                    Monto = command.Monto,
-                    SaldoDisponible = billeteraNueva.SaldoDisponible,
-                    FechaFin = subasta.FechaFin,
-                    TiempoExtendido = tiempoExtendido
-                };
-            } ,cancellationToken);
+                        SaldoDisponible = billeteraNueva.SaldoDisponible,
+                        FechaFin = subasta.FechaFin,
+                        TiempoExtendido = tiempoExtendido
+                    };
+                },
+                cancellationToken);
 
             await _notificadorSubasta.NotificarNuevaPuja(
                 resultado!.SubastaId,
                 resultado.Monto,
                 command.CompradorId,
                 resultado.FechaFin,
-                resultado.TiempoExtendido);
+                resultado.TiempoExtendido,
+                cancellationToken);
 
-            return resultado!;
+            return resultado;
         }
     }
 }

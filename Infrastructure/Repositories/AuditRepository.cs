@@ -13,13 +13,9 @@ namespace Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task AgregarAsync(
-            AuditLog auditoria,
-            CancellationToken cancellationToken)
+        public async Task AgregarAsync(AuditLog auditoria,CancellationToken cancellationToken)
         {
-            await _context.AuditoriaLogs.AddAsync(
-                auditoria,
-                cancellationToken);
+            await _context.AuditoriaLogs.AddAsync(auditoria,cancellationToken);
         }
     }
 }

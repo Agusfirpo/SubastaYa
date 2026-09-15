@@ -14,7 +14,6 @@ namespace Api_SubastaYa.Controllers
         private readonly GetAuctionsHandler _listar;
         private readonly CreateAuctionHandler _crear;
         private readonly GetAuctionByIdHandler _obtener;
-
         public AuctionsController(GetAuctionsHandler listar, CreateAuctionHandler crear,GetAuctionByIdHandler obtener)
         {
             _listar = listar;
@@ -50,9 +49,7 @@ namespace Api_SubastaYa.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<CreateAuctionResponse>> Crear(
-        CreateAuctionRequest request,
-        CancellationToken cancellationToken)
+        public async Task<ActionResult<CreateAuctionResponse>> Crear(CreateAuctionRequest request, CancellationToken cancellationToken)
         {
             var resultado = await _crear.Handle(new CrearSubastaCommand
             {
@@ -71,13 +68,9 @@ namespace Api_SubastaYa.Controllers
         }
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<AuctionDetailResponse>> ObtenerPorId(
-       int id,
-       CancellationToken cancellationToken)
+        public async Task<ActionResult<AuctionDetailResponse>> ObtenerPorId(int id, CancellationToken cancellationToken)
         {
-            var resultado = await _obtener.Handle(
-                new GetAuctionByIdQuery { Id = id },
-                cancellationToken);
+            var resultado = await _obtener.Handle(new GetAuctionByIdQuery { Id = id },cancellationToken);
 
             return Ok(resultado);
         }

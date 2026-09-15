@@ -10,8 +10,7 @@ namespace Application.Interfaces.Repositories
 {
     public interface IAuditRepository
     {
-        Task AgregarAsync(
-            AuditLog auditoria,
-            CancellationToken cancellationToken);
+        Task AgregarAsync(AuditLog auditoria,CancellationToken cancellationToken);
+
     }
 }

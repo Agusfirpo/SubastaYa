@@ -8,5 +8,6 @@ namespace Application.UseCases.Subasta.Queries
     public class GetAuctionsBySellerQuery
     {
         public int VendedorId { get; set; }
+
     }
 }

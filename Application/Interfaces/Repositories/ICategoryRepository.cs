@@ -10,7 +10,7 @@ namespace Application.Interfaces.Repositories
 {
     public interface ICategoryRepository
     {
-        Task<IList<Category>> ObtenerTodasAsync(
-            CancellationToken cancellationToken);
+        Task<IList<Category>> ObtenerTodasAsync(CancellationToken cancellationToken);
+
     }
 }

@@ -10,8 +10,7 @@ namespace Application.UseCases.Billetera.Handler
     {
         private readonly IWalletRepository _billeteraRepository;
 
-        public GetWalletHandler(
-            IWalletRepository billeteraRepository)
+        public GetWalletHandler(IWalletRepository billeteraRepository)
         {
             _billeteraRepository = billeteraRepository;
         }

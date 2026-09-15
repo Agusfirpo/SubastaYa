@@ -12,12 +12,6 @@ public class UserRepository : IUserRepository
     public UserRepository(AppDbContext context)
         => _context = context;
 
-    public async Task<User?> ObtenerPorEmailAsync(
-        string email,
-        CancellationToken cancellationToken) =>
-        await _context.Usuarios
-            .AsNoTracking()
-            .FirstOrDefaultAsync(
-                u => u.Email == email,
-                cancellationToken);
+    public async Task<User?> ObtenerPorEmailAsync(string email, CancellationToken cancellationToken) =>
+        await _context.Usuarios.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email,cancellationToken);
 }

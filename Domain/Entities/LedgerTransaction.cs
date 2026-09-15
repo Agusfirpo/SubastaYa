@@ -17,5 +17,6 @@ namespace Domain.Entities
         public DateTime Fecha { get; set; } 
         public Wallet Billetera { get; set; } 
         public Auction? Subasta { get; set; }
+
     }
 }

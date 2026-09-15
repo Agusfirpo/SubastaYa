@@ -9,28 +9,15 @@ namespace Application.Interfaces.Repositories
 {
     public interface IAuctionRepository
     {
-        Task<IList<Auction>> ObtenerTodasAsync(
-            CancellationToken cancellationToken);
+        Task<IList<Auction>> ObtenerTodasAsync(CancellationToken cancellationToken);
 
-        Task<Auction?> ObtenerPorIdAsync(
-            int id,
-            CancellationToken cancellationToken);
+        Task<Auction?> ObtenerPorIdAsync(int id,CancellationToken cancellationToken);
+        Task AgregarAsync(Auction subasta,CancellationToken cancellationToken);
+        Task<IList<Auction>> ObtenerPorVendedorIdAsync(int vendedorId,CancellationToken cancellationToken);
 
-        Task AgregarAsync(
-            Auction subasta,
-            CancellationToken cancellationToken);
+        Task<Auction?> ObtenerPorIdParaActualizarAsync(int id,CancellationToken cancellationToken);
 
-        Task<IList<Auction>> ObtenerPorVendedorIdAsync(
-            int vendedorId,
-            CancellationToken cancellationToken);
-
-        Task<Auction?> ObtenerPorIdParaActualizarAsync(
-            int id,
-            CancellationToken cancellationToken);
-
-        Task<IList<Auction>> ObtenerVencidasParaActualizarAsync(
-            DateTime fechaActual,
-            CancellationToken cancellationToken);
+        Task<IList<Auction>> ObtenerVencidasParaActualizarAsync(DateTime fechaActual,CancellationToken cancellationToken);
 
         Task<(IList<Auction> Items, int TotalItems)> ObtenerTodasAsync(
             string? estado,
@@ -43,8 +30,7 @@ namespace Application.Interfaces.Repositories
             string? busqueda,
             CancellationToken cancellationToken);
 
-        Task<IList<Auction>> ObtenerProgramadasParaProcesarAsync(
-            DateTime ahora,
-            CancellationToken cancellationToken);
+        Task<IList<Auction>> ObtenerProgramadasParaProcesarAsync(DateTime ahora,CancellationToken cancellationToken);
+
     }
 }

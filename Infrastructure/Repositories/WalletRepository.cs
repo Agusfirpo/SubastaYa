@@ -14,14 +14,9 @@ namespace Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<Wallet?> ObtenerPorUsuarioAsync(
-            int usuarioId,
-            CancellationToken cancellationToken)
+        public async Task<Wallet?> ObtenerPorUsuarioAsync(int usuarioId, CancellationToken cancellationToken)
         {
-            return await _context.Billeteras
-                .FirstOrDefaultAsync(
-                    b => b.Id == usuarioId,
-                    cancellationToken);
+            return await _context.Billeteras.FirstOrDefaultAsync(b => b.Id == usuarioId,cancellationToken);
         }
     }
 }

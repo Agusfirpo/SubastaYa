@@ -8,13 +8,10 @@ namespace Application.DTOs.Response
     public class PlaceBidResponse
     {
         public int SubastaId { get; set; }
-
         public decimal Monto { get; set; }
-
         public decimal SaldoDisponible { get; set; }
-
         public DateTime FechaFin { get; set; }
-
         public bool TiempoExtendido { get; set; }
+
     }
 }

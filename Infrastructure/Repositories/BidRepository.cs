@@ -14,9 +14,7 @@ namespace Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<IList<Bid>> ObtenerPorSubastaIdAsync(
-            int subastaId,
-            CancellationToken cancellationToken)
+        public async Task<IList<Bid>> ObtenerPorSubastaIdAsync(int subastaId, CancellationToken cancellationToken)
         {
             return await _context.Pujas
                 .AsNoTracking()
@@ -25,9 +23,7 @@ namespace Infrastructure.Repositories
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<Bid?> ObtenerMayorPorSubastaIdAsync(
-            int subastaId,
-            CancellationToken cancellationToken)
+        public async Task<Bid?> ObtenerMayorPorSubastaIdAsync(int subastaId,CancellationToken cancellationToken)
         {
             return await _context.Pujas
                 .AsNoTracking()
@@ -36,18 +32,12 @@ namespace Infrastructure.Repositories
                 .FirstOrDefaultAsync(cancellationToken);
         }
 
-        public async Task AgregarAsync(
-            Bid puja,
-            CancellationToken cancellationToken)
+        public async Task AgregarAsync(Bid puja,CancellationToken cancellationToken)
         {
-            await _context.Pujas.AddAsync(
-                puja,
-                cancellationToken);
+            await _context.Pujas.AddAsync(puja,cancellationToken);
         }
 
-        public async Task<IList<Bid>> ObtenerPorCompradorIdAsync(
-            int compradorId,
-            CancellationToken cancellationToken)
+        public async Task<IList<Bid>> ObtenerPorCompradorIdAsync(int compradorId,CancellationToken cancellationToken)
         {
             return await _context.Pujas
                 .Include(p => p.Subasta)

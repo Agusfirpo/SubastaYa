@@ -18,5 +18,6 @@ namespace Application.UseCases.Subasta.Command
         public decimal IncrementoMinimo { get; set; }
         public DateTime FechaInicio { get; set; }
         public DateTime FechaFin { get; set; }
+
     }
 }

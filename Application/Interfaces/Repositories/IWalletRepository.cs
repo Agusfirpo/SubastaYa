@@ -10,8 +10,7 @@ namespace Application.Interfaces.Repositories
 {
     public interface IWalletRepository
     {
-        Task<Wallet?> ObtenerPorUsuarioAsync(
-            int usuarioId,
-            CancellationToken cancellationToken);
+        Task<Wallet?> ObtenerPorUsuarioAsync(int usuarioId,CancellationToken cancellationToken);
+
     }
 }

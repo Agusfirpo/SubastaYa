@@ -8,7 +8,7 @@ namespace Application.DTOs.Request
     public class PlaceBidRequest
     {
         public int CompradorId { get; set; }
-
         public decimal Monto { get; set; }
+
     }
 }

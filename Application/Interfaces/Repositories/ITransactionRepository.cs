@@ -10,12 +10,9 @@ namespace Application.Interfaces.Repositories
 {
     public interface ITransactionRepository
     {
-        Task AgregarAsync(
-            LedgerTransaction transaccion,
-            CancellationToken cancellationToken);
+        Task AgregarAsync(LedgerTransaction transaccion,CancellationToken cancellationToken);
 
-        Task<IList<LedgerTransaction>> ObtenerPorBilleteraIdAsync(
-            int billeteraId,
-            CancellationToken cancellationToken);
+        Task<IList<LedgerTransaction>> ObtenerPorBilleteraIdAsync(int billeteraId,CancellationToken cancellationToken);
+
     }
 }

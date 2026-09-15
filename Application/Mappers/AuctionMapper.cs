@@ -55,7 +55,6 @@ namespace Application.Mappers
                 Estado = subasta.Estado.ToString()
             };
         }
-
         public static ListingResponse ToPublicacionResponse(Auction subasta)
         {
             var tienePujas = subasta.Pujas.Any();

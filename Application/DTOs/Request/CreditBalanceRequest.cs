@@ -9,5 +9,6 @@ namespace Application.DTOs.Request
     public class CreditBalanceRequest
     {
         public decimal Monto { get; set; }
+
     }
 }

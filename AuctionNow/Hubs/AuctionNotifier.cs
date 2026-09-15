@@ -12,7 +12,7 @@ namespace Api_SubastaYa.Hubs
             _hubContext = hubContext;
         }
 
-        public async Task NotificarNuevaPuja(int subastaId,decimal monto,int compradorId,DateTime fechaFin,bool tiempoExtendido)
+        public async Task NotificarNuevaPuja(int subastaId,decimal monto,int compradorId,DateTime fechaFin,bool tiempoExtendido, CancellationToken cancellationToken)
         {
             await _hubContext.Clients.Group($"subasta-{subastaId}").SendAsync("NuevaPuja",
                 new
@@ -21,7 +21,8 @@ namespace Api_SubastaYa.Hubs
                         monto,
                         compradorId,
                         fechaFin,
-                        tiempoExtendido
+                        tiempoExtendido,
+                        cancellationToken
                     });
         }
     }

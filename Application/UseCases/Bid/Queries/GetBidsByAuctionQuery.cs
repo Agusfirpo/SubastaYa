@@ -9,5 +9,6 @@ namespace Application.UseCases.Puja.Queries
     public class GetBidsByAuctionQuery
     {
         public int SubastaId { get; set; }
+
     }
 }

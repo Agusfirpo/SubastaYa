@@ -15,5 +15,6 @@ namespace Domain.Entities
         public DateTime FechaPuja { get; set; }
         public Auction Subasta { get; set; } = null!;
         public User Comprador { get; set; } = null!;
+
     }
 }

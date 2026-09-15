@@ -11,5 +11,6 @@ namespace Application.UseCases.Billetera.Command
         public int UsuarioId { get; set; }
 
         public decimal Monto { get; set; }
+
     }
 }

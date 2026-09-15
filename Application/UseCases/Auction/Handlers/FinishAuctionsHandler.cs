@@ -60,17 +60,11 @@ namespace Application.UseCases.Subasta.Handler
                 }
 
                 // DETERMINAR GANADOR
-                var pujaGanadora = subasta.Pujas
-                    .OrderByDescending(p => p.Monto)
-                    .First();
+                var pujaGanadora = subasta.Pujas.OrderByDescending(p => p.Monto).First();
 
-                var billeteraComprador =
-                    await _billeteraRepository.ObtenerPorUsuarioAsync(
-                        pujaGanadora.CompradorId ,cancellationToken);
+                var billeteraComprador =await _billeteraRepository.ObtenerPorUsuarioAsync(pujaGanadora.CompradorId ,cancellationToken);
 
-                var billeteraVendedor =
-                    await _billeteraRepository.ObtenerPorUsuarioAsync(
-                        subasta.VendedorId ,cancellationToken);
+                var billeteraVendedor =await _billeteraRepository.ObtenerPorUsuarioAsync(subasta.VendedorId ,cancellationToken);
 
                 if (billeteraComprador == null ||
                     billeteraVendedor == null)

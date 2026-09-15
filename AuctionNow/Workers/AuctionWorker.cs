@@ -12,18 +12,15 @@ namespace Api_SubastaYa.Workers
             _scopeFactory = scopeFactory;
         }
 
-        protected override async Task ExecuteAsync(
-            CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
             {
                 using var scope = _scopeFactory.CreateScope();
 
-                var programadas = scope.ServiceProvider
-                    .GetRequiredService<ProcessScheduledAuctionsHandler>();
+                var programadas = scope.ServiceProvider.GetRequiredService<ProcessScheduledAuctionsHandler>();
 
-                var finalizar = scope.ServiceProvider
-                    .GetRequiredService<FinishAuctionsHandler>();
+                var finalizar = scope.ServiceProvider.GetRequiredService<FinishAuctionsHandler>();
 
                 try
                 {
@@ -43,13 +40,10 @@ namespace Api_SubastaYa.Workers
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(
-                        $"Error procesando subastas: {ex.Message}");
+                    Console.WriteLine($"Error procesando subastas: {ex.Message}");
                 }
 
-                await Task.Delay(
-                    TimeSpan.FromSeconds(1),
-                    stoppingToken);
+                await Task.Delay(TimeSpan.FromSeconds(1),stoppingToken);
             }
         }
     }

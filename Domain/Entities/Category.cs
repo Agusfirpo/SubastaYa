@@ -12,5 +12,6 @@ namespace Domain.Entities
         public string Nombre { get; set; }
         public string? UrlIcono { get; set; }
         public IList<Auction> Subastas { get; set; } = new List<Auction>(); 
+
     }
 }
