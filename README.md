@@ -1,8 +1,6 @@
 # 🔨 AuctionNow - Plataforma de Subastas en Tiempo Real
 
-AuctionNow es una aplicación web de subastas desarrollada para la materia **Proyecto de Software**.
-
-El sistema permite crear subastas, realizar pujas, administrar una billetera virtual, aplicar reglas de anti-sniping y actualizar la sala de subasta en tiempo real.
+AuctionNow es una aplicación web de subastas que permite crear subastas, realizar pujas, administrar una billetera virtual, aplicar reglas de anti-sniping y actualizar la sala de subasta en tiempo real.
 
 ---
 
@@ -13,7 +11,7 @@ El sistema permite crear subastas, realizar pujas, administrar una billetera vir
 - ASP.NET Core Web API
 - Entity Framework Core
 - SQL Server
-- Clean Architecture / Arquitectura Hexagonal
+- Clean Architecture 
 - Repository Pattern
 - Unit of Work
 - DTOs y Mappers
@@ -26,8 +24,6 @@ El sistema permite crear subastas, realizar pujas, administrar una billetera vir
 - MudBlazor
 - Consumo de API REST
 - SignalR para actualizaciones en tiempo real
-
-El Frontend se encuentra desacoplado del Backend.
 
 ---
 
@@ -53,6 +49,13 @@ AuctionNow
 1. Configurar Base de Datos
 
 Verificar la cadena de conexión en appsettings.json.
+
+Ejemplo:
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=TU_SERVIDOR;Database=AuctionNowDb;Trusted_Connection=True;TrustServerCertificate=True;"
+  }
+}
 
 2. Ejecutar Migraciones
 
@@ -131,7 +134,6 @@ Temporizador de la subasta
 ✅ Conceptos Técnicos Implementados
 
 Clean Architecture
-Arquitectura Hexagonal
 Entity Framework Core
 Code First
 Transacciones
@@ -144,7 +146,6 @@ Background Worker
 DTOs
 Mappers
 Manejo de errores HTTP
-Frontend desacoplado
 
 👥 Integrantes
 Agustín Firpo
