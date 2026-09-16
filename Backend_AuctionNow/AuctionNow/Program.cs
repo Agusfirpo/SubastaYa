@@ -94,7 +94,6 @@ app.UseAuthorization();
 
 // 4. Endpoints y Hubs
 app.MapControllers();
-app.MapHub<AuctionHub>("/hubs/auctionHub");
 app.MapHub<AuctionHub>("/hubs/subastas");
 
 app.Run();

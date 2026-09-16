@@ -178,7 +178,7 @@ namespace Application.UseCases.Puja.Handler
                     // NO se incrementa Version manualmente.
                     // RowVersion es manejado automáticamente
                     // por SQL Server / Entity Framework Core.
-
+                    subasta.FechaFin = subasta.FechaFin.AddTicks(1);
                     resultado = new PlaceBidResponse
                     {
                         SubastaId = subasta.Id,

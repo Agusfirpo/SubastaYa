@@ -7,23 +7,33 @@ namespace Api_SubastaYa.Hubs
     {
         private readonly IHubContext<AuctionHub> _hubContext;
 
-        public AuctionNotifier(IHubContext<AuctionHub> hubContext)
+        public AuctionNotifier(
+            IHubContext<AuctionHub> hubContext)
         {
             _hubContext = hubContext;
         }
 
-        public async Task NotificarNuevaPuja(int subastaId,decimal monto,int compradorId,DateTime fechaFin,bool tiempoExtendido, CancellationToken cancellationToken)
+        public async Task NotificarNuevaPuja(
+            int subastaId,
+            decimal monto,
+            int compradorId,
+            DateTime fechaFin,
+            bool tiempoExtendido,
+            CancellationToken cancellationToken)
         {
-            await _hubContext.Clients.Group($"subasta-{subastaId}").SendAsync("NuevaPuja",
-                new
+            await _hubContext.Clients
+                .Group($"subasta-{subastaId}")
+                .SendAsync(
+                    "NuevaPuja",
+                    new
                     {
                         subastaId,
                         monto,
                         compradorId,
                         fechaFin,
-                        tiempoExtendido,
-                        cancellationToken
-                    });
+                        tiempoExtendido
+                    },
+                    cancellationToken);
         }
     }
 }

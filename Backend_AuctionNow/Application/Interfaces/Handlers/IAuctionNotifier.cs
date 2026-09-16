@@ -8,7 +8,7 @@ namespace Application.Interfaces.Handlers
 {
     public interface IAuctionNotifier
     {
-        Task NotificarNuevaPuja(int subastaUd, decimal monto, int compradorId, DateTime fechafin, bool tiempoExtendido,CancellationToken cancellationToken);
+        Task NotificarNuevaPuja(int subastaId, decimal monto, int compradorId, DateTime fechafin, bool tiempoExtendido,CancellationToken cancellationToken);
 
     }
 }

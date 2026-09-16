@@ -35,7 +35,7 @@ namespace Application.UseCases.Subasta.Handler
             }
         }
 
-        private async Task FinalizarSubasta(Domain.Entities.Auction subasta,DateTime fechaActual ,CancellationToken cancellationToken)
+        private async Task FinalizarSubasta(Auction subasta,DateTime fechaActual ,CancellationToken cancellationToken)
         {
             await _unidadTrabajo.EjecutarEnTransaccionAsync(async () =>
             {
