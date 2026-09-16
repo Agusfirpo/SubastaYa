@@ -1,8 +1,6 @@
 # 🔨 AuctionNow - Plataforma de Subastas en Tiempo Real
 
-AuctionNow es una aplicación web de subastas desarrollada para la materia **Proyecto de Software**.
-
-El sistema permite crear subastas, realizar pujas, administrar una billetera virtual, aplicar reglas de anti-sniping y actualizar la sala de subasta en tiempo real.
+AuctionNow es una aplicación web de subastas que permite crear subastas, realizar pujas, administrar una billetera virtual, aplicar reglas de anti-sniping y actualizar la sala de subasta en tiempo real.
 
 ---
 
