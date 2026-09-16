@@ -97,4 +97,14 @@ app.MapControllers();
 app.MapHub<AuctionHub>("/hubs/auctionHub");
 app.MapHub<AuctionHub>("/hubs/subastas");
 
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+
+    var context = scope.ServiceProvider
+        .GetRequiredService<AppDbContext>();
+
+    await VolumeTestSeeder.SeedAsync(context);
+}
+
 app.Run();
