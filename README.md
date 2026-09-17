@@ -121,7 +121,6 @@ Marcar subastas sin ofertas como Desierta
 Liquidar fondos entre comprador y vendedor
 Registrar auditoría
 
-
 📡 SignalR
 SignalR permite actualizar en tiempo real:
 
