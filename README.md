@@ -43,7 +43,7 @@ AuctionNow
 │
 ├── AuctionNow.sln
 └── README.md
-
+```
 🚀 Ejecución
 
 1. Configurar Base de Datos
